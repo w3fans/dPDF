@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Run bounded Windows installer packaging under the current PowerShell host so required hashing commands resolve consistently.
+
 - Preserve immutable Windows builds and packaging diagnostics before installer qualification; recover an existing tag from a passed exact-source native cache without recompiling, retagging or overwriting release assets.
 
 ## 0.1.54 - 2026-11-08 - Development preview
