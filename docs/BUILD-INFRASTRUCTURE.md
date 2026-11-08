@@ -15,6 +15,23 @@ publication. Public repositories retain useful independent hosted validation.
 | Release page | Lightweight Ubuntu publisher | Existing authenticated local publisher and user timer |
 | Windows ref resolution and queued receipts | Ubuntu even when every worker was skipped | Skipped with private Windows workers; retained for public validation |
 
+## Public repository publication
+
+The public repository uses `release.yml` for release notes and the Windows
+installer workflow for native preview packaging and qualified asset uploads.
+The competing local release-page timer is disabled after successful public
+Actions readback. Its existing helper remains available for reviewed recovery;
+select one page publisher before using it.
+
+Fedora 44/45 source builds continue through the existing local COPR operator,
+with persistent build IDs and exact-source attachment receipts. The hosted COPR
+submitter remains off, preventing duplicate builds and credential transfers.
+Public hosted Linux and Windows validation is independent of controlled desktop
+and physical-printer acceptance. Skipped jobs are never passing test evidence.
+
+The local-recovery instructions below describe the private/fallback lane;
+they do not require disabling the selected public release workflow.
+
 ## Preserved build and release controls
 
 The release host remains the source/release authority. Its installed Cargo wrapper delegates
