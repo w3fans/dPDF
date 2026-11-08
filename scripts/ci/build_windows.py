@@ -3,6 +3,8 @@ import argparse
 import json
 import os
 from pathlib import Path
+import hashlib
+import re
 import shutil
 import subprocess
 import tempfile
@@ -11,12 +13,44 @@ import artifact_cache
 import validate_windows
 
 
+def reuse_hosted(source, commit, report, target, artifacts):
+    """Recover exact cached bytes; never compile or infer controlled acceptance."""
+    identity = report.get('artifact_identity', {})
+    checks = report.get('checks', [])
+    required = {'ci-contract', 'powershell-syntax'} | {
+        name for name, _, _ in validate_windows.plan(source, 'binary', 'pdfium', 'qpdf', 'service')}
+    if report.get('status') != 'PASS' or report.get('lane') != 'hosted' \
+            or report.get('source_commit') != commit or identity.get('source_commit') != commit \
+            or identity.get('target') != 'x86_64-pc-windows-msvc' or identity.get('profile') != 'release' \
+            or not checks or any(c.get('status') != 'PASS' for c in checks) \
+            or not required.issubset({c.get('name') for c in checks}) \
+            or len({c.get('name') for c in checks}) != len(checks):
+        raise ValueError('Exact-source complete hosted validation is required; no rebuild')
+    if identity.get('adapter_sha256') != artifact_cache.digest(source / 'build.ps1') \
+            or identity.get('compiler_sha256') != hashlib.sha256(report['compiler'].encode()).hexdigest() \
+            or identity.get('cargo_sha256') != hashlib.sha256(report['toolchain'].encode()).hexdigest():
+        raise ValueError('Build provenance differs from the validated source/toolchain')
+    expected = report.get('binary_sha256', '')
+    if not re.fullmatch(r'[a-f0-9]{64}', expected):
+        raise ValueError('Missing validated binary hash')
+    candidates = [target / 'release/dpdf.exe', target / 'x86_64-pc-windows-msvc/release/dpdf.exe']
+    matches = [p for p in candidates if p.is_file() and not p.is_symlink()
+               and artifact_cache.digest(p) == expected]
+    if len(matches) != 1:
+        raise ValueError('Validated binary unavailable or changed in cache; no rebuild')
+    binary = artifact_cache.store(artifacts, identity, matches[0])
+    return binary, dict(identity=identity, binary_sha256=expected, artifact_reused=True,
+                        scope='build_identity_only', hosted_validation_run=report.get('run_url'))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, default=Path('.'))
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--acceptance-report', type=Path,
                         help='Private packaging requires the exact passed controlled native report')
+    parser.add_argument('--reuse-report', type=Path, help='Passed hosted report for packaging-only recovery')
+    parser.add_argument('--reuse-target', type=Path, help='Exact native target cache; never rebuilt in recovery')
     args = parser.parse_args()
     if os.name != 'nt':
         raise RuntimeError('Native Windows is required; no hosted fallback')
@@ -26,6 +60,19 @@ def main():
     commit = validate_windows.git(source, 'rev-parse', 'HEAD')
     if validate_windows.git(source, 'status', '--porcelain', '--untracked-files=all'):
         raise RuntimeError('Build source must be clean')
+    if args.reuse_report or args.reuse_target:
+        if not (args.reuse_report and args.reuse_target) or args.acceptance_report:
+            parser.error('Hosted recovery requires report and cache; it is not controlled native acceptance')
+        artifacts = Path(os.environ.get('RUNNER_TEMP') or tempfile.gettempdir()) / 'native-artifacts'
+        binary, record = reuse_hosted(source, commit, json.loads(args.reuse_report.read_text()),
+                                      args.reuse_target.resolve(), artifacts)
+        (output / 'build-provenance.json').write_text(json.dumps(record, indent=2) + '\n')
+        (output / 'artifact-path.txt').write_text(str(binary) + '\n')
+        if os.environ.get('GITHUB_ENV'):
+            with Path(os.environ['GITHUB_ENV']).open('a', encoding='utf-8') as stream:
+                stream.write(f'DPDF_VERIFIED_BINARY={binary}\n')
+        print(json.dumps(record, indent=2))
+        return 0
     cache = Path(os.environ.get('DPDF_CI_ROOT') or os.environ.get('RUNNER_TEMP') or tempfile.gettempdir())
     target = cache / 'dpdf-msvc-target'
     artifacts = Path(os.environ.get('DPDF_NATIVE_ARTIFACT_ROOT') or cache)

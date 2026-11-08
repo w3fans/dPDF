@@ -5,6 +5,8 @@ import tempfile
 import unittest
 
 import artifact_cache as cache
+import build_windows
+import copy
 
 
 class Artifacts(unittest.TestCase):
@@ -16,6 +18,50 @@ class Artifacts(unittest.TestCase):
         self.identity = cache.identity('a' * 40, 'compiler', 'cargo', self.env)
         self.original = self.root / 'compiled.exe'
         self.original.write_bytes(b'controlled artifact fixture')
+
+    def hosted_fixture(self):
+        source = self.root / 'source'
+        source.mkdir()
+        (source / 'build.ps1').write_text('# synthetic adapter')
+        identity = cache.identity('a' * 40, 'compiler', 'cargo', self.env,
+                                  cache.digest(source / 'build.ps1'))
+        target = self.root / 'target'
+        binary = target / 'release/dpdf.exe'
+        binary.parent.mkdir(parents=True)
+        binary.write_bytes(self.original.read_bytes())
+        names = {'ci-contract', 'powershell-syntax'} | {
+            name for name, _, _ in build_windows.validate_windows.plan(
+                source, 'binary', 'pdfium', 'qpdf', 'service')}
+        report = dict(status='PASS', lane='hosted', source_commit='a' * 40,
+                      compiler='compiler', toolchain='cargo', artifact_identity=identity,
+                      binary_sha256=cache.digest(binary),
+                      checks=[dict(name=name, status='PASS') for name in sorted(names)])
+        return source, target, binary, report
+
+    def test_hosted_recovery_requires_exact_passed_source_and_bytes(self):
+        source, target, binary, report = self.hosted_fixture()
+        snapshot, record = build_windows.reuse_hosted(source, 'a' * 40, report, target, self.root / 'cache')
+        self.assertEqual(snapshot.read_bytes(), binary.read_bytes())
+        self.assertTrue(record['artifact_reused'])
+        self.assertNotIn('native_acceptance', record)
+        for key, value in [('status', 'FAIL'), ('source_commit', 'b' * 40), ('lane', 'desktop')]:
+            changed = copy.deepcopy(report)
+            changed[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                build_windows.reuse_hosted(source, 'a' * 40, changed, target, self.root / 'cache')
+        binary.write_bytes(b'tampered cache')
+        with self.assertRaisesRegex(ValueError, 'no rebuild'):
+            build_windows.reuse_hosted(source, 'a' * 40, report, target, self.root / 'cache')
+
+    def test_hosted_recovery_rejects_missing_checks_or_changed_adapter(self):
+        source, target, binary, report = self.hosted_fixture()
+        changed = copy.deepcopy(report)
+        changed['checks'].pop()
+        with self.assertRaises(ValueError):
+            build_windows.reuse_hosted(source, 'a' * 40, changed, target, self.root / 'cache')
+        (source / 'build.ps1').write_text('# changed adapter')
+        with self.assertRaisesRegex(ValueError, 'provenance'):
+            build_windows.reuse_hosted(source, 'a' * 40, report, target, self.root / 'cache')
 
     def test_immutable_snapshot_survives_later_target_builds(self):
         snapshot = cache.store(self.root, self.identity, self.original)
