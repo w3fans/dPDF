@@ -109,7 +109,10 @@ jobs:
       - name: Package and test the exact binary within native resource limits
         shell: pwsh
         run: |
-          python scripts/ci/limited_windows.py --source . --log "$env:RUNNER_TEMP/dpdf-package.log" --timeout 2700 -- powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File packaging/windows/package-preview.ps1 -BinaryPath "$env:DPDF_VERIFIED_BINARY" -Version '${{ steps.version.outputs.version }}' -WorkDirectory "$env:RUNNER_TEMP"
+          $packagingHost = Join-Path $PSHOME 'pwsh.exe'
+          if (!(Test-Path -LiteralPath $packagingHost -PathType Leaf)) { throw 'Current PowerShell host unavailable' }
+          Get-Command Get-FileHash -ErrorAction Stop | Out-Null
+          python scripts/ci/limited_windows.py --source . --log "$env:RUNNER_TEMP/dpdf-package.log" --timeout 2700 -- "$packagingHost" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File packaging/windows/package-preview.ps1 -BinaryPath "$env:DPDF_VERIFIED_BINARY" -Version '${{ steps.version.outputs.version }}' -WorkDirectory "$env:RUNNER_TEMP"
           if ($LASTEXITCODE -ne 0) {
             $code = $LASTEXITCODE
             Get-Content -LiteralPath "$env:RUNNER_TEMP/dpdf-package.log" -Tail 120 -ErrorAction Continue
