@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Preserve immutable Windows builds and packaging diagnostics before installer qualification; recover an existing tag from a passed exact-source native cache without recompiling, retagging or overwriting release assets.
+
 ## 0.1.54 - 2026-11-08 - Development preview
 
 - Continue the development preview in the clean public source repository, preserving product version progression and license notices; keep hosted validation separate from manually authorized native desktop workers.

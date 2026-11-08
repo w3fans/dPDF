@@ -13,8 +13,12 @@ on:
   workflow_dispatch:
     inputs:
       release_ref:
-        description: 'vMAJOR.MINOR.PATCH tag to package (artifacts only; no release upload)'
+        description: 'Existing vMAJOR.MINOR.PATCH tag to package and publish after qualification'
         required: true
+      native_run_id:
+        description: 'Optional successful exact-source hosted validation run; package its cached binary without rebuilding'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -30,10 +34,21 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: read
+      actions: read
+    defaults:
+      run:
+        working-directory: source
     steps:
+      - name: Checkout maintained packaging harness
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          path: harness
+          persist-credentials: false
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.release_ref || github.ref }}
+          path: source
           persist-credentials: false
           fetch-depth: 0
       - name: Resolve version
@@ -47,16 +62,67 @@ jobs:
           $ref = $env:REQUESTED_RELEASE_REF
           if ($ref.StartsWith('v') -and $ref -ne "v$version") { throw "Ref $ref does not match package version $version" }
           "version=$version" >> $env:GITHUB_OUTPUT
+          "commit=$(git rev-parse HEAD)" >> $env:GITHUB_OUTPUT
+      - name: Restore exact validated native target
+        id: native-cache
+        if: inputs.native_run_id != ''
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25
+        with:
+          path: ${{ runner.temp }}/dpdf-msvc-target
+          key: dpdf-msvc-v1-${{ hashFiles('source/Cargo.lock') }}-${{ steps.version.outputs.commit }}
+      - name: Recover passed exact-source native build without compilation
+        if: inputs.native_run_id != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NATIVE_RUN_ID: ${{ inputs.native_run_id }}
+          CACHE_HIT: ${{ steps.native-cache.outputs.cache-hit }}
+        run: |
+          if ($env:NATIVE_RUN_ID -notmatch '^[0-9]+$' -or $env:CACHE_HIT -ne 'true') { throw 'PENDING: exact native cache/run required; no rebuild' }
+          $run = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:NATIVE_RUN_ID" | ConvertFrom-Json
+          $commit = git rev-parse HEAD
+          if ($LASTEXITCODE -ne 0 -or $run.head_sha -ne $commit -or $run.conclusion -ne 'success' -or $run.path -ne '.github/workflows/windows-validation.yml' -or $run.head_branch -ne 'main' -or $run.event -ne 'push') { throw 'Unapproved or incomplete native source/run' }
+          $report = Join-Path $env:RUNNER_TEMP 'recovered-native-report'
+          gh run download $env:NATIVE_RUN_ID --repo $env:GITHUB_REPOSITORY --name "windows-hosted-$env:NATIVE_RUN_ID-$($run.run_attempt)" --dir $report
+          if ($LASTEXITCODE -ne 0) { throw 'Native report download failed' }
+          python ../harness/scripts/ci/build_windows.py --source . --output "$env:RUNNER_TEMP/dpdf-native-build" --reuse-report "$report/report.json" --reuse-target "$env:RUNNER_TEMP/dpdf-msvc-target"
+          if ($LASTEXITCODE -ne 0) { throw 'Exact validated artifact recovery failed; no rebuild' }
       - name: Build optimized executable
+        if: inputs.native_run_id == ''
         shell: pwsh
         run: |
-          python scripts/ci/build_windows.py --source . --output "$env:RUNNER_TEMP/dpdf-native-build"
+          python ../harness/scripts/ci/build_windows.py --source . --output "$env:RUNNER_TEMP/dpdf-native-build"
           if ($LASTEXITCODE -ne 0) { throw "Native build/provenance verification failed ($LASTEXITCODE)" }
+      - name: Retain immutable build before packaging
+        shell: pwsh
+        run: |
+          $saved = Join-Path $env:RUNNER_TEMP 'native-release-artifact'
+          New-Item -ItemType Directory -Force -Path $saved | Out-Null
+          Copy-Item -LiteralPath $env:DPDF_VERIFIED_BINARY -Destination (Join-Path $saved 'dpdf.exe')
+          Copy-Item -LiteralPath "$env:RUNNER_TEMP/dpdf-native-build/build-provenance.json" -Destination $saved
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: native-${{ steps.version.outputs.commit }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/native-release-artifact
+          if-no-files-found: error
+          retention-days: 30
       - name: Package and test the exact binary within native resource limits
         shell: pwsh
         run: |
           python scripts/ci/limited_windows.py --source . --log "$env:RUNNER_TEMP/dpdf-package.log" --timeout 2700 -- powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File packaging/windows/package-preview.ps1 -BinaryPath "$env:DPDF_VERIFIED_BINARY" -Version '${{ steps.version.outputs.version }}' -WorkDirectory "$env:RUNNER_TEMP"
-          if ($LASTEXITCODE -ne 0) { throw "Bounded installer qualification failed ($LASTEXITCODE)" }
+          if ($LASTEXITCODE -ne 0) {
+            $code = $LASTEXITCODE
+            Get-Content -LiteralPath "$env:RUNNER_TEMP/dpdf-package.log" -Tail 120 -ErrorAction Continue
+            throw "Bounded installer qualification failed ($code)"
+          }
+      - name: Retain packaging diagnostics
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: packaging-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dpdf-package.log
+          if-no-files-found: ignore
+          retention-days: 14
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: dpdf-windows-${{ steps.version.outputs.version }}
@@ -66,13 +132,17 @@ jobs:
 
   publish:
     # Only tag pushes attach files to the release created by release.yml.
-    if: ${{ !github.event.repository.private && (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
+    if: ${{ !github.event.repository.private && ((github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || (github.event_name == 'workflow_dispatch' && startsWith(inputs.release_ref, 'v'))) }}
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ inputs.release_ref || github.ref }}
+          persist-credentials: false
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
           pattern: dpdf-windows-*
@@ -81,7 +151,7 @@ jobs:
       - name: Attach to the development-preview release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ inputs.release_ref || github.ref_name }}
         shell: bash
         run: |
           set -euo pipefail
@@ -91,7 +161,14 @@ jobs:
             [ "$attempt" -eq 30 ] && { echo "Release $RELEASE_TAG was not created by the preview publisher" >&2; exit 1; }
             sleep 20
           done
-          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --clobber dist/*
+          python3 - <<'PYCODE'
+          import os,pathlib,runpy,subprocess,sys
+          sys.path.insert(0,'scripts')
+          publisher=runpy.run_path('scripts/publish-copr.py')
+          commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          publisher['attach_verified_assets'](os.environ['RELEASE_TAG'],commit,
+              sorted(p for p in pathlib.Path('dist').iterdir() if p.is_file()))
+          PYCODE
 
   report:
     # SSH-only maintainers read the outcome from a report-only branch, like the
