@@ -1,6 +1,6 @@
 [package]
 name = "dpdf"
-version = "0.1.53"
+version = "0.1.54"
 edition = "2024"
 description = "A compact native PDF workspace"
 license = "Apache-2.0"

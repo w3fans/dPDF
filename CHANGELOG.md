@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.54 - 2026-11-08 - Development preview
+
 - Continue the development preview in the clean public source repository, preserving product version progression and license notices; keep hosted validation separate from manually authorized native desktop workers.
 
 - Resume existing preview delivery through the authenticated local publisher, retain exact-tag receipts, expose delivery status and recovery commands, and hand off pushed tags to the existing publication timers without hosted jobs or new versions.

@@ -5,7 +5,7 @@
 A compact native PDF workspace for Fedora Linux and Windows. Rust core, Slint UI,
 PDFium rendering, and qpdf page assembly. No Electron.
 
-**Current version: 0.1.53 — reader development preview.** v0.2.0 is reserved for
+**Current version: 0.1.54 — reader development preview.** v0.2.0 is reserved for
 the first stable reader milestone after Fedora and Windows acceptance, including
 printing. The preview is not the completed v0.2.0 milestone.
 
