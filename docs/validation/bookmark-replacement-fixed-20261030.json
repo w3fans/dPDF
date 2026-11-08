@@ -1,0 +1,22 @@
+{
+  "scope": "generated_contract_scan_replacement_outline",
+  "source": "v0.1.37 plus bookmark-preservation candidate",
+  "binary_sha256": "492620750149bf6a0f8706fcf663864d1817f8b0b192f04ac211c30d448194fc",
+  "input_sha256": "76bd93e521e1fc585b0251555f29f3e7acb09954251a57866c9f5eb47a873cfa",
+  "output_sha256": "df3373b747252d176c45f463e28c4f2e8c6f906bdf7cb9b3f6cb11b75c1e3338",
+  "pages": 10,
+  "outline_targets": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "input_unchanged": true,
+  "result": "PASS"
+}

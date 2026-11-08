@@ -1,0 +1,11 @@
+{
+  "scope": "generated_asset_metadata_delayed_lock_release",
+  "binary_sha256": "54bed2394dd463e20d0a0d5c09b8749fa92327d24cff8fb9f628dbb84ccd4c23",
+  "lock_held_seconds": 1.3,
+  "exit_before_release": 1,
+  "exit_code": 1,
+  "elapsed_seconds": 1.385,
+  "metadata_unchanged": true,
+  "stderr": "Error: Asset metadata is locked or unavailable: lock acquisition failed because the operation would block",
+  "result": "PREMATURE_TIMEOUT"
+}

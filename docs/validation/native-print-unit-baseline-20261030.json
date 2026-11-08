@@ -1,0 +1,23 @@
+{
+  "scope": "generated_native_physical_unit_print_baseline",
+  "source_commit": "b41d9d31f460c2f3004f83bf8f7725d0c1faa2e6",
+  "binary_version": "dPDF 0.1.34 (reader development preview)",
+  "binary_sha256": "f147a3b8055c53c408e58133db581dceb0eb55c99c2780b858a6a0118a34f8cb",
+  "fixture_sha256": "ed2d2d074cb95a00ea7e19ac307c11dd56edf1c18a4754578e5780dad7f4ae9f",
+  "backend": "native GTK file-only",
+  "user_unit": 2,
+  "expected_physical_points": [
+    612,
+    792
+  ],
+  "observed_source_points": [
+    306,
+    396
+  ],
+  "observed_draw_points": [
+    306,
+    396
+  ],
+  "result": "EXPECTED_FAILURE",
+  "hardware_printers_used": false
+}

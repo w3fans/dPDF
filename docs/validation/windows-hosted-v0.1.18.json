@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "reports": [
+    {
+      "lane": "hosted",
+      "source_ref": "v0.1.18",
+      "source_commit": "9c21d858a712475299bdbeff70b7949c0e27583a",
+      "status": "PASS",
+      "run_url": "https://github.com/w3fans/dPDF/actions/runs/40914877718",
+      "desktop_context": {
+        "session_id": 2,
+        "station_visible": true,
+        "input_desktop_accessible": true
+      },
+      "checks": [
+        {
+          "name": "ci-contract",
+          "status": "PASS"
+        },
+        {
+          "name": "powershell-syntax",
+          "status": "PASS"
+        },
+        {
+          "name": "build",
+          "status": "PASS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "PASS"
+        },
+        {
+          "name": "clippy",
+          "status": "PASS"
+        },
+        {
+          "name": "format",
+          "status": "PASS"
+        },
+        {
+          "name": "reader",
+          "status": "PASS"
+        },
+        {
+          "name": "pages",
+          "status": "PASS"
+        },
+        {
+          "name": "marks",
+          "status": "PASS"
+        },
+        {
+          "name": "overlays",
+          "status": "PASS"
+        },
+        {
+          "name": "review",
+          "status": "PASS"
+        },
+        {
+          "name": "aliases",
+          "status": "PASS"
+        },
+        {
+          "name": "geometry",
+          "status": "PASS"
+        },
+        {
+          "name": "staged-reader",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "lane": "desktop",
+      "source_ref": "v0.1.18",
+      "source_commit": "9c21d858a712475299bdbeff70b7949c0e27583a",
+      "status": "PASS",
+      "run_url": "https://github.com/w3fans/dPDF/actions/runs/40914877718",
+      "desktop_context": {
+        "session_id": 2,
+        "station_visible": true,
+        "input_desktop_accessible": true
+      },
+      "checks": [
+        {
+          "name": "ci-contract",
+          "status": "PASS"
+        },
+        {
+          "name": "powershell-syntax",
+          "status": "PASS"
+        },
+        {
+          "name": "build",
+          "status": "PASS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "PASS"
+        },
+        {
+          "name": "clippy",
+          "status": "PASS"
+        },
+        {
+          "name": "format",
+          "status": "PASS"
+        },
+        {
+          "name": "reader",
+          "status": "PASS"
+        },
+        {
+          "name": "pages",
+          "status": "PASS"
+        },
+        {
+          "name": "marks",
+          "status": "PASS"
+        },
+        {
+          "name": "overlays",
+          "status": "PASS"
+        },
+        {
+          "name": "review",
+          "status": "PASS"
+        },
+        {
+          "name": "aliases",
+          "status": "PASS"
+        },
+        {
+          "name": "geometry",
+          "status": "PASS"
+        },
+        {
+          "name": "staged-reader",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-placement-1",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-image-1",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-placement-1-5",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-image-1-5",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-placement-2",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-image-2",
+          "status": "PASS"
+        },
+        {
+          "name": "about",
+          "status": "PASS"
+        },
+        {
+          "name": "review-ui",
+          "status": "PASS"
+        },
+        {
+          "name": "passwords",
+          "status": "PASS"
+        },
+        {
+          "name": "recovery",
+          "status": "PASS"
+        },
+        {
+          "name": "windows-print",
+          "status": "PASS"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>dPDF</title>
+  <defs>
+    <linearGradient id="page" x1="0" y1="16" x2="0" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e3ebf6"/>
+    </linearGradient>
+    <!-- User-space units so the straight stem receives the gradient too. -->
+    <linearGradient id="mono" x1="84" y1="56" x2="172" y2="184" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#4b93e6"/>
+      <stop offset="1" stop-color="#2353b0"/>
+    </linearGradient>
+  </defs>
+  <!-- Page with a folded corner -->
+  <path d="M56 16H170L220 66V224a16 16 0 0 1-16 16H56a16 16 0 0 1-16-16V32a16 16 0 0 1 16-16Z"
+        fill="url(#page)" stroke="#2c4a73" stroke-width="10" stroke-linejoin="round"/>
+  <path d="M170 16V54a12 12 0 0 0 12 12H220Z"
+        fill="#c4d3e8" stroke="#2c4a73" stroke-width="10" stroke-linejoin="round"/>
+  <!-- "d" monogram -->
+  <circle cx="114" cy="136" r="36" fill="none" stroke="url(#mono)" stroke-width="26"/>
+  <path d="M150 62V172" fill="none" stroke="url(#mono)" stroke-width="26" stroke-linecap="round"/>
+  <!-- Signature stroke -->
+  <path d="M68 206c10-12 20-14 24-4s12 8 22-2 18-6 22 2 24 4 50-10"
+        fill="none" stroke="#e0890b" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

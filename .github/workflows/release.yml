@@ -1,0 +1,55 @@
+name: Publish development preview
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dpdf-release-publisher
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Verify release files and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/release-version.py verify --tag "$RELEASE_TAG"
+          notes="docs/releases/$RELEASE_TAG.md"
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag \
+              --prerelease --title "dPDF $RELEASE_TAG — development preview" --notes-file "$notes"
+          fi
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --json databaseId,tagName,url,isPrerelease,isDraft > "$RUNNER_TEMP/dpdf-release.json"
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess
+          path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'dpdf-release.json'
+          receipt = json.loads(path.read_text())
+          assert receipt['tagName'] == os.environ['RELEASE_TAG']
+          assert receipt['isPrerelease'] and not receipt['isDraft']
+          receipt['source_commit'] = subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          path.write_text(json.dumps(receipt,indent=2)+'\n')
+          PY
+          # SSH-only maintainers can verify publication through this small Git receipt.
+          if git ls-remote --exit-code origin refs/notes/dpdf-releases >/dev/null 2>&1; then
+            git fetch origin refs/notes/dpdf-releases:refs/notes/dpdf-releases
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if ! git notes --ref=dpdf-releases show HEAD >/dev/null 2>&1; then
+            git notes --ref=dpdf-releases add --file "$RUNNER_TEMP/dpdf-release.json" HEAD
+          fi
+          git push origin refs/notes/dpdf-releases

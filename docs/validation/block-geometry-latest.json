@@ -1,0 +1,1721 @@
+{
+  "schema": 1,
+  "poppler_version": "pdftoppm version 26.01.0",
+  "driver_sha256": "530fd5c6ea1641aa858aa2142fc27beb355981ceee83da185b9745f63a4453cb",
+  "scope": "generated_block_geometry_only",
+  "qualified_for_secure_export": false,
+  "dPDF_secure_export_enabled": false,
+  "recorded_at": "2026-10-29T22:45:27.231320+00:00",
+  "expected_cases": 32,
+  "cases": [
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 3.5165413279132793,
+      "poppler_350dpi_mean_abs_error": 2.3239695753268403,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.5333,
+          0.475,
+          0.2667
+        ],
+        "effective_pdf_region": [
+          90.0,
+          59.99998474121094,
+          280.0,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          190.0,
+          0.0,
+          0.0,
+          80.010009765625,
+          90.0,
+          59.99998474121094
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          80.00999999999999
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 1.7913297628274087,
+      "poppler_350dpi_mean_abs_error": 2.832501608610453,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2,
+          0.225,
+          0.2667,
+          0.475
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.000003814697266,
+          280.0,
+          140.010009765625
+        ],
+        "image_matrix": [
+          0.0,
+          80.01000595092773,
+          -190.0,
+          0.0,
+          280.0,
+          60.000003814697266
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          80.00999999999999,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 2.154926421915576,
+      "poppler_350dpi_mean_abs_error": 2.34353978386125,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.3,
+          0.2,
+          0.475,
+          0.2667
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.000003814697266,
+          280.0,
+          140.010009765625
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -80.01000595092773,
+          280.0,
+          140.010009765625
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          80.00999999999999
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 2.8223403393908546,
+      "poppler_350dpi_mean_abs_error": 2.5688339036588577,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.5333,
+          0.3,
+          0.2667,
+          0.475
+        ],
+        "effective_pdf_region": [
+          90.0,
+          59.99998474121094,
+          280.0,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          0.0,
+          -80.010009765625,
+          190.0,
+          0.0,
+          90.0,
+          140.00999450683594
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          80.00999999999999,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 3.5165413279132793,
+      "poppler_350dpi_mean_abs_error": 2.3239695753268403,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.5333,
+          0.475,
+          0.2667
+        ],
+        "effective_pdf_region": [
+          90.0,
+          59.99998474121094,
+          280.0,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          190.0,
+          0.0,
+          0.0,
+          80.010009765625,
+          90.0,
+          59.99998474121094
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          80.00999999999999
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 1.7913297628274087,
+      "poppler_350dpi_mean_abs_error": 2.832501608610453,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2,
+          0.225,
+          0.2667,
+          0.475
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.000003814697266,
+          280.0,
+          140.010009765625
+        ],
+        "image_matrix": [
+          0.0,
+          80.01000595092773,
+          -190.0,
+          0.0,
+          280.0,
+          60.000003814697266
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          80.00999999999999,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 2.154926421915576,
+      "poppler_350dpi_mean_abs_error": 2.34353978386125,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.3,
+          0.2,
+          0.475,
+          0.2667
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.000003814697266,
+          280.0,
+          140.010009765625
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -80.01000595092773,
+          280.0,
+          140.010009765625
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          80.00999999999999
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 2.8223403393908546,
+      "poppler_350dpi_mean_abs_error": 2.5688339036588577,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.5333,
+          0.3,
+          0.2667,
+          0.475
+        ],
+        "effective_pdf_region": [
+          90.0,
+          59.99998474121094,
+          280.0,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          0.0,
+          -80.010009765625,
+          190.0,
+          0.0,
+          90.0,
+          140.00999450683594
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          80.00999999999999,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 2.1972547519240577,
+      "poppler_350dpi_mean_abs_error": 2.670921273307696,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.1944,
+          0.5385,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          89.98400115966797,
+          59.98799133300781,
+          279.99200439453125,
+          139.989990234375
+        ],
+        "image_matrix": [
+          190.00800323486328,
+          0.0,
+          0.0,
+          80.00199890136719,
+          89.98400115966797,
+          59.98799133300781
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 1.8087272515843944,
+      "poppler_350dpi_mean_abs_error": 2.614944374449303,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.1538,
+          0.1944,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          89.9840087890625,
+          59.987998962402344,
+          279.99200439453125,
+          139.99000549316406
+        ],
+        "image_matrix": [
+          0.0,
+          80.00200653076172,
+          -190.00799560546875,
+          0.0,
+          279.99200439453125,
+          59.987998962402344
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 2.3590031494665866,
+      "poppler_350dpi_mean_abs_error": 2.3022115719810823,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2778,
+          0.1538,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          89.9840087890625,
+          59.988014221191406,
+          279.9920349121094,
+          139.99002075195312
+        ],
+        "image_matrix": [
+          -190.00802612304688,
+          0.0,
+          0.0,
+          -80.00200653076172,
+          279.9920349121094,
+          139.99002075195312
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 1.8877231234374092,
+      "poppler_350dpi_mean_abs_error": 3.0744409767112897,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.5385,
+          0.2778,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          89.9840087890625,
+          59.98799133300781,
+          279.9920349121094,
+          139.989990234375
+        ],
+        "image_matrix": [
+          0.0,
+          -80.00199890136719,
+          190.00802612304688,
+          0.0,
+          89.9840087890625,
+          139.989990234375
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 2.1972547519240577,
+      "poppler_350dpi_mean_abs_error": 2.670921273307696,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.1944,
+          0.5385,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          89.98400115966797,
+          59.98799133300781,
+          279.99200439453125,
+          139.989990234375
+        ],
+        "image_matrix": [
+          190.00800323486328,
+          0.0,
+          0.0,
+          80.00199890136719,
+          89.98400115966797,
+          59.98799133300781
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 1.8087272515843944,
+      "poppler_350dpi_mean_abs_error": 2.614944374449303,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.1538,
+          0.1944,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          89.9840087890625,
+          59.987998962402344,
+          279.99200439453125,
+          139.99000549316406
+        ],
+        "image_matrix": [
+          0.0,
+          80.00200653076172,
+          -190.00799560546875,
+          0.0,
+          279.99200439453125,
+          59.987998962402344
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 2.3590031494665866,
+      "poppler_350dpi_mean_abs_error": 2.3022115719810823,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2778,
+          0.1538,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          89.9840087890625,
+          59.988014221191406,
+          279.9920349121094,
+          139.99002075195312
+        ],
+        "image_matrix": [
+          -190.00802612304688,
+          0.0,
+          0.0,
+          -80.00200653076172,
+          279.9920349121094,
+          139.99002075195312
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": false,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 1.8877231234374092,
+      "poppler_350dpi_mean_abs_error": 3.0744409767112897,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.5385,
+          0.2778,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          89.9840087890625,
+          59.98799133300781,
+          279.9920349121094,
+          139.989990234375
+        ],
+        "image_matrix": [
+          0.0,
+          -80.00199890136719,
+          190.00802612304688,
+          0.0,
+          89.9840087890625,
+          139.989990234375
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 1.5799609887868473,
+      "poppler_350dpi_mean_abs_error": 2.6722227706121493,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.3,
+          0.4667,
+          0.475,
+          0.2666
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.00999450683594,
+          280.0,
+          139.989990234375
+        ],
+        "image_matrix": [
+          190.0,
+          0.0,
+          0.0,
+          79.97999572753906,
+          90.0,
+          60.00999450683594
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.98
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 2.3949322722067348,
+      "poppler_350dpi_mean_abs_error": 2.8073186291714194,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2667,
+          0.3,
+          0.2666,
+          0.475
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.01000213623047,
+          280.0,
+          139.99000549316406
+        ],
+        "image_matrix": [
+          0.0,
+          79.9800033569336,
+          -190.0,
+          0.0,
+          280.0,
+          60.01000213623047
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          79.98,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 3.6813697318007663,
+      "poppler_350dpi_mean_abs_error": 3.2801513921792282,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.2667,
+          0.475,
+          0.2666
+        ],
+        "effective_pdf_region": [
+          89.99996948242188,
+          60.00999069213867,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -79.97999954223633,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.98
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": false,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 2.354351505897504,
+      "poppler_350dpi_mean_abs_error": 3.908760711883244,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.4667,
+          0.225,
+          0.2666,
+          0.475
+        ],
+        "effective_pdf_region": [
+          89.99996948242188,
+          60.00999450683594,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "image_matrix": [
+          0.0,
+          -79.97999572753906,
+          190.0,
+          0.0,
+          89.99996948242188,
+          139.989990234375
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          79.98,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 1.5799609887868473,
+      "poppler_350dpi_mean_abs_error": 2.6722227706121493,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.3,
+          0.4667,
+          0.475,
+          0.2666
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.00999450683594,
+          280.0,
+          139.989990234375
+        ],
+        "image_matrix": [
+          190.0,
+          0.0,
+          0.0,
+          79.97999572753906,
+          90.0,
+          60.00999450683594
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.98
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 2.3949322722067348,
+      "poppler_350dpi_mean_abs_error": 2.8073186291714194,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2667,
+          0.3,
+          0.2666,
+          0.475
+        ],
+        "effective_pdf_region": [
+          90.0,
+          60.01000213623047,
+          280.0,
+          139.99000549316406
+        ],
+        "image_matrix": [
+          0.0,
+          79.9800033569336,
+          -190.0,
+          0.0,
+          280.0,
+          60.01000213623047
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          79.98,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 3.6813697318007663,
+      "poppler_350dpi_mean_abs_error": 3.2801513921792282,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.2667,
+          0.475,
+          0.2666
+        ],
+        "effective_pdf_region": [
+          89.99996948242188,
+          60.00999069213867,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -79.97999954223633,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.98
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": false,
+      "inherited": true,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 2.354351505897504,
+      "poppler_350dpi_mean_abs_error": 3.908760711883244,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.4667,
+          0.225,
+          0.2666,
+          0.475
+        ],
+        "effective_pdf_region": [
+          89.99996948242188,
+          60.00999450683594,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "image_matrix": [
+          0.0,
+          -79.97999572753906,
+          190.0,
+          0.0,
+          89.99996948242188,
+          139.989990234375
+        ],
+        "page_points": [
+          300.0,
+          400.0
+        ],
+        "displayed_block_points": [
+          79.98,
+          190.0
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 2.4329684831547898,
+      "poppler_350dpi_mean_abs_error": 2.6218999700805083,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2778,
+          0.4615,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          90.00800323486328,
+          60.00799560546875,
+          280.0160217285156,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          190.00801849365234,
+          0.0,
+          0.0,
+          80.00199890136719,
+          90.00800323486328,
+          60.00799560546875
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 2.4518184196755626,
+      "poppler_350dpi_mean_abs_error": 2.764579347498886,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2308,
+          0.2778,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          90.00801849365234,
+          60.007999420166016,
+          280.01605224609375,
+          140.010009765625
+        ],
+        "image_matrix": [
+          0.0,
+          80.00201034545898,
+          -190.0080337524414,
+          0.0,
+          280.01605224609375,
+          60.007999420166016
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 2.9965871537250206,
+      "poppler_350dpi_mean_abs_error": 2.360922398719775,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.1944,
+          0.2308,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          90.00802612304688,
+          60.007999420166016,
+          280.0160217285156,
+          140.010009765625
+        ],
+        "image_matrix": [
+          -190.00799560546875,
+          0.0,
+          0.0,
+          -80.00201034545898,
+          280.0160217285156,
+          140.010009765625
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": false,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 2.527708006279435,
+      "poppler_350dpi_mean_abs_error": 3.369392268327519,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.4615,
+          0.1944,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          90.00802612304688,
+          60.00799560546875,
+          280.0160217285156,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          0.0,
+          -80.00199890136719,
+          190.00799560546875,
+          0.0,
+          90.00802612304688,
+          140.00999450683594
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 0,
+      "result": "PASS",
+      "block_mean_abs_error": 2.4329684831547898,
+      "poppler_350dpi_mean_abs_error": 2.6218999700805083,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2778,
+          0.4615,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          90.00800323486328,
+          60.00799560546875,
+          280.0160217285156,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          190.00801849365234,
+          0.0,
+          0.0,
+          80.00199890136719,
+          90.00800323486328,
+          60.00799560546875
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 90,
+      "result": "PASS",
+      "block_mean_abs_error": 2.4518184196755626,
+      "poppler_350dpi_mean_abs_error": 2.764579347498886,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.2308,
+          0.2778,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          90.00801849365234,
+          60.007999420166016,
+          280.01605224609375,
+          140.010009765625
+        ],
+        "image_matrix": [
+          0.0,
+          80.00201034545898,
+          -190.0080337524414,
+          0.0,
+          280.01605224609375,
+          60.007999420166016
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 180,
+      "result": "PASS",
+      "block_mean_abs_error": 2.9965871537250206,
+      "poppler_350dpi_mean_abs_error": 2.360922398719775,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        924,
+        389
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.1944,
+          0.2308,
+          0.5278,
+          0.3077
+        ],
+        "effective_pdf_region": [
+          90.00802612304688,
+          60.007999420166016,
+          280.0160217285156,
+          140.010009765625
+        ],
+        "image_matrix": [
+          -190.00799560546875,
+          0.0,
+          0.0,
+          -80.00201034545898,
+          280.0160217285156,
+          140.010009765625
+        ],
+        "page_points": [
+          360.0,
+          260.0
+        ],
+        "displayed_block_points": [
+          190.008,
+          80.002
+        ]
+      }
+    },
+    {
+      "negative_media": true,
+      "cropped": true,
+      "inherited": true,
+      "rotation": 270,
+      "result": "PASS",
+      "block_mean_abs_error": 2.527708006279435,
+      "poppler_350dpi_mean_abs_error": 3.369392268327519,
+      "removable_combined_object": 1,
+      "removed_objects": 5,
+      "removed_types": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "block_pixels": [
+        389,
+        924
+      ],
+      "nominal_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.4615,
+          0.1944,
+          0.3077,
+          0.5278
+        ],
+        "effective_pdf_region": [
+          90.00802612304688,
+          60.00799560546875,
+          280.0160217285156,
+          140.00999450683594
+        ],
+        "image_matrix": [
+          0.0,
+          -80.00199890136719,
+          190.00799560546875,
+          0.0,
+          90.00802612304688,
+          140.00999450683594
+        ],
+        "page_points": [
+          260.0,
+          360.0
+        ],
+        "displayed_block_points": [
+          80.002,
+          190.008
+        ]
+      }
+    }
+  ],
+  "binary_version": "dPDF 0.1.24 (reader development preview)",
+  "binary_sha256": "6b364cc753e751fe0a6539b5255d2078c1e95aaf6feeac9623f4e02dcdb87780",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "prototype_sha256": "9859e555f97b2a72927079085be7945244e4cbec618d282d72f9a62c3189e761",
+  "unqualified": [
+    "arbitrary documents/catalog/resource reachability",
+    "fractional boxes/UserUnit",
+    "arbitrary clipping/transparency",
+    "tagged/shared content",
+    "production worker/UI",
+    "Windows/editor/physical print acceptance"
+  ],
+  "status": "PASS"
+}

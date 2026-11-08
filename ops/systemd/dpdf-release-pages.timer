@@ -1,0 +1,10 @@
+[Unit]
+Description=Check pending dPDF GitHub release-page publication
+
+[Timer]
+OnBootSec=1min
+OnUnitInactiveSec=1min
+Unit=dpdf-release-pages.service
+
+[Install]
+WantedBy=timers.target

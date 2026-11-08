@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+if [[ -f ops/project.env ]]; then source ops/project.env; fi
+: "${DPDF_CARGO:?Set DPDF_CARGO to the configured remote Cargo wrapper in private ops/project.env}"
+exec "$DPDF_CARGO" build --locked "$@"

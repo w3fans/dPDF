@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "version": "0.1.53",
+  "tag": "v0.1.53",
+  "previous_version": "0.1.52",
+  "channel": "development-preview",
+  "notes": "docs/releases/v0.1.53.md"
+}

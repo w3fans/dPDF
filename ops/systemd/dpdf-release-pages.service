@@ -1,0 +1,20 @@
+[Unit]
+Description=Recover GitHub pages for existing reviewed dPDF preview tags
+After=network-online.target
+
+[Service]
+Type=exec
+EnvironmentFile=%h/.config/dpdf/publication.env
+ExecStart=/usr/bin/python3 %h/.local/lib/dpdf/release_page.py --repository ${DPDF_RELEASE_PAGE_REPOSITORY} --output ${DPDF_PUBLICATION_OUTPUTS}/github-release-pages --privacy-patterns ${DPDF_PRIVACY_PATTERNS} --since v0.1.46 --fetch --apply --asset-publisher %h/.local/lib/dpdf/publish-copr.py --publication-root ${DPDF_PUBLICATION_OUTPUTS} --worktrees ${DPDF_PUBLICATION_WORKTREES} --delivery-checkpoint ${DPDF_PUBLICATION_OUTPUTS}/RELEASE-DELIVERY-CHECKPOINT.json
+CacheDirectory=dpdf/release-page-tmp
+CacheDirectoryMode=0700
+Environment=TMPDIR=%C/dpdf/release-page-tmp
+UMask=0077
+CPUQuota=25%
+MemoryHigh=128M
+MemoryMax=256M
+MemorySwapMax=64M
+IOWeight=10
+Nice=15
+RuntimeMaxSec=45min
+NoNewPrivileges=yes

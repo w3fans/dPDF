@@ -1,0 +1,344 @@
+{
+  "scope": "generated_PDFium_whole_object_removal_probe_only",
+  "dPDF_secure_export_enabled": false,
+  "qualified_for_secure_export": false,
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "cases": [
+    {
+      "name": "contained-text",
+      "region": [
+        90,
+        130,
+        210,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 1,
+          "bounds": [
+            30.43000030517578,
+            239.80999755859375,
+            71.18000030517578,
+            245.8000030517578
+          ],
+          "marks": 0,
+          "intersects": false,
+          "contained": false
+        },
+        {
+          "index": 1,
+          "type": 1,
+          "bounds": [
+            100.72000122070312,
+            149.80999755859375,
+            135.6199951171875,
+            155.8000030517578
+          ],
+          "marks": 0,
+          "intersects": true,
+          "contained": true
+        }
+      ],
+      "selected": 1,
+      "crossing": 0,
+      "action": "removed_whole_objects_only",
+      "search_matches_after": 0,
+      "outside_changed_pixels": 0,
+      "secret_payload_retained": false,
+      "image_resource_retained": false
+    },
+    {
+      "name": "crossing-text",
+      "region": [
+        120,
+        130,
+        180,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 1,
+          "bounds": [
+            30.43000030517578,
+            149.80999755859375,
+            239.17999267578125,
+            155.8000030517578
+          ],
+          "marks": 0,
+          "intersects": true,
+          "contained": false
+        }
+      ],
+      "selected": 0,
+      "crossing": 1,
+      "action": "refused_crossing_object"
+    },
+    {
+      "name": "contained-path",
+      "region": [
+        90,
+        130,
+        210,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 1,
+          "bounds": [
+            30.43000030517578,
+            239.80999755859375,
+            71.18000030517578,
+            245.8000030517578
+          ],
+          "marks": 0,
+          "intersects": false,
+          "contained": false
+        },
+        {
+          "index": 1,
+          "type": 2,
+          "bounds": [
+            99.0,
+            149.0,
+            201.0,
+            151.0
+          ],
+          "marks": 0,
+          "intersects": true,
+          "contained": true
+        }
+      ],
+      "selected": 1,
+      "crossing": 0,
+      "action": "removed_whole_objects_only",
+      "search_matches_after": 0,
+      "outside_changed_pixels": 0,
+      "secret_payload_retained": false,
+      "image_resource_retained": false
+    },
+    {
+      "name": "crossing-path",
+      "region": [
+        90,
+        130,
+        210,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 2,
+          "bounds": [
+            18.0,
+            148.0,
+            382.0,
+            152.0
+          ],
+          "marks": 0,
+          "intersects": true,
+          "contained": false
+        }
+      ],
+      "selected": 0,
+      "crossing": 1,
+      "action": "refused_crossing_object"
+    },
+    {
+      "name": "contained-actualtext",
+      "region": [
+        90,
+        130,
+        230,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 1,
+          "bounds": [
+            100.72000122070312,
+            149.80999755859375,
+            201.6199951171875,
+            155.8000030517578
+          ],
+          "marks": 1,
+          "intersects": true,
+          "contained": true
+        }
+      ],
+      "selected": 1,
+      "crossing": 0,
+      "action": "removed_whole_objects_only",
+      "search_matches_after": 0,
+      "outside_changed_pixels": 0,
+      "secret_payload_retained": false,
+      "image_resource_retained": false
+    },
+    {
+      "name": "shared-actualtext",
+      "region": [
+        90,
+        130,
+        210,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 1,
+          "bounds": [
+            30.43000030517578,
+            239.80999755859375,
+            71.18000030517578,
+            245.8000030517578
+          ],
+          "marks": 1,
+          "intersects": false,
+          "contained": false
+        },
+        {
+          "index": 1,
+          "type": 1,
+          "bounds": [
+            100.72000122070312,
+            149.80999755859375,
+            135.6199951171875,
+            155.8000030517578
+          ],
+          "marks": 1,
+          "intersects": true,
+          "contained": true
+        }
+      ],
+      "selected": 1,
+      "crossing": 0,
+      "action": "removed_whole_objects_only",
+      "search_matches_after": 1,
+      "outside_changed_pixels": 0,
+      "secret_payload_retained": true,
+      "image_resource_retained": false
+    },
+    {
+      "name": "unused-form-resource",
+      "region": [
+        90,
+        125,
+        210,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 5,
+          "bounds": [
+            100.72000122070312,
+            149.80999755859375,
+            135.6199951171875,
+            155.8000030517578
+          ],
+          "marks": 0,
+          "intersects": true,
+          "contained": true
+        }
+      ],
+      "selected": 1,
+      "crossing": 0,
+      "action": "removed_whole_objects_only",
+      "search_matches_after": 0,
+      "outside_changed_pixels": 0,
+      "secret_payload_retained": false,
+      "image_resource_retained": false
+    },
+    {
+      "name": "shared-form-placement",
+      "region": [
+        90,
+        125,
+        210,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 5,
+          "bounds": [
+            100.72000122070312,
+            149.80999755859375,
+            135.6199951171875,
+            155.8000030517578
+          ],
+          "marks": 0,
+          "intersects": true,
+          "contained": true
+        },
+        {
+          "index": 1,
+          "type": 5,
+          "bounds": [
+            100.72000122070312,
+            239.80999755859375,
+            135.6199951171875,
+            245.8000030517578
+          ],
+          "marks": 0,
+          "intersects": false,
+          "contained": false
+        }
+      ],
+      "selected": 1,
+      "crossing": 0,
+      "action": "removed_whole_objects_only",
+      "search_matches_after": 1,
+      "outside_changed_pixels": 0,
+      "secret_payload_retained": true,
+      "image_resource_retained": false
+    },
+    {
+      "name": "unused-image-resource",
+      "region": [
+        90,
+        130,
+        210,
+        175
+      ],
+      "objects": [
+        {
+          "index": 0,
+          "type": 3,
+          "bounds": [
+            100.0,
+            140.0,
+            200.0,
+            170.0
+          ],
+          "marks": 0,
+          "intersects": true,
+          "contained": true
+        }
+      ],
+      "selected": 1,
+      "crossing": 0,
+      "action": "removed_whole_objects_only",
+      "search_matches_after": 0,
+      "outside_changed_pixels": 0,
+      "secret_payload_retained": false,
+      "image_resource_retained": false
+    }
+  ],
+  "blockers": [
+    "shared-actualtext: removed-region text remains searchable through retained metadata/content",
+    "shared-actualtext: live/extractable SECRET payload remains after object removal and qpdf rewrite"
+  ],
+  "unverified": [
+    "partial text/path/image surgery",
+    "nested form mutation and shared resources",
+    "crop/rotation/UserUnit coordinates",
+    "clipping/transparency/soft masks",
+    "tag trees/annotations/forms/review isolation",
+    "raster compositing and final baked-block assembly",
+    "Windows execution and external editor interoperability"
+  ]
+}

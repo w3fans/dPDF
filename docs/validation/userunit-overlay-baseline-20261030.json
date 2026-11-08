@@ -1,0 +1,21 @@
+{
+  "scope": "generated_userunit_overlay_baseline",
+  "source_version": "v0.1.32",
+  "source_commit": "54163eee742c15468683c7efc3f5992fc8447845",
+  "input_sha256": "1230ee552c9bf7198d347936243877f080d195eb78a16fd10a84266cd1ed75c4",
+  "output_sha256": "c49b6e57b49c97059eafa1ffb7fc7c69b63124e7d85d20549ba6e3caa651b86c",
+  "user_unit": 2,
+  "user_unit_preserved": true,
+  "requested_width_mm": 40,
+  "image_matrix": {
+    "a": 113.3860092163086,
+    "b": 0.0,
+    "c": 0.0,
+    "d": 56.69309997558594,
+    "e": -1.6536006927490234,
+    "f": 194.9604949951172
+  },
+  "physical_width_mm_by_pdf_specification": 80.00012872483995,
+  "specification": "https://opensource.adobe.com/dc-acrobat-sdk-docs/pdfstandards/PDF32000_2008.pdf",
+  "result": "PHYSICAL_WIDTH_MISMATCH"
+}

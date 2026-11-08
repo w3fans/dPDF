@@ -1,0 +1,43 @@
+{
+  "scope": "generated_contract_scan_replacement_outline",
+  "binary_version": "dPDF 0.1.37 (reader development preview)",
+  "binary_sha256": "258b6ba35acbd964eb5dea564fd4444b71b298208ba0feb039cbee59e34f0803",
+  "qpdf_version": "qpdf version 12.3.2\nRun qpdf --copyright to see copyright and license information.",
+  "states": {
+    "source": {
+      "sha256": "76bd93e521e1fc585b0251555f29f3e7acb09954251a57866c9f5eb47a873cfa",
+      "pages": 10,
+      "outlines": 10,
+      "valid_outline_targets": 10,
+      "last_outline": {
+        "dest": [
+          "23 0 R",
+          "/Fit"
+        ],
+        "destpageposfrom1": 10,
+        "kids": [],
+        "object": "34 0 R",
+        "open": true,
+        "title": "Page 10"
+      }
+    },
+    "copy": {
+      "sha256": "853c314ae4ef806e94c7b691a62d4c8e7727cc3d566dadb7702a12a0530aee4e",
+      "pages": 10,
+      "outlines": 10,
+      "valid_outline_targets": 9,
+      "last_outline": {
+        "dest": [
+          "17 0 R",
+          "/Fit"
+        ],
+        "destpageposfrom1": null,
+        "kids": [],
+        "object": "5 0 R",
+        "open": true,
+        "title": "Page 10"
+      }
+    }
+  },
+  "diagnosis": "Original page-10 bookmark retains a destination to a null object after replacement; no old page dictionary at that destination."
+}

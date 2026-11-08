@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "scope": "generated_64_MiB_padding_reader_buffer_probe",
+  "representative_office_document": false,
+  "timing_is_gui_presentation": false,
+  "recorded_at": "2026-10-29T17:20:26.263967+00:00",
+  "platform": "Linux-7.2.11-200.fc44.x86_64-x86_64-with-glibc2.43",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "baseline": {
+    "binary_version": "dPDF 0.1.19 (reader development preview)",
+    "binary_sha256": "5a72f0b6dc270f2c5bb1053a5d6be77080d2b59fe8367555dca455bc12e226ad",
+    "runs": [
+      {
+        "read_ms": 26.185494,
+        "load_ms": 25.990505,
+        "metadata_ms": 0.025415,
+        "first_page_ready_ms": 59.780037,
+        "process_peak_kib": 181056
+      },
+      {
+        "read_ms": 29.289704,
+        "load_ms": 26.077282,
+        "metadata_ms": 0.024776000000000003,
+        "first_page_ready_ms": 63.234984,
+        "process_peak_kib": 180964
+      },
+      {
+        "read_ms": 27.813357,
+        "load_ms": 26.260294,
+        "metadata_ms": 0.029728,
+        "first_page_ready_ms": 63.513453999999996,
+        "process_peak_kib": 181148
+      }
+    ],
+    "median": {
+      "read_ms": 27.813357,
+      "load_ms": 26.077282,
+      "metadata_ms": 0.025415,
+      "first_page_ready_ms": 63.234984,
+      "process_peak_kib": 181056
+    }
+  },
+  "candidate": {
+    "binary_version": "dPDF 0.1.20 (reader development preview)",
+    "binary_sha256": "9c2554660e9c646dd16a3537f2babd5ba0ca73eceb6c01543ce6ba85d7c9e112",
+    "runs": [
+      {
+        "read_ms": 28.267609999999998,
+        "load_ms": 0.118299,
+        "metadata_ms": 0.023246,
+        "first_page_ready_ms": 36.894034999999995,
+        "process_peak_kib": 118116
+      },
+      {
+        "read_ms": 29.224175000000002,
+        "load_ms": 0.12640500000000002,
+        "metadata_ms": 0.020027999999999997,
+        "first_page_ready_ms": 37.224094,
+        "process_peak_kib": 118312
+      },
+      {
+        "read_ms": 29.112612,
+        "load_ms": 0.16103699999999999,
+        "metadata_ms": 0.023118,
+        "first_page_ready_ms": 37.212706999999995,
+        "process_peak_kib": 117560
+      }
+    ],
+    "median": {
+      "read_ms": 29.112612,
+      "load_ms": 0.12640500000000002,
+      "metadata_ms": 0.023118,
+      "first_page_ready_ms": 37.212706999999995,
+      "process_peak_kib": 118116
+    }
+  },
+  "input_bytes": 67109585,
+  "input_sha256": "77cd3944c87af487e2cff156dcabfe06be9b13edf2ad5855d7e1440c00d01313",
+  "median_peak_reduction_kib": 62940,
+  "median_peak_reduction_percent": 34.76272534464475
+}

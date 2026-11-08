@@ -1,0 +1,39 @@
+name: Dedicated Windows desktop validation
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: 'Commit/tag to test in a dedicated logged-in desktop; opens fixture windows and Microsoft Print to PDF'
+        required: true
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      commit: ${{ steps.source.outputs.commit }}
+      ref: ${{ steps.source.outputs.ref }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: source
+        env:
+          REQUESTED_REF: ${{ inputs.release_ref }}
+        run: python3 scripts/ci/resolve_ref.py
+  desktop:
+    if: ${{ !github.event.repository.private }}
+    needs: resolve
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/windows-lane.yml
+    with:
+      commit: ${{ needs.resolve.outputs.commit }}
+      source_ref: ${{ needs.resolve.outputs.ref }}
+      lane: desktop
+      runner_labels: '["self-hosted", "Windows", "X64", "dpdf-windows-desktop"]'

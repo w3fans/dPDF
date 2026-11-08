@@ -1,0 +1,69 @@
+{
+  "source_ref": "main",
+  "source_commit": "ccb78b99ef4d2d93f53e2e4e3ae4086427b73075",
+  "lane": "hosted",
+  "status": "PASS",
+  "run_url": "https://github.com/w3fans/dPDF/actions/runs/40924308817",
+  "checks": [
+    {
+      "name": "ci-contract",
+      "status": "PASS"
+    },
+    {
+      "name": "powershell-syntax",
+      "status": "PASS"
+    },
+    {
+      "name": "build",
+      "status": "PASS"
+    },
+    {
+      "name": "unit-tests",
+      "status": "PASS"
+    },
+    {
+      "name": "clippy",
+      "status": "PASS"
+    },
+    {
+      "name": "format",
+      "status": "PASS"
+    },
+    {
+      "name": "reader",
+      "status": "PASS"
+    },
+    {
+      "name": "pages",
+      "status": "PASS"
+    },
+    {
+      "name": "marks",
+      "status": "PASS"
+    },
+    {
+      "name": "overlays",
+      "status": "PASS"
+    },
+    {
+      "name": "review",
+      "status": "PASS"
+    },
+    {
+      "name": "aliases",
+      "status": "PASS"
+    },
+    {
+      "name": "geometry",
+      "status": "PASS"
+    },
+    {
+      "name": "staged-reader",
+      "status": "PASS"
+    },
+    {
+      "name": "user-registration",
+      "status": "PASS"
+    }
+  ]
+}

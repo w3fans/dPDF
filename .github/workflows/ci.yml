@@ -1,0 +1,212 @@
+name: Pull-request CI
+
+# Hosted compilation is public-only. Private code uses controlled local adapters.
+# Pull-request code never runs on the self-hosted Windows test machine runner.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dpdf-ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CARGO_TERM_COLOR: never
+  CARGO_INCREMENTAL: '0'
+  PDFIUM_URL: https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/7881/pdfium-linux-x64.tgz
+  PDFIUM_SHA256: 1470e21b8b4a3b4ad7f85684e2da11d94f3b69a86d81dee11b9b6709d927ac1d
+
+jobs:
+  policy:
+    if: ${{ !github.event.repository.private }}
+    name: Repository policy and script contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Pull-request policy (no agent/private files, no release metadata edits)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 scripts/ci/check_pr_policy.py --base "$BASE_SHA" --head "$HEAD_SHA"
+      - name: Release metadata consistency
+        run: python3 scripts/release-version.py verify
+      - name: Script contract tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/test_pr_policy.py
+          python3 scripts/test-upstream-sync.py
+          python3 scripts/test-private-display.py
+          python3 scripts/test-public-export.py
+          python3 scripts/ci/test_ci.py
+          python3 scripts/ci/test_artifact_cache.py
+          python3 scripts/ci/test_local_copr.py
+          python3 scripts/ci/test_release_page.py
+          python3 scripts/ci/test_delivery_checkpoint.py
+          python3 scripts/ci/test_resolve_ref.py
+          python3 scripts/test-cargo-notices.py
+          python3 scripts/test-print-dialog.py
+          python3 scripts/test-print-benchmark.py
+          python3 scripts/test-rpm-publication.py
+
+  linux:
+    if: ${{ !github.event.repository.private }}
+    name: Linux build, tests and PDF regression suites
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install test helpers
+        run: |
+          set -euo pipefail
+          sudo apt-get update -q
+          # Build: fontconfig headers for Slint's font discovery. Runtime: helpers and
+          # libraries loaded by the real-window suites.
+          sudo apt-get install -y -q --no-install-recommends pkg-config libfontconfig-dev \
+            lld qpdf poppler-utils xvfb xdotool desktop-file-utils dbus libgtk-3-0t64 \
+            shared-mime-info fonts-dejavu-core libxkbcommon-x11-0 libfontconfig1
+      - name: Rust toolchain
+        run: |
+          set -euo pipefail
+          rustup toolchain install stable --profile minimal --component rustfmt,clippy
+          rustup default stable
+          rustc -vV
+          cargo -vV
+      - name: Restore Cargo cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: dpdf-linux-v1-${{ hashFiles('Cargo.lock') }}-${{ github.sha }}
+          restore-keys: |
+            dpdf-linux-v1-${{ hashFiles('Cargo.lock') }}-
+            dpdf-linux-v1-
+      - name: Format
+        run: cargo fmt --check
+      - name: Clippy (default)
+        run: cargo clippy --locked -- -D warnings
+      - name: Clippy (Windows print adapter metadata check)
+        run: cargo clippy --locked --features check-windows-print -- -D warnings
+      - name: Unit tests (debug, overflow checks enabled)
+        run: cargo test --locked
+      - name: Unit tests (release profile, as in the release gate)
+        run: cargo test --locked --release
+      - name: Release build
+        run: |
+          set -euo pipefail
+          cargo build --locked --release
+          python3 scripts/release-version.py verify --binary target/release/dpdf
+      - name: Save Cargo cache
+        if: github.event_name == 'push'
+        uses: actions/cache/save@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            target
+          key: dpdf-linux-v1-${{ hashFiles('Cargo.lock') }}-${{ github.sha }}
+      - name: Dependency notice inventory
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 scripts/check-cargo-notices.py --target linux
+          python3 scripts/check-cargo-notices.py --target windows
+      - name: Pinned PDFium 7881
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/pdfium"
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/pdfium.tgz" "$PDFIUM_URL"
+          echo "$PDFIUM_SHA256  $RUNNER_TEMP/pdfium.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/pdfium.tgz" -C "$RUNNER_TEMP/pdfium"
+      - name: PDF regression corpora and private-Xvfb window suites
+        env:
+          SOURCE_COMMIT: ${{ github.sha }}
+          SOURCE_REF: ${{ github.ref }}
+        run: |
+          python3 scripts/ci/validate_linux.py --source . --commit "$(git rev-parse HEAD)" \
+            --ref "$SOURCE_REF" --binary target/release/dpdf \
+            --pdfium "$RUNNER_TEMP/pdfium/lib/libpdfium.so" --qpdf "$(command -v qpdf)" \
+            --output "$RUNNER_TEMP/linux-validation"
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/linux-validation/README.md" ]; then
+            cat "$RUNNER_TEMP/linux-validation/README.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload report and per-suite logs
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: linux-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/linux-validation/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  windows:
+    name: Windows hosted native checks
+    # Push/tag Windows lanes and their published receipts stay in windows-validation.yml.
+    if: ${{ !github.event.repository.private && (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') }}
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout validation harness
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: harness
+          persist-credentials: false
+      - name: Checkout exact source commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: source
+          persist-credentials: false
+      - name: Restore hosted native build cache
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ${{ runner.temp }}/dpdf-msvc-target
+          key: dpdf-msvc-v1-${{ hashFiles('source/Cargo.lock') }}-${{ github.sha }}
+          restore-keys: |
+            dpdf-msvc-v1-${{ hashFiles('source/Cargo.lock') }}-
+            dpdf-msvc-v1-
+      - name: Native bounded Windows checks
+        shell: powershell
+        env:
+          VALIDATION_REPORT_DIR: ${{ runner.temp }}/dpdf-validation-pr
+          VALIDATED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+          VALIDATED_REF: ${{ github.ref }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Path $env:VALIDATION_REPORT_DIR -Force | Out-Null
+          $python = (Get-Command python.exe -CommandType Application | Select-Object -First 1).Source
+          $ErrorActionPreference = 'Continue'
+          & $python harness/scripts/ci/validate_windows.py --source source --commit $env:VALIDATED_COMMIT --ref $env:VALIDATED_REF --lane hosted --output $env:VALIDATION_REPORT_DIR
+          $code = $LASTEXITCODE
+          $ErrorActionPreference = 'Stop'
+          Get-Content (Join-Path $env:VALIDATION_REPORT_DIR 'README.md') | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
+          if ($code -ne 0) { throw "Windows validation failed ($code)" }
+      - name: Upload report and per-suite logs
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: windows-pr-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/dpdf-validation-pr/
+          if-no-files-found: ignore
+          retention-days: 30

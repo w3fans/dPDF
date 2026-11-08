@@ -1,0 +1,17 @@
+{
+  "scope": "generated_reader_resize_regression",
+  "baseline": "v0.1.26 reader logic plus diagnostic-only additions",
+  "source_base_commit": "8eb67c288c4a162bd5141d5534c342d944b1341a",
+  "binary_version": "dPDF 0.1.26 (reader development preview)",
+  "binary_sha256": "2b9e7e5dbd77093017ccfc16071c63aff0ebf87efd37dc5575087c992898fd79",
+  "case": "single page / 200% / sidebar hidden",
+  "expected_scroll": [
+    -484.0,
+    -1103.04
+  ],
+  "observed_scroll": [
+    0,
+    0
+  ],
+  "result": "REPRODUCED reading-position loss"
+}

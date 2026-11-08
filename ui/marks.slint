@@ -1,0 +1,161 @@
+import { Button, LineEdit, ComboBox, Slider, CheckBox, Palette } from "std-widgets.slint";
+
+export component MarkStudioWindow inherits Window {
+    title: "dPDF — Signatures & stamps";
+    preferred-width: 1000px; preferred-height: 720px;
+    min-width: 840px; min-height: 620px;
+    default-font-size: 13px;
+    in-out property <bool> dark: false;
+    in property <bool> busy;
+    in property <bool> has-source;
+    in property <bool> can-save;
+    in property <bool> can-place;
+    in property <bool> saved-item;
+    in property <image> original;
+    in property <image> cleaned;
+    in property <string> source-label;
+    in property <string> result-label;
+    in property <string> status: "Import an image or select a saved mark";
+    in property <[string]> assets;
+    in-out property <int> selected-asset: -1;
+    in-out property <string> asset-name;
+    in-out property <string> notes;
+    in-out property <int> kind: 0;
+    in-out property <string> width-mm: "45";
+    in-out property <string> height-mm: "20";
+    in-out property <bool> aspect-locked: true;
+    in-out property <bool> remove-white: true;
+    in-out property <bool> paper-background: false;
+    in-out property <float> angle: 0;
+    in-out property <float> white-level: 245;
+    in-out property <float> black-level: 0;
+    in-out property <string> crop-x: "0";
+    in-out property <string> crop-y: "0";
+    in-out property <string> crop-width;
+    in-out property <string> crop-height;
+    in property <float> crop-left;
+    in property <float> crop-top;
+    in property <float> crop-right: 1;
+    in property <float> crop-bottom: 1;
+    out property <float> source-window-x: crop-surface.absolute-position.x / 1px;
+    out property <float> source-window-y: crop-surface.absolute-position.y / 1px;
+    out property <float> source-view-width: crop-surface.width / 1px;
+    out property <float> source-view-height: crop-surface.height / 1px;
+    callback import-image();
+    callback paste-image();
+    callback choose-asset(int);
+    callback refresh-library();
+    callback reset-crop();
+    callback crop(float, float, float, float);
+    callback save-asset();
+    callback save-size();
+    callback place-mark();
+    callback close-studio();
+    changed dark => { Palette.color-scheme = root.dark ? ColorScheme.dark : ColorScheme.light; }
+    background: Palette.background;
+
+    VerticalLayout {
+        padding: 8px; spacing: 7px;
+        HorizontalLayout {
+            spacing: 6px;
+            Text { text: "Signatures & stamps"; font-weight: 700; color: Palette.foreground; vertical-alignment: center; }
+            ComboBox { model: root.assets; current-index <=> root.selected-asset; horizontal-stretch: 1; enabled: !root.busy; selected(value) => { root.choose-asset(self.current-index); } }
+            Button { text: "Refresh"; enabled: !root.busy; clicked => { root.refresh-library(); } }
+            Button { text: "Import image…"; enabled: !root.busy; clicked => { root.import-image(); } }
+            Button { text: "Paste image"; enabled: !root.busy; clicked => { root.paste-image(); } }
+        }
+        HorizontalLayout {
+            spacing: 6px;
+            Text { text: "Name"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.asset-name; horizontal-stretch: 1; enabled: root.has-source; }
+            ComboBox { model: ["Signature", "Stamp", "Initials", "Other"]; current-index <=> root.kind; enabled: root.has-source; width: 135px; }
+            Text { text: "Width mm"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.width-mm; width: 65px; enabled: root.has-source; }
+            Text { text: "Height mm"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.height-mm; width: 65px; enabled: root.has-source; }
+            CheckBox { text: "Lock ratio"; checked <=> root.aspect-locked; enabled: root.has-source; }
+        }
+        HorizontalLayout {
+            spacing: 8px;
+            VerticalLayout {
+                horizontal-stretch: 1; min-width: 0px;
+                Text { text: "Original — drag to crop"; color: Palette.foreground; }
+                Rectangle {
+                    background: #ffffff; border-color: #89909a; border-width: 1px;
+                    original-image := Image { source: root.original; width: parent.width; height: parent.height; image-fit: contain; }
+                    crop-surface := Rectangle {
+                        width: original-image.source.width > 0 ? min(parent.width, parent.height * original-image.source.width / original-image.source.height) : parent.width;
+                        height: original-image.source.height > 0 ? min(parent.height, parent.width * original-image.source.height / original-image.source.width) : parent.height;
+                        x: (parent.width - self.width) / 2; y: (parent.height - self.height) / 2;
+                        Rectangle {
+                            x: root.crop-left * parent.width; y: root.crop-top * parent.height;
+                            width: (root.crop-right - root.crop-left) * parent.width;
+                            height: (root.crop-bottom - root.crop-top) * parent.height;
+                            border-color: #3f80cf; border-width: root.has-source ? 2px : 0px;
+                            background: #3f80cf14;
+                        }
+                        TouchArea {
+                            enabled: root.has-source && !root.busy;
+                            mouse-cursor: crosshair;
+                            pointer-event(event) => {
+                                if (event.kind == PointerEventKind.up && event.button == PointerEventButton.left) {
+                                    root.crop(self.pressed-x / self.width, self.pressed-y / self.height, self.mouse-x / self.width, self.mouse-y / self.height);
+                                }
+                            }
+                        }
+                    }
+                }
+                Text { text: root.source-label; color: Palette.foreground; overflow: elide; }
+            }
+            VerticalLayout {
+                horizontal-stretch: 1; min-width: 0px;
+                HorizontalLayout {
+                    Text { text: "Cleaned preview"; color: Palette.foreground; horizontal-stretch: 1; }
+                    CheckBox { text: "Paper background"; checked <=> root.paper-background; }
+                }
+                Rectangle {
+                    background: root.paper-background ? #dce1e8 : #ffffff;
+                    border-color: #89909a; border-width: 1px;
+                    Image { source: root.cleaned; width: parent.width; height: parent.height; image-fit: contain; }
+                }
+                Text { text: root.result-label; color: Palette.foreground; overflow: elide; }
+            }
+        }
+        HorizontalLayout {
+            spacing: 5px;
+            Text { text: "Crop px: X"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.crop-x; width: 65px; enabled: root.has-source; }
+            Text { text: "Y"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.crop-y; width: 65px; enabled: root.has-source; }
+            Text { text: "Width"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.crop-width; width: 65px; enabled: root.has-source; }
+            Text { text: "Height"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.crop-height; width: 65px; enabled: root.has-source; }
+            Button { text: "Reset crop"; enabled: root.has-source && !root.busy; clicked => { root.reset-crop(); } }
+            Rectangle { horizontal-stretch: 1; }
+            CheckBox { text: "Remove white"; checked <=> root.remove-white; enabled: root.has-source; }
+        }
+        HorizontalLayout {
+            spacing: 7px;
+            Text { text: "Deskew " + round(root.angle * 10) / 10 + "°"; min-width: 95px; color: Palette.foreground; vertical-alignment: center; }
+            Slider { minimum: -15; maximum: 15; value <=> root.angle; enabled: root.has-source; }
+            Text { text: "White " + round(root.white-level); min-width: 70px; color: Palette.foreground; vertical-alignment: center; }
+            Slider { minimum: 150; maximum: 255; value <=> root.white-level; enabled: root.has-source && root.remove-white; }
+            Text { text: "Black " + round(root.black-level); min-width: 70px; color: Palette.foreground; vertical-alignment: center; }
+            Slider { minimum: 0; maximum: 149; value <=> root.black-level; enabled: root.has-source && root.remove-white; }
+        }
+        HorizontalLayout {
+            spacing: 6px;
+            Text { text: "Notes"; color: Palette.foreground; vertical-alignment: center; }
+            LineEdit { text <=> root.notes; horizontal-stretch: 1; enabled: root.has-source; }
+        }
+        HorizontalLayout {
+            spacing: 6px;
+            Text { text: root.busy ? "Working… " + root.status : root.status; horizontal-stretch: 1; overflow: elide; color: Palette.foreground; vertical-alignment: center; }
+            Button { text: "Save default size"; enabled: root.saved-item && root.can-save && !root.busy; clicked => { root.save-size(); } }
+            Button { text: "Save new asset"; enabled: root.can-save && !root.busy; clicked => { root.save-asset(); } }
+            Button { text: "Place on PDF"; enabled: root.can-place && root.can-save && !root.busy; clicked => { root.place-mark(); } }
+            Button { text: "Close"; clicked => { root.close-studio(); } }
+        }
+    }
+}

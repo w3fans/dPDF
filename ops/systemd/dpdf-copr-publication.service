@@ -1,0 +1,22 @@
+[Unit]
+Description=Publish reviewed dPDF preview tags through the local COPR operator
+After=network-online.target
+
+[Service]
+Type=exec
+CacheDirectory=dpdf/publication-tmp
+CacheDirectoryMode=0700
+Environment=TMPDIR=%C/dpdf/publication-tmp
+EnvironmentFile=%h/.config/dpdf/publication.env
+ExecStart=/usr/bin/python3 %h/.local/lib/dpdf/local_copr.py --repository ${DPDF_REPOSITORY} --worktrees ${DPDF_PUBLICATION_WORKTREES} --outputs ${DPDF_PUBLICATION_OUTPUTS} --baseline ${DPDF_PUBLICATION_BASELINE} --privacy-patterns ${DPDF_PRIVACY_PATTERNS} --pdfium-sources ${DPDF_PDFIUM_SOURCES} --source-cache ${DPDF_SOURCE_CACHE} --cargo-home ${DPDF_CARGO_HOME}
+UMask=0077
+CPUQuota=50%
+CPUWeight=10
+MemoryHigh=1G
+MemoryMax=1536M
+MemorySwapMax=128M
+IOWeight=10
+Nice=15
+TasksMax=512
+RuntimeMaxSec=3h
+NoNewPrivileges=yes

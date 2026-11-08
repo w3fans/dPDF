@@ -1,0 +1,36 @@
+{
+  "scope": "generated_page_tree_and_resource_retention_after_assembly",
+  "method": "Normal generated bake plus originals differing only in page-tree/untouched-page metadata. No arbitrary PDF input is accepted by the CLI.",
+  "binary_version": "dPDF 0.1.39 (reader development preview)",
+  "binary_sha256": "ff6477b2be74a6ddb667031fd430ec4867c1a4307956e918dc947de66d9adb73",
+  "production_secure_export_enabled": false,
+  "cases": [
+    {
+      "case": "page-tree-stream",
+      "input_sha256": "e07ba2def084a2eb54b1faf27a01381dc14f23b62cdf26ecb984f5c14fc2c775",
+      "output_sha256": "32b94c82ddf0f98f63a948f90fc460247349f0199167ce4c55848668d086c025",
+      "page_search_matches": 0,
+      "reachable_label_retained": true,
+      "reachable_date_retained": true,
+      "input_unchanged": true
+    },
+    {
+      "case": "untouched-page-pieceinfo",
+      "input_sha256": "759bf3f238c0c7aa7268a247737d7f150100b0581a8dba19cb21b280bd03a014",
+      "output_sha256": "2ccacf3e00beac5a7e209f7a4f6529173319d44ea679ffc875b0c08a90bfc9aa",
+      "page_search_matches": 0,
+      "reachable_label_retained": true,
+      "reachable_date_retained": true,
+      "input_unchanged": true
+    },
+    {
+      "case": "untouched-page-resources",
+      "input_sha256": "0e19e5805cfe646349d987fcfe38a6d693e0b420e86d1509e92c5e80201ca079",
+      "output_sha256": "5e84517054c96ab10c889e7ef1fdf20b532055b10948697ae59e47679777cdc9",
+      "page_search_matches": 0,
+      "reachable_label_retained": true,
+      "reachable_date_retained": true,
+      "input_unchanged": true
+    }
+  ]
+}

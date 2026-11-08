@@ -1,0 +1,17 @@
+dPDF
+Copyright 2026 Denis Zvegelj and dPDF contributors
+
+dPDF-owned source, UI, documentation and generated test fixtures are licensed
+under the Apache License, Version 2.0. Third-party components retain their own
+licenses. See docs/LICENSING.md and docs/THIRD_PARTY.md.
+
+Open-source Fedora and Windows application distributions select Slint's
+GPL-3.0-only option. The combined application is distributed under GPLv3;
+dPDF-owned source remains Apache-2.0.
+Slint attribution is provided in About dPDF and on public project/release pages.
+The selected GPL text is retained under packaging/licenses/slint in source/RPM
+packages and licenses/slint in staged runtimes. Earlier previews selected Slint's
+royalty-free desktop option; retained alternative texts do not change this choice.
+
+MuPDF is not linked or bundled with dPDF. Its separate capability probe does
+not select it as a production redaction engine or establish licensing clearance.

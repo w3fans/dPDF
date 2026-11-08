@@ -1,0 +1,144 @@
+name: Windows installer
+
+# Builds the per-user dPDF MSI and a portable zip for every release tag, tests the
+# MSI by installing, running and uninstalling it in an isolated runner profile, then
+# attaches both to the tag's development-preview release. Unsigned preview
+# builds: Windows SmartScreen may warn until code signing is configured.
+
+on:
+  push:
+    tags: ['v*']
+    # Pre-release test of the packaging itself: artifacts and report only.
+    branches: ['ci/windows-installer']
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: 'vMAJOR.MINOR.PATCH tag to package (artifacts only; no release upload)'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dpdf-windows-installer-${{ github.ref_name }}-${{ inputs.release_ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: ${{ !github.event.repository.private }}
+    runs-on: windows-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_ref || github.ref }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        env:
+          REQUESTED_RELEASE_REF: ${{ inputs.release_ref || github.ref_name }}
+        run: |
+          $version = python -c "import tomllib;print(tomllib.load(open('Cargo.toml','rb'))['package']['version'])"
+          if ($LASTEXITCODE -ne 0 -or $version -notmatch '^\d+\.\d+\.\d+$') { throw "Cannot read package version: $version" }
+          $ref = $env:REQUESTED_RELEASE_REF
+          if ($ref.StartsWith('v') -and $ref -ne "v$version") { throw "Ref $ref does not match package version $version" }
+          "version=$version" >> $env:GITHUB_OUTPUT
+      - name: Build optimized executable
+        shell: pwsh
+        run: |
+          python scripts/ci/build_windows.py --source . --output "$env:RUNNER_TEMP/dpdf-native-build"
+          if ($LASTEXITCODE -ne 0) { throw "Native build/provenance verification failed ($LASTEXITCODE)" }
+      - name: Package and test the exact binary within native resource limits
+        shell: pwsh
+        run: |
+          python scripts/ci/limited_windows.py --source . --log "$env:RUNNER_TEMP/dpdf-package.log" --timeout 2700 -- powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File packaging/windows/package-preview.ps1 -BinaryPath "$env:DPDF_VERIFIED_BINARY" -Version '${{ steps.version.outputs.version }}' -WorkDirectory "$env:RUNNER_TEMP"
+          if ($LASTEXITCODE -ne 0) { throw "Bounded installer qualification failed ($LASTEXITCODE)" }
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: dpdf-windows-${{ steps.version.outputs.version }}
+          path: ${{ env.DPDF_DIST }}
+          retention-days: 30
+          if-no-files-found: error
+
+  publish:
+    # Only tag pushes attach files to the release created by release.yml.
+    if: ${{ !github.event.repository.private && (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: dpdf-windows-*
+          path: dist
+          merge-multiple: true
+      - name: Attach to the development-preview release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd dist && sha256sum -c SHA256SUMS.txt)
+          for attempt in $(seq 1 30); do
+            gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 && break
+            [ "$attempt" -eq 30 ] && { echo "Release $RELEASE_TAG was not created by the preview publisher" >&2; exit 1; }
+            sleep 20
+          done
+          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --clobber dist/*
+
+  report:
+    # SSH-only maintainers read the outcome from a report-only branch, like the
+    # Windows validation lanes. It never touches main or tags.
+    if: ${{ !github.event.repository.private && (always()) }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_ref || github.ref }}
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        continue-on-error: true
+        with:
+          pattern: dpdf-windows-*
+          path: dist
+          merge-multiple: true
+      - name: Publish installer report branch
+        env:
+          RESULT: ${{ needs.build.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BRANCH: validation/ci-windows-installer-${{ github.run_id }}-${{ github.run_attempt }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          commit=$(git rev-parse HEAD)
+          mkdir -p docs/validation/automated
+          {
+            echo "# Windows installer build: ${RESULT^^}"
+            echo
+            echo "Source: \`${{ inputs.release_ref || github.ref_name }}\` / \`$commit\`"
+            echo
+            echo "Run: $RUN_URL"
+            echo
+            echo "The build job installs the per-user MSI on a isolated runner profile, runs the"
+            echo "installed dpdf.exe (version, PDFium probe, bundled qpdf extract), checks the"
+            echo "Open With registration and Start Menu shortcut, uninstalls and checks cleanup."
+            echo "A FAILURE or CANCELLED result means no installer is qualified for this commit."
+            echo
+            if [ -f dist/SHA256SUMS.txt ]; then echo '```'; cat dist/SHA256SUMS.txt; echo '```'; fi
+          } > docs/validation/automated/INSTALLER.md
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$BRANCH"
+          git add docs/validation/automated/INSTALLER.md
+          git commit -m "Windows installer build: $RESULT (${commit:0:12})"
+          git push origin "$BRANCH"

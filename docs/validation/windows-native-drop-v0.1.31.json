@@ -1,0 +1,212 @@
+{
+  "scope": "native_windows_ole_drop_regression",
+  "source_commit": "11306b220dd48463b4919427cd9375a52dbda021",
+  "source_ref": "v0.1.31",
+  "run_url": "https://github.com/w3fans/dPDF/actions/runs/41040245759",
+  "service_status": "PASS",
+  "service_check_count": 17,
+  "desktop_status": "FAIL",
+  "desktop_check_count": 37,
+  "desktop_context": {
+    "session_id": 2,
+    "station_visible": true,
+    "input_desktop_accessible": true
+  },
+  "checks": [
+    {
+      "name": "ci-contract",
+      "status": "PASS"
+    },
+    {
+      "name": "powershell-syntax",
+      "status": "PASS"
+    },
+    {
+      "name": "build",
+      "status": "PASS",
+      "seconds": 201.672
+    },
+    {
+      "name": "unit-tests",
+      "status": "PASS",
+      "seconds": 56.469
+    },
+    {
+      "name": "clippy",
+      "status": "PASS",
+      "seconds": 21.718
+    },
+    {
+      "name": "format",
+      "status": "PASS",
+      "seconds": 1.5
+    },
+    {
+      "name": "reader",
+      "status": "PASS",
+      "seconds": 1.453
+    },
+    {
+      "name": "pages",
+      "status": "PASS",
+      "seconds": 6.063
+    },
+    {
+      "name": "marks",
+      "status": "PASS",
+      "seconds": 0.297
+    },
+    {
+      "name": "overlays",
+      "status": "PASS",
+      "seconds": 14.906
+    },
+    {
+      "name": "review",
+      "status": "PASS",
+      "seconds": 6.016
+    },
+    {
+      "name": "aliases",
+      "status": "PASS",
+      "seconds": 0.5
+    },
+    {
+      "name": "geometry",
+      "status": "PASS",
+      "seconds": 1.578
+    },
+    {
+      "name": "engine-paths",
+      "status": "PASS",
+      "seconds": 0.484
+    },
+    {
+      "name": "block-probe",
+      "status": "PASS",
+      "seconds": 33.938
+    },
+    {
+      "name": "staged-reader",
+      "status": "PASS",
+      "seconds": 1.375
+    },
+    {
+      "name": "user-registration",
+      "status": "PASS",
+      "seconds": 6.234
+    },
+    {
+      "name": "native-file-drop-1",
+      "status": "FAIL",
+      "seconds": 4.109
+    },
+    {
+      "name": "viewport-1",
+      "status": "PASS",
+      "seconds": 4.891
+    },
+    {
+      "name": "document-tabs-1",
+      "status": "PASS",
+      "seconds": 0.641
+    },
+    {
+      "name": "clipboard-placement-1",
+      "status": "PASS",
+      "seconds": 6.047
+    },
+    {
+      "name": "clipboard-image-1",
+      "status": "PASS",
+      "seconds": 1.14
+    },
+    {
+      "name": "native-file-drop-1-5",
+      "status": "FAIL",
+      "seconds": 2.688
+    },
+    {
+      "name": "viewport-1-5",
+      "status": "PASS",
+      "seconds": 5.203
+    },
+    {
+      "name": "document-tabs-1-5",
+      "status": "PASS",
+      "seconds": 0.75
+    },
+    {
+      "name": "clipboard-placement-1-5",
+      "status": "PASS",
+      "seconds": 6.094
+    },
+    {
+      "name": "clipboard-image-1-5",
+      "status": "PASS",
+      "seconds": 1.188
+    },
+    {
+      "name": "native-file-drop-2",
+      "status": "PASS",
+      "seconds": 3.375
+    },
+    {
+      "name": "viewport-2",
+      "status": "PASS",
+      "seconds": 6.734
+    },
+    {
+      "name": "document-tabs-2",
+      "status": "PASS",
+      "seconds": 1.313
+    },
+    {
+      "name": "clipboard-placement-2",
+      "status": "PASS",
+      "seconds": 6.984
+    },
+    {
+      "name": "clipboard-image-2",
+      "status": "PASS",
+      "seconds": 1.312
+    },
+    {
+      "name": "about",
+      "status": "PASS",
+      "seconds": 3.203
+    },
+    {
+      "name": "review-ui",
+      "status": "PASS",
+      "seconds": 22.688
+    },
+    {
+      "name": "passwords",
+      "status": "PASS",
+      "seconds": 32.969
+    },
+    {
+      "name": "recovery",
+      "status": "PASS",
+      "seconds": 21.953
+    },
+    {
+      "name": "windows-print",
+      "status": "PASS",
+      "seconds": 30.516
+    }
+  ],
+  "failure_logs": [
+    {
+      "name": "native-file-drop-1",
+      "tail": "PASS: native OLE hover/cancel left the reader empty\r\nPASS: native Windows OLE Unicode/multiple/duplicate file drops and keyboard tabs, scale=1.0\r\nTraceback (most recent call last):\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\shutil.py\", line 633, in _rmtree_unsafe\r\n    os.unlink(fullname)\r\nPermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\dpdf-validation-dxpgab9w\\\\temp\\\\dpdf-native-ole-zqwjqw1j\\\\reader.log'\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"D:\\a\\dPDF\\dPDF\\source\\scripts\\check-windows-drop.py\", line 257, in <module>\r\n    main()\r\n  File \"D:\\a\\dPDF\\dPDF\\source\\scripts\\check-windows-drop.py\", line 169, in main\r\n    with tempfile.TemporaryDirectory(prefix='dpdf-native-ole-') as directory:\r\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 950, in __exit__\r\n    self.cleanup()\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 954, in cleanup\r\n    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 934, in _rmtree\r\n    _shutil.rmtree(name, onexc=onexc)\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\shutil.py\", line 781, in rmtree\r\n    return _rmtree_unsafe(path, onexc)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\shutil.py\", line 635, in _rmtree_unsafe\r\n    onexc(os.unlink, fullname, err)\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 909, in onexc\r\n    _os.unlink(path)\r\nPermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\dpdf-validation-dxpgab9w\\\\temp\\\\dpdf-native-ole-zqwjqw1j\\\\reader.log'\r\n"
+    },
+    {
+      "name": "native-file-drop-1-5",
+      "tail": "PASS: native OLE hover/cancel left the reader empty\r\nPASS: native Windows OLE Unicode/multiple/duplicate file drops and keyboard tabs, scale=1.5\r\nTraceback (most recent call last):\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\shutil.py\", line 633, in _rmtree_unsafe\r\n    os.unlink(fullname)\r\nPermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\dpdf-validation-dxpgab9w\\\\temp\\\\dpdf-native-ole-1r5w9z6t\\\\reader.log'\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"D:\\a\\dPDF\\dPDF\\source\\scripts\\check-windows-drop.py\", line 257, in <module>\r\n    main()\r\n  File \"D:\\a\\dPDF\\dPDF\\source\\scripts\\check-windows-drop.py\", line 169, in main\r\n    with tempfile.TemporaryDirectory(prefix='dpdf-native-ole-') as directory:\r\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 950, in __exit__\r\n    self.cleanup()\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 954, in cleanup\r\n    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 934, in _rmtree\r\n    _shutil.rmtree(name, onexc=onexc)\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\shutil.py\", line 781, in rmtree\r\n    return _rmtree_unsafe(path, onexc)\r\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\shutil.py\", line 635, in _rmtree_unsafe\r\n    onexc(os.unlink, fullname, err)\r\n  File \"C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\Lib\\tempfile.py\", line 909, in onexc\r\n    _os.unlink(path)\r\nPermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\\\Users\\\\runneradmin\\\\AppData\\\\Local\\\\Temp\\\\dpdf-validation-dxpgab9w\\\\temp\\\\dpdf-native-ole-1r5w9z6t\\\\reader.log'\r\n"
+    }
+  ],
+  "interpretation": "The native OLE protocol/Unicode/multiple/duplicate/tab assertions completed at all three scales. Two checks failed during Windows log cleanup; this release desktop result remains FAIL. The next candidate retries only sharing/lock violations for up to five seconds, with overall PASS after successful cleanup.",
+  "qualification": "Automated hosted protocol checks only; manual Explorer, [private] and physical printers remain separate."
+}

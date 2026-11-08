@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "scope": "local_build_resource_and_generated_headless_reader_observation",
+  "source": "v0.1.35 plus scan-replacement-unit candidate",
+  "resource_caps": {
+    "cpus": 1,
+    "memory_high_bytes": 1610612736,
+    "memory_max_bytes": 2147483648,
+    "swap_max_bytes": 134217728
+  },
+  "caveats": [
+    "Build wall time includes host memory-pressure effects; not a controlled throughput guarantee.",
+    "Reader timing is generated headless delivery, not GUI presentation or physical printing.",
+    "Build artifacts are identified by hash; retired build source folders are unavailable."
+  ],
+  "profiles": [
+    {
+      "dpdf_opt_level": 3,
+      "job": "[private]-dpdf-c0a01f40b1014d2b",
+      "binary_sha256": "078063a518e13adcbf16b31ca4345577a9a6e07ce5c4025505588dd2aa0f7ff8",
+      "build_wall_seconds": 2023.324,
+      "build_cpu_seconds": 103.220843,
+      "memory_peak_bytes": 1726230528,
+      "memory_swap_peak_bytes": 134217728,
+      "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+      "reader_medians": [
+        {
+          "name": "50-office",
+          "samples": 5,
+          "first_page_ready_ms": 11.703919,
+          "metadata_ms": 1.0315999999999999,
+          "first_render_ms": 9.849715,
+          "cache_bytes": 45459264,
+          "lazy_page_sizes_ms": 0.563666,
+          "eager_page_sizes_ms": 2.757143,
+          "process_peak_kib": 97160
+        },
+        {
+          "name": "1000-text",
+          "samples": 5,
+          "first_page_ready_ms": 33.004066,
+          "metadata_ms": 21.47015,
+          "first_render_ms": 9.589419,
+          "cache_bytes": 45459264,
+          "lazy_page_sizes_ms": 11.044616,
+          "eager_page_sizes_ms": 36.892286000000006,
+          "process_peak_kib": 100884
+        },
+        {
+          "name": "50-vector",
+          "samples": 5,
+          "first_page_ready_ms": 18.668054,
+          "metadata_ms": 0.592588,
+          "first_render_ms": 16.897426,
+          "cache_bytes": 45459264,
+          "lazy_page_sizes_ms": 0.525295,
+          "eager_page_sizes_ms": 86.457624,
+          "process_peak_kib": 93252
+        }
+      ]
+    },
+    {
+      "dpdf_opt_level": 2,
+      "job": "[private]-dpdf-bf659164b23d41b1",
+      "binary_sha256": "54bed2394dd463e20d0a0d5c09b8749fa92327d24cff8fb9f628dbb84ccd4c23",
+      "build_wall_seconds": 104.375,
+      "build_cpu_seconds": 102.750907,
+      "memory_peak_bytes": 1611247616,
+      "memory_swap_peak_bytes": 134111232,
+      "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+      "reader_medians": [
+        {
+          "name": "50-office",
+          "samples": 5,
+          "first_page_ready_ms": 11.559289,
+          "metadata_ms": 1.065191,
+          "first_render_ms": 9.681043,
+          "cache_bytes": 45459264,
+          "lazy_page_sizes_ms": 0.558458,
+          "eager_page_sizes_ms": 2.6874160000000002,
+          "process_peak_kib": 97300
+        },
+        {
+          "name": "1000-text",
+          "samples": 5,
+          "first_page_ready_ms": 35.306571000000005,
+          "metadata_ms": 22.40436,
+          "first_render_ms": 9.857089,
+          "cache_bytes": 45459264,
+          "lazy_page_sizes_ms": 11.205322,
+          "eager_page_sizes_ms": 38.122491000000004,
+          "process_peak_kib": 101044
+        },
+        {
+          "name": "50-vector",
+          "samples": 5,
+          "first_page_ready_ms": 20.166171,
+          "metadata_ms": 0.642624,
+          "first_render_ms": 18.04817,
+          "cache_bytes": 45459264,
+          "lazy_page_sizes_ms": 0.558786,
+          "eager_page_sizes_ms": 90.60833,
+          "process_peak_kib": 93044
+        }
+      ]
+    }
+  ]
+}

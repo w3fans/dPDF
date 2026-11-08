@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=dPDF
+Icon=net.dpdf.dPDF
+Comment=Compact PDF workspace
+Exec=/app/dPDF/dpdf %F
+Terminal=false
+Categories=Office;Viewer;
+MimeType=application/pdf;
+StartupNotify=true

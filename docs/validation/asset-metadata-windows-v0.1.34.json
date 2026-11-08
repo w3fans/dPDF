@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "source_commit": "b41d9d31f460c2f3004f83bf8f7725d0c1faa2e6",
+  "source_ref": "v0.1.34",
+  "run_url": "https://github.com/w3fans/dPDF/actions/runs/41049865364",
+  "status": "FAIL",
+  "checks": [
+    {
+      "name": "unit-tests",
+      "command": [
+        "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+        "test",
+        "--locked",
+        "--release"
+      ],
+      "status": "FAIL",
+      "exit_code": 101,
+      "seconds": 93.578
+    }
+  ],
+  "interpretation": "Intermittent asset metadata lock acquisition timeout; not a PDF export or signature image failure. Later passing runs do not change this recorded result.",
+  "diagnostic": "---- marks::tests::concurrent_usage_and_size_updates_preserve_assets_and_future_metadata stdout ----\n\nthread '<unnamed>' (4768) panicked at src\\marks.rs:696:69:\ncalled `Result::unwrap()` on an `Err` value: Asset metadata is locked or unavailable: lock acquisition failed because the operation would block\nnote: run with `RUST_BACKTRACE=1` environment variable to display a backtrace\n\nthread 'marks::tests::concurrent_usage_and_size_updates_preserve_assets_and_future_metadata' (8716) panicked at src\\marks.rs:709:28:\ncalled `Result::unwrap()` on an `Err` value: Any { .. }\n\n\nfailures:\n    marks::tests::concurrent_usage_and_size_updates_preserve_assets_and_future_metadata\n\ntest result: FAILED. 52 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.49s\n\nerror: test failed, to rerun pass `--bin dpdf`\n"
+}

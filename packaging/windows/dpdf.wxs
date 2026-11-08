@@ -1,0 +1,86 @@
+<!--
+  dPDF Windows installer (WiX Toolset 5). Built by packaging/windows/build-msi.ps1
+  from a runtime staged by stage.ps1 (-QpdfBin required).
+
+  Dual-purpose package, per-user by default: no elevation, files under
+  %LOCALAPPDATA%\Programs\dPDF, registration under HKCU. An administrator can
+  install for all users with `msiexec /i dPDF.msi MSIINSTALLPERUSER=""`.
+  Registration mirrors register.ps1 (Start Menu, Open With, App Paths, registered
+  application capabilities) and never writes the .pdf default or UserChoice.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="dPDF" Manufacturer="dPDF" Version="$(var.Version)"
+           UpgradeCode="c580773f-8d86-4f2a-851d-39ded0c5168d"
+           Scope="perUserOrMachine" Compressed="yes" Language="1033">
+    <SummaryInformation Description="dPDF $(var.Version) development preview" />
+    <MajorUpgrade AllowSameVersionUpgrades="yes"
+                  DowngradeErrorMessage="A newer version of dPDF is already installed." />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Icon Id="dpdf.ico" SourceFile="!(bindpath.stage)\dpdf.ico" />
+    <Property Id="ARPPRODUCTICON" Value="dpdf.ico" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="dPDF" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder" />
+
+    <Feature Id="Main" Title="dPDF" Level="1">
+      <ComponentGroupRef Id="Runtime" />
+      <ComponentRef Id="Registration" />
+      <ComponentRef Id="StartMenuShortcut" />
+    </Feature>
+
+    <ComponentGroup Id="Runtime" Directory="INSTALLFOLDER">
+      <Files Include="!(bindpath.stage)\**">
+        <!-- The MSI performs registration itself; the helper is for portable zips. -->
+        <Exclude Files="!(bindpath.stage)\register.ps1" />
+      </Files>
+    </ComponentGroup>
+
+    <Component Id="Registration" Directory="INSTALLFOLDER" Guid="5d0c2b8e-61a4-4c3f-9a55-4f86b8a1e7c2">
+      <RegistryKey Root="HKMU" Key="Software\Classes\net.dpdf.dPDF">
+        <RegistryValue Value="dPDF PDF Document" Type="string" KeyPath="yes" />
+        <RegistryValue Name="dPDF.Owner" Value="net.dpdf.dPDF" Type="string" />
+        <RegistryValue Name="dPDF.Executable" Value="[INSTALLFOLDER]dpdf.exe" Type="string" />
+        <RegistryValue Key="DefaultIcon" Value="&quot;[INSTALLFOLDER]dpdf.ico&quot;,0" Type="string" />
+        <RegistryValue Key="shell\open" Name="MultiSelectModel" Value="Document" Type="string" />
+        <RegistryValue Key="shell\open\command" Value="&quot;[INSTALLFOLDER]dpdf.exe&quot; &quot;%1&quot;" Type="string" />
+      </RegistryKey>
+      <RegistryKey Root="HKMU" Key="Software\Classes\Applications\dpdf.exe">
+        <RegistryValue Name="FriendlyAppName" Value="dPDF" Type="string" />
+        <RegistryValue Name="dPDF.Owner" Value="net.dpdf.dPDF" Type="string" />
+        <RegistryValue Name="dPDF.Executable" Value="[INSTALLFOLDER]dpdf.exe" Type="string" />
+        <RegistryValue Key="SupportedTypes" Name=".pdf" Value="" Type="string" />
+        <RegistryValue Key="DefaultIcon" Value="&quot;[INSTALLFOLDER]dpdf.ico&quot;,0" Type="string" />
+        <RegistryValue Key="shell\open\command" Value="&quot;[INSTALLFOLDER]dpdf.exe&quot; &quot;%1&quot;" Type="string" />
+      </RegistryKey>
+      <RegistryKey Root="HKMU" Key="Software\Microsoft\Windows\CurrentVersion\App Paths\dpdf.exe">
+        <RegistryValue Value="[INSTALLFOLDER]dpdf.exe" Type="string" />
+        <RegistryValue Name="dPDF.Owner" Value="net.dpdf.dPDF" Type="string" />
+        <RegistryValue Name="dPDF.Executable" Value="[INSTALLFOLDER]dpdf.exe" Type="string" />
+      </RegistryKey>
+      <RegistryKey Root="HKMU" Key="Software\net.dpdf.dPDF">
+        <RegistryValue Name="dPDF.Owner" Value="net.dpdf.dPDF" Type="string" />
+        <RegistryValue Name="dPDF.Executable" Value="[INSTALLFOLDER]dpdf.exe" Type="string" />
+        <RegistryValue Key="Capabilities" Name="ApplicationName" Value="dPDF" Type="string" />
+        <RegistryValue Key="Capabilities" Name="ApplicationDescription" Value="Compact PDF workspace" Type="string" />
+        <RegistryValue Key="Capabilities" Name="ApplicationIcon" Value="&quot;[INSTALLFOLDER]dpdf.ico&quot;,0" Type="string" />
+        <RegistryValue Key="Capabilities\FileAssociations" Name=".pdf" Value="net.dpdf.dPDF" Type="string" />
+        <RegistryValue Key="Capabilities\MimeAssociations" Name="application/pdf" Value="net.dpdf.dPDF" Type="string" />
+      </RegistryKey>
+      <RegistryValue Root="HKMU" Key="Software\RegisteredApplications" Name="net.dpdf.dPDF"
+                     Value="Software\net.dpdf.dPDF\Capabilities" Type="string" />
+      <RegistryValue Root="HKMU" Key="Software\Classes\.pdf\OpenWithProgids" Name="net.dpdf.dPDF"
+                     Value="" Type="string" />
+    </Component>
+
+    <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder" Guid="a3f1e0d4-2b7c-4e59-8c61-0d9b5e7f3a14">
+      <Shortcut Id="dPDFShortcut" Name="dPDF" Description="Compact PDF workspace"
+                Target="[INSTALLFOLDER]dpdf.exe" WorkingDirectory="INSTALLFOLDER" Icon="dpdf.ico" />
+      <RegistryValue Root="HKMU" Key="Software\net.dpdf.dPDF" Name="StartMenuShortcut" Value="1"
+                     Type="integer" KeyPath="yes" />
+    </Component>
+  </Package>
+</Wix>

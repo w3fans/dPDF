@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support dPDF development</title>
+<meta name="description" content="Support dPDF, a compact open-source PDF workspace for Fedora Linux and Windows. Choose a voluntary contribution to further development.">
+<link rel="canonical" href="https://idz.si/bs/dpdf-donate.html">
+<style>
+:root{color-scheme:light dark;font-family:system-ui,sans-serif;background:#131416;color:#eef0f3}*{box-sizing:border-box}body{margin:0;padding:clamp(20px,6vw,64px) 20px}main{max-width:640px;margin:auto;background:#202226;border:1px solid #393d43;border-radius:20px;padding:clamp(24px,5vw,44px)}.brand{color:#8cbcff;font-weight:600;letter-spacing:.12em}h1{font-size:clamp(28px,5vw,38px);line-height:1.15}p{line-height:1.65;color:#c7ccd5}a{color:#9bc4ff}fieldset{border:0;padding:0;margin:28px 0 0}legend{font-weight:600;margin-bottom:14px}label{display:block;margin-bottom:8px}input{font:inherit;border:1px solid #5d6571;border-radius:8px;padding:12px;background:#131416;color:#fff;width:100%}button{font:inherit;font-weight:600;margin-top:16px;background:#8cbcff;color:#10223c;padding:13px 20px;border:0;border-radius:9px;cursor:pointer;width:100%}button:hover{background:#b3d3ff}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #ffcf77;outline-offset:3px}.note{font-size:.9rem}footer{margin-top:32px;border-top:1px solid #393d43;padding-top:20px}small{line-height:1.5;color:#c7ccd5}
+</style>
+</head>
+<body><main>
+<a class="brand" href="https://github.com/w3fans/dPDF">dPDF</a>
+<h1>Support further development</h1>
+<p>dPDF helps you read and print PDFs, assemble contract pages, prepare visual signatures and stamps, and review documents in separate revisions.</p>
+<p>If it makes your daily work easier, you can help fund continued development, testing and improvements. Contributions are voluntary; dPDF remains open source under Apache-2.0.</p>
+<form method="post" action="https://idz.si/bs/dpdf-payment.php">
+<input type="hidden" name="target" value="payBSG.php">
+<input type="hidden" name="ref" value="dPDF development support">
+<input type="hidden" name="sourceSite" value="dPDF">
+<fieldset><legend>Choose your contribution</legend>
+<label for="amount">Amount in EUR</label>
+<input id="amount" name="amount" type="number" min="1" max="10000" step="0.01" value="10.00" required inputmode="decimal" aria-describedby="payment-note">
+<label for="name">Name (optional)</label>
+<input id="name" name="name" type="text" maxlength="160" autocomplete="name">
+<label for="email">Email (optional)</label>
+<input id="email" name="email" type="email" maxlength="254" autocomplete="email">
+<p class="note">You may include your name and email for payment correspondence and invoice requests. Automated confirmation and invoicing are not available yet.</p>
+<button type="submit">Continue to secure bank payment</button>
+</fieldset>
+<p class="note" id="payment-note">You will go directly to the bank’s secure card-payment page. Card details are entered only at the bank. Your optional name and email are forwarded with the payment.</p>
+</form>
+<footer><p><a href="https://github.com/w3fans/dPDF">Source code and issue tracker</a> · <a href="https://idz.si/">IDZ</a></p><small>dPDF by Denis Zvegelj. Thank you for supporting independent open-source development.</small></footer>
+</main></body></html>

@@ -1,0 +1,62 @@
+name: Fedora 44 and 45 RPM and COPR release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: 'Existing v0.1.x tag to build and publish to COPR'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dpdf-fedora-${{ inputs.release_ref || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  copr:
+    # The local operator publishes private tags with persistent build receipts.
+    # A public hosted relay is an explicit opt-in, never a second submitter.
+    if: ${{ !github.event.repository.private && vars.DPDF_HOSTED_COPR == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_ref || github.ref }}
+          persist-credentials: false
+      - name: Verify release tag
+        env:
+          RELEASE_TAG: ${{ inputs.release_ref || github.ref_name }}
+        run: python3 scripts/release-version.py verify --tag "$RELEASE_TAG"
+      - name: Install COPR client in isolated environment
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends rpm cpio
+          python3 -m venv "$RUNNER_TEMP/copr-client"
+          "$RUNNER_TEMP/copr-client/bin/pip" install 'copr-cli==2.5'
+      - name: Build exact release on Fedora 44 and 45 and attach RPMs
+        env:
+          COPR_LOGIN: ${{ secrets.COPR_LOGIN }}
+          COPR_TOKEN: ${{ secrets.COPR_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_ref || github.ref_name }}
+        run: |
+          export PATH="$RUNNER_TEMP/copr-client/bin:$PATH"
+          python3 scripts/publish-copr.py --tag "$RELEASE_TAG" --output "$RUNNER_TEMP/fedora-rpm" --attach
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: dpdf-fedora-${{ inputs.release_ref || github.ref_name }}
+          # COPR retains the packages and the publisher attaches them to the
+          # release. Recovery needs its receipt, not two redundant SRPM copies.
+          path: |
+            ${{ runner.temp }}/fedora-rpm/copr-release.json
+            ${{ runner.temp }}/fedora-rpm/SHA256SUMS-fedora.txt
+          retention-days: 7
+          if-no-files-found: ignore

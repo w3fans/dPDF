@@ -1,0 +1,47 @@
+# Third-party components
+
+- [Slint 1.18.1](https://github.com/slint-ui/slint): native UI. The Fedora/Windows desktop
+  open-source application uses Slint's GPL-3.0-only option, with attribution.
+  dPDF-owned source retains Apache-2.0. See docs/LICENSING.md and the retained text under
+  packaging/licenses/slint; Slint itself is not Apache-licensed.
+- [pdfium-render 0.9.4](https://github.com/ajrcarey/pdfium-render): Rust bindings.
+- [PDFium](https://pdfium.googlesource.com/pdfium/): PDF engine; the tested binary
+  distribution is [chromium/7881](https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F7881).
+  Include its LICENSE and licenses/ directory, including third-party dependencies.
+  Fedora RPMs build this pinned engine from the source manifest in
+  packaging/fedora/pdfium-sources.json, using Fedora's GN and Clang toolchain;
+  they do not copy the binary distribution into a source RPM.
+- [rfd](https://github.com/PolyMeilex/rfd): native/portal file dialogs.
+- [qpdf](https://qpdf.readthedocs.io/): optional page assembly dependency for the v0.4.0 groundwork;
+  reading works without it. Retain its LICENSE/NOTICE and applicable third-party notices.
+  The Windows MSI/portable zip bundle the official qpdf 12.4.2 MSVC runtime
+  (`qpdf.exe`, `qpdf30.dll`) under Apache-2.0, with `LICENSE.txt`, `NOTICE.md` and
+  `Artistic-2.0` from the v12.4.2 source tag in `licenses/qpdf/`
+  (`packaging/licenses/qpdf/`).
+- Microsoft Visual C++ runtime DLLs (`vcruntime140*.dll`, `msvcp140*.dll`,
+  `concrt140.dll`) ship app-local in the Windows installer exactly as qpdf's official
+  Windows archive provides them. `dpdf.exe` uses the same runtime. These are
+  Microsoft redistributable files.
+- [CUPS](https://openprinting.github.io/cups/): Linux printer integration via `lp`.
+- [SumatraPDF](https://www.sumatrapdfreader.org/docs/Command-line-arguments): optional,
+  separately configured Windows print helper during development. Not bundled.
+- [windows-sys 0.61.2](https://github.com/microsoft/windows-rs): Microsoft Win32
+  bindings for the native Windows print dialog, GDI and process-local COM setup.
+
+Cargo.lock pins Rust dependencies. Target-specific notice inventories and exact
+upstream text snapshots live under packaging/licenses/rust and are staged with
+the runtime. Linux currently covers 348 selected packages; Windows covers 254.
+The collector records hashes/provenance and the source check rejects dependency
+configuration or lockfile drift. These include build/proc-macro packages and remain
+inventory-only: toolchain/native-library/vendored-content and complete distribution
+review are still required. dPDF-owned code is Apache-2.0. No
+production license-compliance audit is claimed by a successful development build.
+
+- [image 0.25.10](https://github.com/image-rs/image): PNG/JPEG decoding, orientation
+  and bounded page-image resampling.
+- [arboard 3.7.0](https://github.com/1Password/arboard): native text clipboard.
+  Xvfb is an optional test helper, not an application dependency or bundled runtime.
+
+- [GTK 3](https://docs.gtk.org/gtk3/class.PrintOperation.html), GLib/GObject and
+  [Cairo](https://www.cairographics.org/): system Fedora native-print runtimes.
+  Loaded only by the print child, not bundled in the staged dPDF runtime.

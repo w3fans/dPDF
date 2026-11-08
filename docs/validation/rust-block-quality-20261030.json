@@ -1,0 +1,178 @@
+{
+  "scope": "generated_case18_python_sampling_investigation",
+  "qualified_for_secure_export": false,
+  "comparisons": [
+    {
+      "mapping": 10000,
+      "bake_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.2667,
+          0.475,
+          0.2666
+        ],
+        "effective_pdf_region": [
+          89.99996948242188,
+          60.00999069213867,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -79.97999954223633,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.98
+        ]
+      },
+      "print_350": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.2465371674883245
+      },
+      "print_400": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.5327956531608216
+      }
+    },
+    {
+      "mapping": 1000000,
+      "bake_dpi": 350,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.266667,
+          0.475,
+          0.266666
+        ],
+        "effective_pdf_region": [
+          90.00003051757812,
+          60.000099182128906,
+          280.0000305175781,
+          139.99990844726562
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -79.99980926513672,
+          280.0000305175781,
+          139.99990844726562
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.99980000000001
+        ]
+      },
+      "print_350": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.242533673124933
+      },
+      "print_400": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.459839972761321
+      }
+    },
+    {
+      "mapping": 10000,
+      "bake_dpi": 400,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.2667,
+          0.475,
+          0.2666
+        ],
+        "effective_pdf_region": [
+          89.99996948242188,
+          60.00999069213867,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -79.97999954223633,
+          279.9999694824219,
+          139.989990234375
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.98
+        ]
+      },
+      "print_350": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.896741005352831
+      },
+      "print_400": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.465120304165248
+      }
+    },
+    {
+      "mapping": 1000000,
+      "bake_dpi": 400,
+      "geometry": {
+        "normalized": [
+          0.225,
+          0.266667,
+          0.475,
+          0.266666
+        ],
+        "effective_pdf_region": [
+          90.00003051757812,
+          60.000099182128906,
+          280.0000305175781,
+          139.99990844726562
+        ],
+        "image_matrix": [
+          -190.0,
+          0.0,
+          0.0,
+          -79.99980926513672,
+          280.0000305175781,
+          139.99990844726562
+        ],
+        "page_points": [
+          400.0,
+          300.0
+        ],
+        "displayed_block_points": [
+          190.0,
+          79.99980000000001
+        ]
+      },
+      "print_350": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.897946597818063
+      },
+      "print_400": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.223459312223357
+      }
+    }
+  ],
+  "source_sha256": "baed7f216e217d3c5a26fdb7c48fc154507d809e2aac23b79821377843d9ba22",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "python_probe_sha256": "9859e555f97b2a72927079085be7945244e4cbec618d282d72f9a62c3189e761",
+  "note": "Parameter investigation on a generated negative-origin, 180-degree page; current Rust executable evidence is recorded separately in rust-block-latest.json."
+}

@@ -1,0 +1,33 @@
+{
+  "scope": "generated_image_page_replacement_units",
+  "binary_version": "dPDF 0.1.35 (reader development preview)",
+  "binary_sha256": "aa19e30b8216d5a5c86611a206732c4388a43812729fdf699090b05b3813784c",
+  "input_sha256": "ed2d2d074cb95a00ea7e19ac307c11dd56edf1c18a4754578e5780dad7f4ae9f",
+  "source": {
+    "unit": 2,
+    "box": [
+      0,
+      0,
+      306,
+      396
+    ],
+    "physical_points": [
+      612,
+      792
+    ]
+  },
+  "replaced": {
+    "unit": 1,
+    "box": [
+      0,
+      0,
+      306,
+      396
+    ],
+    "physical_points": [
+      306,
+      396
+    ]
+  },
+  "result": "PHYSICAL_SIZE_MISMATCH"
+}

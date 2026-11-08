@@ -1,0 +1,26 @@
+{
+  "scope": "generated_catalog_retention_after_assembly",
+  "method": "Bake normal generated case, then assemble with a catalog-bearing original differing only in catalog/attachment objects; no arbitrary PDF accepted by the CLI.",
+  "binary_sha256": "ba428204d6c9463a44c8a1520c08500f54df1c872567969ea72e892d03f4c44f",
+  "production_secure_export_enabled": false,
+  "cases": [
+    {
+      "case": "catalog-stream",
+      "input_sha256": "b9ff18075499f6834ebf8513350caeac334e27c979e8e5aab24a320eaa2a2e4d",
+      "output_sha256": "24375f8ca38ff95201579b80e38210d342b7d5cc4be71c8c92ba9e666b9f90c3",
+      "page_search_matches": 0,
+      "reachable_label_retained": true,
+      "reachable_date_retained": true,
+      "input_unchanged": true
+    },
+    {
+      "case": "catalog-attachment",
+      "input_sha256": "c3192c7e4573eff457451375cac0fb2981414c26014eade48bd1dfefd7d210af",
+      "output_sha256": "a8aec233e78481e479cd7e5314617dd110168f51b34ab27f1dd9ff9fa219b2ab",
+      "page_search_matches": 0,
+      "reachable_label_retained": true,
+      "reachable_date_retained": true,
+      "input_unchanged": true
+    }
+  ]
+}

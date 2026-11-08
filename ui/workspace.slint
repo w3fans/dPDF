@@ -1,0 +1,762 @@
+import { Button, LineEdit, ComboBox, ScrollView, Palette, CheckBox } from "std-widgets.slint";
+export { MarkStudioWindow } from "marks.slint";
+export { AboutWindow } from "about.slint";
+
+export struct PageTile { page: int, px: float, py: float, pw: float, ph: float, bitmap: image, ready: bool }
+export struct SidebarItem { title: string, page: int, bitmap: image, drag: data-transfer }
+export struct SearchMarker { px: float, py: float, pw: float, ph: float, active: bool }
+export struct DocumentTab { name: string, selected: bool }
+export struct ReviewTile {px:float,py:float,pw:float,ph:float,kind:int,turn:int}
+export struct MarkTile { index:int, px:float, py:float, pw:float, ph:float, bitmap:image, opacity:float, selected:bool }
+
+export component Workspace inherits Window {
+    icon: @image-url("assets/dpdf.svg");
+    title: root.has-document ? root.document-title + " — dPDF" : "dPDF — Reader preview";
+    preferred-width: 1180px; preferred-height: 800px;
+    min-width: 900px; min-height: 540px;
+    property <bool> compact-toolbar: false;
+    changed width => { root.compact-toolbar = root.width < 1120px; }
+    changed compact-toolbar => { if !root.compact-toolbar { overflow-menu.close(); } }
+    default-font-size: 13px;
+    in-out property <bool> dark: false;
+    in-out property <bool> sidebar-visible: true;
+    in-out property <bool> search-visible: false;
+    in-out property <bool> share-visible: false;
+    in-out property <bool> privacy-visible: false;
+    in-out property <bool> recovery-enabled;
+    in property <bool> recovery-allowed: true;
+    in property <string> recovery-summary;
+    property <bool> confirm-clear-recovery: false;
+    in property <bool> share-ready;
+    in-out property <bool> share-busy: false;
+    callback share-file(int);
+    in-out property <bool> print-visible: false;
+    in-out property <bool> page-ops-visible: false;
+    in property <bool> export-busy;
+    in property <int> page-count;
+    in-out property <int> page-operation: 0;
+    out property <bool> arranging: root.has-document && root.page-ops-visible && root.page-operation == 7;
+    in-out property <string> operation-pages;
+    in-out property <string> operation-source-pages: "1";
+    in property <string> app-version;
+    in property <bool> has-document;
+    in-out property <bool> review-visible:false;
+    in property <bool> review-ready;
+    in property <bool> review-failed;
+    in property <string> review-failure;
+    callback retry-review();
+    in property <bool> review-loaded;
+    // Status bar summary (R-UI-4): page, view mode, zoom and review visibility/revision.
+    out property <string> status-detail: root.has-document
+        ? "Page " + (root.current-page + 1) + " of " + root.page-count + "  ·  " + root.view-label + "  ·  " + root.zoom-label
+            + (root.review-loaded ? "  ·  " + root.review-status : "")
+        : "";
+    in property <string> review-status;
+    in property <string> review-count;
+    in property <[ReviewTile]> review-tiles;
+    in property <[string]> revision-labels;
+    in-out property <int> revision-index;
+    in-out property <string> revision-name;
+    in-out property <bool> remarks-on:true;
+    in-out property <int> review-filter;
+    in-out property <string> revision-filter-ids:"1,2";
+    in-out property <int> review-tool;
+    in-out property <string> review-text;
+    in-out property <int> review-export;
+    callback choose-revision(int);
+    callback new-revision();
+    callback filter-reviews(int);
+    callback select-remark(int,bool);
+    callback export-review();
+    in-out property <int> review-selected:-1;
+    callback update-remark();
+    in property <bool> password-required;
+    in property <string> password-file;
+    in property <string> password-error;
+    in-out property <string> password-text;
+    callback submit-password();
+    callback cancel-password();
+    changed password-required => { if root.password-required { password-input.focus(); } else { keys.focus(); } }
+
+    in property <bool> has-recovery;
+    in property <bool> recovery-busy;
+    in property <string> recovery-label;
+    in property <string> recovery-note;
+    callback recover-draft();
+    callback discard-recovery();
+    callback set-recovery-enabled(bool);
+    callback clear-recovery();
+    callback show-privacy();
+    in property <bool> busy;
+    in property <bool> print-busy;
+    in property <bool> native-printing;
+    in property <bool> printer-loading;
+    in property <string> printer-note;
+    in property <[string]> printer-choices: ["System default", "Other printer…"];
+    in-out property <int> printer-choice: 0;
+    in property <string> status: "Open a PDF to begin";
+    in property <string> document-title;
+    in property <string> page-label: "0 / 0";
+    in property <string> zoom-label: "100%";
+    in-out property <string> zoom-entry: "100%";
+    in-out property <bool> zoom-editing: false;
+    in-out property <bool> jump-editing: false;
+    out property <float> zoom-field-window-x: zoom-input.absolute-position.x / 1px;
+    out property <float> zoom-field-window-y: zoom-input.absolute-position.y / 1px;
+    in property <string> view-label: "Single page";
+    in property <string> search-label;
+    in property <[DocumentTab]> tabs;
+    in-out property <length> tab-strip-x;
+    in property <length> tab-width: 212px;
+    out property <float> tab-strip-width: tab-strip.visible-width / 1px;
+    out property <float> tab-strip-height: tab-strip.visible-height / 1px;
+    in property <[PageTile]> pages;
+    in property <[SearchMarker]> search-markers;
+    in property <[SearchMarker]> selection-markers;
+    in property <bool> text-selected;
+    in property <[MarkTile]> mark-tiles;
+    in property <bool> mark-pending;
+    in property <bool> has-marks;
+    in property <bool> can-undo-mark;
+    in property <bool> can-redo-mark;
+    callback undo-mark();
+    callback redo-mark();
+    // Remark edits have their own history; Ctrl+Z uses it while the Review panel is open.
+    in property <bool> can-undo-remark;
+    in property <bool> can-redo-remark;
+    callback undo-remark();
+    callback redo-remark();
+    callback cancel-mark-drag();
+    in property <bool> mark-selected;
+    out property <float> mark-handle-window-x;
+    out property <float> mark-handle-window-y;
+    out property <float> mark-width-window-x;
+    out property <float> mark-width-window-y;
+    in-out property <string> mark-width;
+    in-out property <string> mark-height;
+    in-out property <string> mark-opacity: "100";
+    in-out property <bool> mark-lock: true;
+    callback begin-mark(int,float,float,bool);
+    callback drag-mark(float,float,bool);
+    callback apply-mark-size(bool);
+    callback remove-mark();
+    callback cancel-mark();
+    in property <int> current-page;
+    in property <[SidebarItem]> sidebar-items;
+    in-out property <int> sidebar-tab: 0;
+    in-out property <int> view-mode: 0;
+    in-out property <float> canvas-width;
+    in-out property <float> canvas-height;
+    in-out property <length> sidebar-y;
+    in-out property <length> scroll-y;
+    in-out property <length> scroll-x;
+    out property <float> viewport-window-x: canvas.absolute-position.x / 1px;
+    out property <float> viewport-window-y: canvas.absolute-position.y / 1px;
+    out property <float> viewport-width: canvas.visible-width / 1px;
+    out property <float> viewport-height: canvas.visible-height / 1px;
+    out property <float> sidebar-offset: -sidebar.content-y / 1px;
+    out property <float> sidebar-height: sidebar.visible-height / 1px;
+    out property <float> sidebar-window-x: sidebar.absolute-position.x / 1px;
+    out property <float> sidebar-window-y: sidebar.absolute-position.y / 1px;
+    out property <float> sidebar-width: sidebar.visible-width / 1px;
+    out property <int> page-drag-scroll: root.arranging && root.sidebar-visible && !root.password-required ? (page-drag-top.has-drag ? -1 : page-drag-bottom.has-drag ? 1 : 0) : 0;
+    in property <length> thumbnail-height: 168px;
+    in property <length> thumbnail-spacing: 6px;
+    in-out property <string> query;
+    in-out property <string> jump-text;
+    in-out property <string> print-range;
+    in-out property <string> printer-name;
+    in-out property <int> print-scaling: 0;
+    callback open();
+    callback drop-page-at(data-transfer, float);
+    callback open-mark-studio();
+    pure callback can-drop-files(data-transfer) -> bool;
+    callback drop-files(data-transfer);
+    callback save-copy();
+    callback print-document();
+    callback request-print();
+    callback native-print-document();
+    callback show-about();
+    callback export-pages();
+    callback discover-printers();
+    callback choose-printer(int);
+    callback select-tab(int);
+    callback close-tab(int);
+    callback navigate(int);
+    callback jump(string);
+    callback zoom(float);
+    callback set-zoom(string);
+    callback wheel-zoom(float, float, float);
+    callback fit(int);
+    callback rotate();
+    callback change-view(int);
+    callback search(string);
+    callback next-result(int);
+    callback select-sidebar(int);
+    callback select-text(int, float, float, float, float, bool);
+    callback copy-text();
+    callback select-page-text();
+    callback clear-selection();
+    pure callback can-drop-page(data-transfer) -> bool;
+    callback drop-page(data-transfer, int, bool);
+    callback apply-page-order();
+    callback shortcut(string);
+    callback viewport-scrolled();
+
+    background: Palette.background;
+    changed page-operation => {
+        if (root.page-operation == 0) { root.operation-source-pages = "1"; }
+        if (root.page-operation == 1 || root.page-operation == 4) { root.operation-source-pages = ""; }
+        if (root.page-operation == 7) { root.operation-pages = "1-" + root.page-count; }
+    }
+    changed print-visible => { if (root.print-visible) { root.discover-printers(); } }
+    changed dark => { Palette.color-scheme = root.dark ? ColorScheme.dark : ColorScheme.light; }
+    forward-focus: keys;
+    keys := FocusScope {
+        capture-key-pressed(event) => {
+            if root.password-required {
+                if event.text==Key.Escape {root.cancel-password();return accept;}
+                return reject;
+            }
+            if (event.modifiers.control) {
+                if (event.text == "o") { root.open(); return accept; }
+                if ((event.text == "s" || event.text == "S")) { root.save-copy(); return accept; }
+                if (event.text == "p") { if root.has-document { root.request-print(); } return accept; }
+                if (event.text == "f") { root.search-visible = true; search-input.focus(); return accept; }
+                if (event.text == "+" || event.text == "=") { root.zoom(1.2); return accept; }
+                if (event.text == "-") { root.zoom(1 / 1.2); return accept; }
+                if (event.text == "0") { root.fit(1); return accept; }
+                if (event.text == Key.Tab) { root.shortcut(event.modifiers.shift ? "previous-tab" : "next-tab"); return accept; }
+                if (event.text == "w") { root.shortcut("close-tab"); return accept; }
+            }
+            if (event.text == Key.F9) { root.sidebar-visible = !root.sidebar-visible; return accept; }
+            if (event.text == Key.F1) { root.show-about(); return accept; }
+            if (event.text == Key.F3) { root.search-visible = true; root.next-result(event.modifiers.shift ? -1 : 1); return accept; }
+            if (event.text == Key.Escape) { root.zoom-entry = root.zoom-label; keys.focus(); root.review-tool=0; root.clear-selection(); root.search-visible = false; root.share-visible = false; root.privacy-visible = false; root.print-visible = false; root.page-ops-visible = false; return accept; }
+            return reject;
+        }
+        key-pressed(event) => {
+            if root.password-required {return reject;}
+            if (event.modifiers.control && (event.text == "z" || event.text == "Z")) {
+                if (event.modifiers.shift) {
+                    if (root.review-visible && root.can-redo-remark) { root.redo-remark(); return accept; }
+                    if root.can-redo-mark { root.redo-mark(); return accept; }
+                } else {
+                    if (root.review-visible && root.can-undo-remark) { root.undo-remark(); return accept; }
+                    if root.can-undo-mark { root.undo-mark(); return accept; }
+                }
+            }
+            if (event.modifiers.control && (event.text == "y" || event.text == "Y")) {
+                if (root.review-visible && root.can-redo-remark) { root.redo-remark(); return accept; }
+                if root.can-redo-mark { root.redo-mark(); return accept; }
+            }
+            if (event.text == Key.Delete && root.mark-selected) { root.remove-mark(); return accept; }
+
+            if (event.modifiers.control && (event.text == "c" || event.text == "C")) { root.copy-text(); return accept; }
+            if (event.modifiers.control && (event.text == "a" || event.text == "A")) { root.select-page-text(); return accept; }
+            if (event.text == Key.Escape) { root.clear-selection(); return accept; }
+            if (event.text == Key.PageDown) { root.navigate(1); return accept; }
+            if (event.text == Key.PageUp) { root.navigate(-1); return accept; }
+            return reject;
+        }
+        VerticalLayout {
+            spacing: 0px; padding: 0px;
+            Rectangle {
+                height: 44px; background: Palette.alternate-background;
+                // Responsive toolbar contents must not determine the window width.
+                min-width: 0px; preferred-width: 0px;
+                HorizontalLayout {
+                    padding: 6px; spacing: 5px;
+                    Text { text: "dPDF"; font-size: 19px; font-weight: 700; color: Palette.accent-background; vertical-alignment: center; width: root.compact-toolbar ? 44px : 66px; }
+                    Button { text: "Open"; clicked => { root.open(); } }
+                    Button { text: "Save as…"; enabled: root.has-document; clicked => { root.save-copy(); } }
+                    if !root.compact-toolbar: Button { text: "Share…"; enabled: root.has-document; clicked => { root.share-visible = !root.share-visible; } }
+                    if !root.compact-toolbar: Button { text: "Pages…"; enabled: root.has-document && !root.export-busy; clicked => { root.operation-pages = "" + (root.current-page + 1); root.page-ops-visible = !root.page-ops-visible; } }
+                    Button { text: "Print"; enabled: root.has-document; clicked => { root.request-print(); } }
+                    Button { text: "Find"; enabled: root.has-document; clicked => { root.search-visible = !root.search-visible; search-input.focus(); } }
+                    Button { text: "Copy"; enabled: root.text-selected; clicked => { root.copy-text(); } }
+                    if !root.compact-toolbar: Button { text: "Marks…"; clicked => { root.open-mark-studio(); } }
+                    Rectangle { width: root.compact-toolbar ? 2px : 10px; }
+                    Button { text: "‹"; enabled: root.has-document; clicked => { root.navigate(-1); } }
+                    LineEdit {
+                        changed has-focus => { root.jump-editing = self.has-focus; if !self.has-focus { root.jump-text = root.has-document ? "" + (root.current-page + 1) : ""; } }
+                        text <=> root.jump-text; width: 56px; placeholder-text: "Page"; enabled: root.has-document;
+                        accepted => { root.jump(self.text); keys.focus(); }
+                    }
+                    Text { text: root.page-label; vertical-alignment: center; min-width: root.compact-toolbar ? 45px : 70px; color: Palette.foreground; }
+                    Button { text: "›"; enabled: root.has-document; clicked => { root.navigate(1); } }
+                    Rectangle { horizontal-stretch: 1; }
+                    Button { text: root.dark ? "Light" : "Dark"; clicked => { root.dark = !root.dark; } }
+                    if !root.compact-toolbar: Button { text: "Privacy…"; clicked => { root.confirm-clear-recovery = false; root.show-privacy(); root.privacy-visible = !root.privacy-visible; } }
+                    if !root.compact-toolbar: Button { text: "About"; clicked => { root.show-about(); } }
+                    if root.compact-toolbar: Button {
+                        text: "More…";
+                        clicked => { overflow-menu.show(); }
+                    }
+                }
+                overflow-menu := PopupWindow {
+                    x: parent.width - self.width - 6px;
+                    y: parent.height;
+                    width: 220px; height: 284px;
+                    close-policy: PopupClosePolicy.close-on-click-outside;
+                    Rectangle {
+                        background: Palette.background;
+                        border-width: 1px; border-color: Palette.foreground;
+                        VerticalLayout {
+                            padding: 8px; spacing: 4px;
+                            Button { text: "Share…"; enabled: root.has-document; clicked => { overflow-menu.close(); root.share-visible = !root.share-visible; } }
+                            Button { text: "Pages…"; enabled: root.has-document && !root.export-busy; clicked => { overflow-menu.close(); root.operation-pages = "" + (root.current-page + 1); root.page-ops-visible = !root.page-ops-visible; } }
+                            Button { text: "Marks…"; clicked => { overflow-menu.close(); root.open-mark-studio(); } }
+                            Button { text: "Review…"; enabled: root.has-document; clicked => { overflow-menu.close(); root.review-visible = !root.review-visible; } }
+                            CheckBox { text: "Remarks"; checked <=> root.remarks-on; enabled: root.review-ready; toggled => { root.filter-reviews(root.review-filter); } }
+                            Button { text: "Privacy…"; clicked => { overflow-menu.close(); root.confirm-clear-recovery = false; root.show-privacy(); root.privacy-visible = !root.privacy-visible; } }
+                            Button { text: "About"; clicked => { overflow-menu.close(); root.show-about(); } }
+                        }
+                    }
+                }
+            }
+            Rectangle {
+                height: 38px;
+                min-width: 0px; preferred-width: 0px;
+                HorizontalLayout {
+                    padding-left: 7px; padding-right: 7px; spacing: 5px;
+                    Button { text: "Sidebar"; clicked => { root.sidebar-visible = !root.sidebar-visible; } }
+                    Button { text: "−"; enabled: root.has-document; clicked => { root.zoom(1 / 1.2); } }
+                    zoom-input := LineEdit {
+                        changed has-focus => { root.zoom-editing = self.has-focus; if !self.has-focus { root.zoom-entry = root.zoom-label; } }
+                        text <=> root.zoom-entry; placeholder-text: "Zoom %"; width: 68px; enabled: root.has-document;
+                        accepted => { root.set-zoom(self.text); keys.focus(); }
+                    }
+                    Button { text: "+"; enabled: root.has-document; clicked => { root.zoom(1.2); } }
+                    Button { text: "Fit width"; enabled: root.has-document; clicked => { root.fit(1); } }
+                    Button { text: "Fit page"; enabled: root.has-document; clicked => { root.fit(2); } }
+                    Button { text: "100%"; enabled: root.has-document; clicked => { root.fit(0); } }
+                    ComboBox {
+                        model: ["Single page", "Continuous", "Two pages"];
+                        current-index <=> root.view-mode; width: 150px;
+                        selected(value) => { root.change-view(self.current-index); }
+                    }
+                    Button { text: "Rotate ↻"; enabled: root.has-document; clicked => { root.rotate(); } }
+                    if !root.compact-toolbar: Button {text:"Review…";enabled:root.has-document;clicked=>{root.review-visible=!root.review-visible;}}
+                    if !root.compact-toolbar: CheckBox {text:"Remarks";checked <=> root.remarks-on;enabled:root.review-ready; toggled=>{root.filter-reviews(root.review-filter);}}
+
+                    if root.native-printing: Button { text: root.compact-toolbar ? "Print…" : "Print options…"; enabled: root.has-document; clicked => { root.print-visible = true; } }
+                    Rectangle { horizontal-stretch: 1; }
+                    if !root.compact-toolbar: Text { text: "Reader preview · v" + root.app-version; min-width: 0px; overflow: elide; vertical-alignment: center; color: Palette.foreground; }
+                }
+            }
+            tab-strip := ScrollView {
+                visible: root.tabs.length > 0;
+                height: root.tabs.length == 0 ? 0px : root.tabs.length * root.tab-width > self.width ? 52px : 34px;
+                vertical-scrollbar-policy: always-off;
+                content-x <=> root.tab-strip-x;
+                content-width: root.tabs.length * root.tab-width;
+                content-height: 32px;
+                for tab[index] in root.tabs: Rectangle {
+                    x: index * root.tab-width; width: root.tab-width - 2px; height: 32px;
+                    background: tab.selected ? Palette.background : Palette.alternate-background;
+                    HorizontalLayout {
+                        padding: 3px; spacing: 2px;
+                        Button { text: tab.name; horizontal-stretch: 1; clicked => { root.select-tab(index); } }
+                        Button { text: "×"; width: 28px; clicked => { root.close-tab(index); } }
+                    }
+                }
+            }
+            Rectangle {
+                visible: root.search-visible;
+                height: root.search-visible ? 40px : 0px; background: Palette.alternate-background;
+                HorizontalLayout {
+                    padding: 5px; spacing: 5px;
+                    search-input := LineEdit { text <=> root.query; placeholder-text: "Find text in this document"; accepted => { root.search(self.text); } }
+                    Button { text: "Search"; clicked => { root.search(root.query); } }
+                    Button { text: "Previous"; clicked => { root.next-result(-1); } }
+                    Button { text: "Next"; clicked => { root.next-result(1); } }
+                    Text { text: root.search-label; min-width: 150px; color: Palette.foreground; vertical-alignment: center; }
+                    Button { text: "×"; clicked => { root.search-visible = false; keys.focus(); } }
+                }
+            }
+            if root.privacy-visible: Rectangle {
+                height: 76px; background: Palette.alternate-background;
+                VerticalLayout {
+                    padding: 5px; spacing: 4px;
+                    HorizontalLayout {
+                        spacing: 5px;
+                        CheckBox {
+                            text: "Keep local draft recovery";
+                            checked <=> root.recovery-enabled;
+                            enabled: root.recovery-allowed && !root.recovery-busy;
+                            toggled => { root.set-recovery-enabled(self.checked); }
+                        }
+                        Text { text: root.recovery-summary; color: Palette.foreground; overflow: elide; horizontal-stretch: 1; vertical-alignment: center; }
+                        Button { text: "×"; clicked => { root.privacy-visible = false; root.confirm-clear-recovery = false; keys.focus(); } }
+                    }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Button {
+                            text: root.confirm-clear-recovery ? "Confirm: delete all drafts" : "Delete all recovery drafts…";
+                            enabled: root.recovery-allowed && !root.recovery-busy;
+                            clicked => {
+                                if (root.confirm-clear-recovery) { root.confirm-clear-recovery = false; root.clear-recovery(); }
+                                else { root.confirm-clear-recovery = true; }
+                            }
+                        }
+                        if root.confirm-clear-recovery: Button { text: "Keep drafts"; clicked => { root.confirm-clear-recovery = false; } }
+                        Text { text: root.confirm-clear-recovery ? "Deletes every saved checkpoint, including other sessions' drafts. Open tabs keep their unsaved work." : "Recovery files contain PDF and signature images. Saved PDFs, assets and preferences are not affected."; color: Palette.foreground; vertical-alignment: center; horizontal-stretch: 1; wrap: word-wrap; }
+                    }
+                }
+            }
+            if root.share-visible && root.has-document: Rectangle {
+                height: 76px; background: Palette.alternate-background;
+                VerticalLayout {
+                    padding: 5px; spacing: 4px;
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Text { text: "Saved file:"; color: Palette.foreground; vertical-alignment: center; }
+                        Text { text: root.document-title; color: Palette.foreground; overflow: elide; horizontal-stretch: 1; vertical-alignment: center; }
+                        Button { text: "×"; clicked => { root.share-visible = false; keys.focus(); } }
+                    }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Button { text: "Copy file path"; enabled: root.share-ready && !root.export-busy; clicked => { root.share-file(1); } }
+                        Button { text: "Open folder"; enabled: root.share-ready && !root.share-busy && !root.export-busy; clicked => { root.share-file(0); } }
+                        Button { text: "Save copy…"; enabled: !root.export-busy; clicked => { root.save-copy(); } }
+                        Text { text: root.share-ready ? "Attach the saved PDF in your email app." : "Save a copy first to include unsaved marks or remarks."; color: Palette.foreground; vertical-alignment: center; horizontal-stretch: 1; wrap: word-wrap; }
+                    }
+                }
+            }
+            if root.review-visible: Rectangle {
+                height:120px;background:Palette.alternate-background;
+                VerticalLayout {
+                    padding:4px;spacing:4px;
+                    HorizontalLayout {
+                        spacing:5px;
+                        Text {text:"Revision";color:Palette.foreground;vertical-alignment:center;}
+                        ComboBox {model:root.revision-labels;current-index <=> root.revision-index;width:160px;enabled:root.review-ready;selected=>{root.choose-revision(self.current-index);}}
+                        LineEdit {text <=> root.revision-name;placeholder-text:"New revision label";horizontal-stretch:1;enabled:root.review-ready;}
+                        Button {text:"New revision";enabled:root.review-ready;clicked=>{root.new-revision();}}
+                        ComboBox {model:["All revisions","Current revision","Selected revisions"];current-index <=> root.review-filter;width:170px;enabled:root.review-ready;selected=>{root.filter-reviews(self.current-index);}}
+                        if root.review-filter==2: LineEdit {text <=> root.revision-filter-ids;width:65px;accepted=>{root.filter-reviews(2);}}
+                    }
+                    HorizontalLayout {
+                        spacing:5px;
+                        ComboBox {model:["Select text","Place note","Highlight area","Underline area"];current-index <=> root.review-tool;width:170px;enabled:root.review-ready;selected=>{root.cancel-mark();}}
+                        LineEdit {text <=> root.review-text;placeholder-text:"Remark text — required for a note";horizontal-stretch:1;enabled:root.review-ready;}
+                        Button {text:"Update text";enabled:root.review-selected>=0;clicked=>{root.update-remark();}}
+                        ComboBox {model:["All remarks visible","Current visibility","Without dPDF remarks"];current-index <=> root.review-export;width:190px;enabled:root.review-ready;}
+                        Button {text:"Export copy…";enabled:root.review-ready && !root.export-busy;clicked=>{root.export-review();}}
+                    }
+                    HorizontalLayout {
+                        Text {text:root.review-failed ? "Review unavailable: " + root.review-failure : root.review-count + (root.review-tool==1 ? " · Click a page to place the note" : root.review-tool>1 ? " · Drag a rectangle over the text; Esc cancels" : " · Review sidebar lists visible remarks");color:Palette.foreground;vertical-alignment:center;horizontal-stretch:1;overflow:elide;}
+                        if root.review-failed: Button {text:"Retry review";clicked=>{root.retry-review();}}
+                        Button {text:"Undo";enabled:root.can-undo-remark;clicked=>{keys.focus();root.undo-remark();}}
+                        Button {text:"Redo";enabled:root.can-redo-remark;clicked=>{keys.focus();root.redo-remark();}}
+                        Button {text:"Remarks list";clicked=>{root.sidebar-visible=true;root.sidebar-tab=2;root.select-sidebar(2);}}
+                    }
+                }
+            }
+            if root.has-recovery: Rectangle {
+                height:40px; background:Palette.alternate-background;
+                HorizontalLayout {
+                    padding:4px; spacing:5px;
+                    Text {text:root.recovery-label; color:Palette.foreground; horizontal-stretch:1; overflow:elide; vertical-alignment:center;}
+                    Button {text:"Recover draft"; enabled:!root.recovery-busy; clicked=>{root.recover-draft();}}
+                    Button {text:"Discard draft"; enabled:!root.recovery-busy; clicked=>{root.discard-recovery();}}
+                }
+            }
+            if root.mark-pending || root.has-marks || root.can-undo-mark || root.can-redo-mark: Rectangle {
+                height: 80px; background: Palette.alternate-background;
+                VerticalLayout {
+                    padding: 4px; spacing: 3px;
+                    HorizontalLayout {
+                        spacing: 5px;
+                    Text { text: root.mark-pending ? "Click a page to place the mark. Esc cancels placement." : "Simple overlays — editable PDF images. Drag to move; use the corner to resize. Save exports a separate copy."; color: Palette.foreground; overflow: elide; horizontal-stretch: 1; vertical-alignment: center; }
+                        Text {text:root.recovery-note; color:Palette.foreground; vertical-alignment:center;}
+                        Button { text: "Undo"; enabled: root.can-undo-mark; clicked => { keys.focus(); root.undo-mark(); } }
+                        Button { text: "Redo"; enabled: root.can-redo-mark; clicked => { keys.focus(); root.redo-mark(); } }
+                    }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        Text { text: "Width mm"; color: Palette.foreground; vertical-alignment: center; }
+                        LineEdit {
+                            property <length> window-x: self.absolute-position.x;
+                            property <length> window-y: self.absolute-position.y;
+                            changed window-x => { root.mark-width-window-x = self.window-x / 1px; }
+                            changed window-y => { root.mark-width-window-y = self.window-y / 1px; }
+                            text <=> root.mark-width; enabled: root.mark-selected; width: 65px; accepted => { root.apply-mark-size(false); } }
+                        Text { text: "Height mm"; color: Palette.foreground; vertical-alignment: center; }
+                        LineEdit { text <=> root.mark-height; enabled: root.mark-selected; width: 65px; accepted => { root.apply-mark-size(false); } }
+                        CheckBox { text: "Lock ratio"; checked <=> root.mark-lock; enabled: root.mark-selected; }
+                        Text { text: "Opacity %"; color: Palette.foreground; vertical-alignment: center; }
+                        LineEdit { text <=> root.mark-opacity; enabled: root.mark-selected; width: 55px; }
+                        Button { text: "Apply"; enabled: root.mark-selected; clicked => { root.apply-mark-size(false); } }
+                        Button { text: "Reset size"; enabled: root.mark-selected; clicked => { root.apply-mark-size(true); } }
+                        Button { text: "Remove"; enabled: root.mark-selected; clicked => { root.remove-mark(); } }
+                        Button { text: "Save copy…"; enabled: root.has-marks && !root.export-busy; clicked => { root.save-copy(); } }
+                        if root.mark-pending: Button { text: "Cancel"; clicked => { root.cancel-mark(); } }
+                    }
+                }
+            }
+            if root.page-ops-visible: Rectangle {
+                height: 102px; background: Palette.alternate-background;
+                VerticalLayout {
+                    padding: 5px; spacing: 4px;
+                    Text { text: "Save an edited copy. Page assembly invalidates existing cryptographic signatures in the result."; color: Palette.foreground; overflow: elide; }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        ComboBox { model: ["Replace page", "Insert pages", "Remove pages", "Extract pages", "Merge files", "Rotate clockwise", "Rotate counterclockwise", "Reorder pages"]; current-index <=> root.page-operation; width: 220px; }
+                        if root.page-operation != 4: LineEdit { text <=> root.operation-pages; placeholder-text: root.page-operation < 2 ? "Target page" : "Pages: 1-3,7"; accepted => { if (root.arranging) { root.apply-page-order(); } } }
+                        if root.page-operation < 2 || root.page-operation == 4: LineEdit { text <=> root.operation-source-pages; placeholder-text: "Source pages (blank = all)"; }
+                        Button { text: root.export-busy ? "Saving…" : "Save edited copy…"; enabled: !root.export-busy; clicked => { root.export-pages(); } }
+                        Button { text: "Close"; clicked => { root.page-ops-visible = false; } }
+                    }
+                    Text { text: root.page-operation == 1 ? "Insert PDF/image before the target page; page count + 1 appends. Images fit A4." : root.page-operation == 7 ? "Drag thumbnails to set output order, then Save edited copy. Page text stays in original order until export." : root.page-operation == 0 ? "Replace with a PDF page or PNG/JPEG scan. Images fit the target page without cropping." : root.page-operation == 4 ? "Append PDFs or PNG/JPEG scans in selected order. Images fit A4." : "Blank page selection means all pages. Existing source files are preserved."; color: Palette.foreground; overflow: elide; }
+                }
+            }
+            if root.print-visible: Rectangle {
+                height: 108px; background: Palette.alternate-background;
+                VerticalLayout {
+                    padding: 5px; spacing: 3px;
+                    Text { text: root.printer-loading ? "Finding printers…" : root.printer-note; color: Palette.foreground; overflow: elide; }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        LineEdit { text <=> root.print-range; placeholder-text: "All pages, or a range such as 1-3,7"; }
+                        ComboBox { model: ["Fit to paper", "Actual size"]; current-index <=> root.print-scaling; }
+                        Button { text: "Current page"; clicked => { root.print-range = "" + (root.current-page + 1); } }
+                    }
+                    HorizontalLayout {
+                        spacing: 5px;
+                        ComboBox { model: root.printer-choices; current-index <=> root.printer-choice; selected(value) => { root.choose-printer(self.current-index); } }
+                        if root.printer-choice == root.printer-choices.length - 1: LineEdit { text <=> root.printer-name; placeholder-text: "Printer name"; }
+                        Button { text: "Refresh"; enabled: !root.printer-loading; clicked => { root.discover-printers(); } }
+                        if root.native-printing: Button { text: "System dialog…"; enabled: !root.print-busy; clicked => { root.native-print-document(); } }
+                        Button { text: root.print-busy ? "Submitting…" : root.native-printing ? "Quick Print" : "Print"; enabled: !root.print-busy; clicked => { root.print-document(); } }
+                        Button { text: "Cancel"; clicked => { root.print-visible = false; } }
+                    }
+                }
+            }
+            HorizontalLayout {
+                spacing: 0px;
+                Rectangle {
+                    visible: root.sidebar-visible;
+                    width: root.sidebar-visible ? 200px : 0px; background: Palette.background;
+                    VerticalLayout {
+                        padding: 5px; spacing: 4px;
+                        ComboBox {
+                            model: ["Pages", "Bookmarks", "Review"];
+                            enabled: !root.arranging;
+                            current-index <=> root.sidebar-tab;
+                            selected(value) => { root.select-sidebar(self.current-index); }
+                        }
+                        if root.arranging: HorizontalLayout {
+                            Text { text: "Output page order"; color: Palette.foreground; vertical-alignment: center; }
+                            Button { text: "Reset"; clicked => { root.operation-pages = "1-" + root.page-count; root.apply-page-order(); } }
+                        }
+                        sidebar := ScrollView {
+                            content-y <=> root.sidebar-y;
+                            VerticalLayout {
+                                spacing: root.thumbnail-spacing;
+                                for item[index] in root.sidebar-items: Rectangle {
+                                    height: root.sidebar-tab == 0 ? root.thumbnail-height : 36px;
+                                    background: Palette.alternate-background;
+                                    border-radius: 3px;
+                                    border-width: item.page == root.current-page ? 2px : 0px;
+                                    border-color: Palette.accent-background;
+                                    if root.sidebar-tab == 0: Image { source: item.bitmap; x: 25px; y: 5px; width: parent.width - 50px; height: 137px; image-fit: contain; }
+                                    Text { text: item.title; x: 6px; y: root.sidebar-tab == 0 ? 143px : 0px; width: parent.width - (root.sidebar-tab==2 ? 44px : 12px); height: 25px; color: Palette.foreground; overflow: elide; horizontal-alignment: root.sidebar-tab == 0 ? center : left; }
+                                    DragArea {
+                                        enabled: root.arranging;
+                                        allow-move: true;
+                                        data: item.drag;
+                                        drag-image: item.bitmap;
+                                        TouchArea { clicked => { if root.sidebar-tab==2 {root.select-remark(index,false);}else{root.jump("" + (item.page + 1));} keys.focus(); } }
+                                    }
+                                    if root.sidebar-tab==2: Button {x:parent.width - 30px;y:0px;width:28px;height:28px;text:"×";clicked=>{root.select-remark(index,true);}}
+                                    before-drop := DropArea {
+                                        height: parent.height / 2;
+                                        can-drop(event) => { root.arranging && root.can-drop-page(event.data) ? DragAction.move : DragAction.none }
+                                        dropped(event) => { root.drop-page(event.data, index, true); return DragAction.move; }
+                                    }
+                                    after-drop := DropArea {
+                                        y: parent.height / 2; height: parent.height / 2;
+                                        can-drop(event) => { root.arranging && root.can-drop-page(event.data) ? DragAction.move : DragAction.none }
+                                        dropped(event) => { root.drop-page(event.data, index, false); return DragAction.move; }
+                                    }
+                                    if before-drop.has-drag: Rectangle { y: 0px; height: 3px; background: Palette.accent-background; }
+                                    if after-drop.has-drag: Rectangle { y: parent.height - 3px; height: 3px; background: Palette.accent-background; }
+                                }
+                            }
+                        }
+                    }
+                }
+                Rectangle {
+                    background: root.dark ? #202329 : #cdd1d6;
+                    canvas := ScrollView {
+                        content-width: root.canvas-width * 1px;
+                        content-height: root.canvas-height * 1px;
+                        content-y <=> root.scroll-y;
+                        content-x <=> root.scroll-x;
+                        scrolled => { root.viewport-scrolled(); }
+                        TouchArea {
+                            width: root.canvas-width * 1px; height: root.canvas-height * 1px;
+                            scroll-event(event) => {
+                                if (event.modifiers.control && event.delta-y != 0px) {
+                                    root.wheel-zoom(event.delta-y > 0px ? 1.12 : 1 / 1.12, self.mouse-x / 1px, self.mouse-y / 1px);
+                                    return accept;
+                                }
+                                return reject;
+                            }
+                        }
+                        for tile in root.pages: Rectangle {
+                            x: tile.px * 1px; y: tile.py * 1px;
+                            width: tile.pw * 1px; height: tile.ph * 1px;
+                            background: white;
+                            if tile.ready: Image { source: tile.bitmap; width: parent.width; height: parent.height; image-fit: fill; }
+                            if !tile.ready: Text { text: "Page " + (tile.page + 1); color: #737b87; horizontal-alignment: center; vertical-alignment: center; }
+                            TouchArea {
+                                mouse-cursor: root.mark-pending || (root.review-visible && root.review-tool>0) ? crosshair : text;
+                                pointer-event(event) => {
+                                    if (event.button == PointerEventButton.left && event.kind == PointerEventKind.down) {
+                                        keys.focus();
+                                        root.select-text(tile.page, self.mouse-x / self.width, self.mouse-y / self.height, self.mouse-x / self.width, self.mouse-y / self.height, false);
+                                    }
+                                    if (event.button == PointerEventButton.left && event.kind == PointerEventKind.up) {
+                                        root.select-text(tile.page, self.pressed-x / self.width, self.pressed-y / self.height, self.mouse-x / self.width, self.mouse-y / self.height, true);
+                                    }
+                                    if (event.kind == PointerEventKind.cancel) { root.clear-selection(); }
+                                }
+                                moved => {
+                                    if (self.pressed) {
+                                        root.select-text(tile.page, self.pressed-x / self.width, self.pressed-y / self.height, self.mouse-x / self.width, self.mouse-y / self.height, false);
+                                    }
+                                }
+                                scroll-event(event) => {
+                                    if (event.modifiers.control && event.delta-y != 0px) {
+                                        root.wheel-zoom(event.delta-y > 0px ? 1.12 : 1 / 1.12, tile.px + self.mouse-x / 1px, tile.py + self.mouse-y / 1px);
+                                        return accept;
+                                    }
+                                    return reject;
+                                }
+                            }
+                        }
+                        for marker in root.search-markers: Rectangle {
+                            visible: root.search-visible;
+                            x: marker.px * 1px; y: marker.py * 1px;
+                            width: marker.pw * 1px; height: marker.ph * 1px;
+                            background: marker.active ? #ffad335c : #ffe23f4a;
+                            border-color: marker.active ? #cc7300 : #c5a300;
+                            border-width: marker.active ? 1px : 0px;
+                        }
+                        for marker in root.selection-markers: Rectangle {
+                            x: marker.px * 1px; y: marker.py * 1px;
+                            width: marker.pw * 1px; height: marker.ph * 1px;
+                            background: #4588dd50; border-color: #3d7ed1; border-width: 1px;
+                        }
+                        for remark in root.review-tiles: Rectangle {
+                            x:remark.px*1px;y:remark.py*1px;width:remark.pw*1px;height:remark.ph*1px;
+                            background:remark.kind==1 ? #ffcc3359 : remark.kind==0 ? #ffcc33 : transparent;
+                            if remark.kind==0: Text {text:"N";color:#392a00;font-weight:600;horizontal-alignment:center;vertical-alignment:center;}
+                            if remark.kind==2: Rectangle {x:remark.turn==3 ? max(0px,parent.width - 2px) : 0px;y:remark.turn==0 ? max(0px,parent.height - 2px) : 0px;width:mod(remark.turn,2)==0 ? parent.width : 2px;height:mod(remark.turn,2)==0 ? 2px : parent.height;background:#2659d9;}
+                        }
+                        for mark in root.mark-tiles: Rectangle {
+                            x: mark.px * 1px; y: mark.py * 1px;
+                            width: mark.pw * 1px; height: mark.ph * 1px;
+                            Image { source: mark.bitmap; width: parent.width; height: parent.height; image-fit: fill; opacity: mark.opacity; }
+                            border-color: #3f80cf; border-width: mark.selected ? 1px : 0px;
+                            TouchArea {
+                                enabled: !root.mark-pending;
+                                mouse-cursor: move;
+                                pointer-event(event) => {
+                                    if (event.button == PointerEventButton.left && event.kind == PointerEventKind.down) { keys.focus(); root.begin-mark(mark.index, (self.absolute-position.x + self.mouse-x) / 1px, (self.absolute-position.y + self.mouse-y) / 1px, false); }
+                                    if (event.button == PointerEventButton.left && event.kind == PointerEventKind.up) { root.drag-mark((self.absolute-position.x + self.mouse-x) / 1px, (self.absolute-position.y + self.mouse-y) / 1px, true); }
+                                    if (event.kind == PointerEventKind.cancel) { root.cancel-mark-drag(); }
+                                }
+                                moved => { if (self.pressed) { root.drag-mark((self.absolute-position.x + self.mouse-x) / 1px, (self.absolute-position.y + self.mouse-y) / 1px, false); } }
+                            }
+                            if mark.selected: Rectangle {
+                                property <length> window-x: self.absolute-position.x;
+                                property <length> window-y: self.absolute-position.y;
+                                changed window-x => { root.mark-handle-window-x = self.window-x / 1px; }
+                                changed window-y => { root.mark-handle-window-y = self.window-y / 1px; }
+                                x: max(0px, parent.width - 12px); y: max(0px, parent.height - 12px); width: min(12px, parent.width); height: min(12px, parent.height); background: #3f80cf;
+                                TouchArea {
+                                    enabled: !root.mark-pending;
+                                    mouse-cursor: se-resize;
+                                    pointer-event(event) => {
+                                        if (event.button == PointerEventButton.left && event.kind == PointerEventKind.down) { root.begin-mark(mark.index, (self.absolute-position.x + self.mouse-x) / 1px, (self.absolute-position.y + self.mouse-y) / 1px, true); }
+                                        if (event.button == PointerEventButton.left && event.kind == PointerEventKind.up) { root.drag-mark((self.absolute-position.x + self.mouse-x) / 1px, (self.absolute-position.y + self.mouse-y) / 1px, true); }
+                                        if (event.kind == PointerEventKind.cancel) { root.cancel-mark-drag(); }
+                                    }
+                                    moved => { if (self.pressed) { root.drag-mark((self.absolute-position.x + self.mouse-x) / 1px, (self.absolute-position.y + self.mouse-y) / 1px, false); } }
+                                }
+                            }
+                        }
+                    }
+                    DropArea {
+                        can-drop(event) => { root.can-drop-files(event.data) ? DragAction.copy : DragAction.none }
+                        dropped(event) => { root.drop-files(event.data); return DragAction.copy; }
+                    }
+                    if !root.has-document: VerticalLayout {
+                        alignment: center; spacing: 12px;
+                        Text { text: "dPDF"; font-size: 48px; font-weight: 700; color: root.dark ? #a9c2ee : #38567d; horizontal-alignment: center; }
+                        Text { text: "A compact workspace for everyday PDFs"; color: root.dark ? #c0c7d2 : #4b586b; horizontal-alignment: center; }
+                        HorizontalLayout { alignment: center; Button { text: "Open PDF…   Ctrl+O"; clicked => { root.open(); } } }
+                    }
+                }
+            }
+            Rectangle {
+                height: 28px; background: Palette.alternate-background;
+                HorizontalLayout {
+                    padding-left: 8px; padding-right: 8px; spacing: 14px;
+                    Text { text: root.busy ? "Working…  " + root.status : root.status; horizontal-stretch: 1; overflow: elide; color: Palette.foreground; vertical-alignment: center; }
+                    Text { text: root.status-detail; color: Palette.foreground; vertical-alignment: center; }
+                }
+            }
+        }
+        // Stable viewport-edge targets keep scrolling independent of recycled
+        // thumbnail images. Only this app's page-order payload is accepted.
+        Rectangle {
+            visible: root.arranging && root.sidebar-visible && !root.password-required;
+            x: sidebar.absolute-position.x; y: sidebar.absolute-position.y;
+            width: sidebar.visible-width; height: min(24px, sidebar.visible-height / 3);
+            page-drag-top := DropArea {
+                can-drop(event) => { root.can-drop-page(event.data) ? DragAction.move : DragAction.none }
+                dropped(event) => { root.drop-page-at(event.data, event.position.y / 1px); return DragAction.move; }
+            }
+            if page-drag-top.has-drag: Rectangle { height: 3px; background: Palette.accent-background; }
+        }
+        Rectangle {
+            visible: root.arranging && root.sidebar-visible && !root.password-required;
+            x: sidebar.absolute-position.x;
+            y: sidebar.absolute-position.y + sidebar.visible-height - self.height;
+            width: sidebar.visible-width; height: min(24px, sidebar.visible-height / 3);
+            page-drag-bottom := DropArea {
+                can-drop(event) => { root.can-drop-page(event.data) ? DragAction.move : DragAction.none }
+                dropped(event) => { root.drop-page-at(event.data, (sidebar.visible-height - parent.height + event.position.y) / 1px); return DragAction.move; }
+            }
+            if page-drag-bottom.has-drag: Rectangle { y: parent.height - 3px; height: 3px; background: Palette.accent-background; }
+        }
+        Rectangle {
+            visible:root.password-required;
+            x:0px;y:0px;width:parent.width;height:parent.height;background:#00000070;
+            TouchArea {}
+            Rectangle {
+                width:min(460px,parent.width - 24px); height:204px;
+                x:(parent.width - self.width)/2;y:(parent.height - self.height)/2;
+                background:Palette.background;border-width:1px;border-color:Palette.border;border-radius:4px;
+                VerticalLayout {
+                    padding:12px;spacing:8px;
+                    Text {text:"Open protected PDF";font-weight:600;color:Palette.foreground;}
+                    Text {text:root.password-file;overflow:elide;color:Palette.foreground;}
+                    Text {text:root.password-error;overflow:elide;color:Palette.foreground;}
+                    password-input := LineEdit {text <=> root.password-text;input-type:password;accepted=>{root.submit-password();}}
+                    HorizontalLayout {
+                        Rectangle {horizontal-stretch:1;}
+                        Button {text:"Cancel";clicked=>{root.cancel-password();}}
+                        Button {text:"Unlock";clicked=>{root.submit-password();}}
+                    }
+                }
+            }
+        }
+
+    }
+}

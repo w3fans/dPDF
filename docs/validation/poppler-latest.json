@@ -1,0 +1,128 @@
+{
+  "scope": "generated_Poppler_export_interoperability_only",
+  "binary_version": "dPDF 0.1.45 (reader development preview)",
+  "binary_sha256": "66e99dfa8120751e1ac1720e988b12e14bca4c811515d481c3d6e979c67f897c",
+  "poppler": "pdftoppm version 26.01.0",
+  "cases": [
+    {
+      "cropped": false,
+      "rotation": 0,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "cropped": false,
+      "rotation": 90,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "cropped": false,
+      "rotation": 180,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "cropped": false,
+      "rotation": 270,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "cropped": true,
+      "rotation": 0,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "cropped": true,
+      "rotation": 90,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "cropped": true,
+      "rotation": 180,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "cropped": true,
+      "rotation": 270,
+      "status": "PASS",
+      "outside_changed_pixels": 0,
+      "checks": [
+        "overlay physical placement/alpha/text",
+        "visible native remarks",
+        "hide annotations",
+        "hidden remarks",
+        "clean copy retains marks"
+      ]
+    },
+    {
+      "name": "contract page-10 replacement",
+      "status": "PASS",
+      "checks": [
+        "pages 1/9 identical",
+        "page 10 replaced",
+        "outside text count preserved"
+      ]
+    }
+  ],
+  "unqualified": [
+    "interactive external-viewer editing",
+    "physical printer output",
+    "Windows Poppler execution",
+    "genuine secure region baking"
+  ],
+  "status": "PASS"
+}

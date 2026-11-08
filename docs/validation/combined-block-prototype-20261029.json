@@ -1,0 +1,80 @@
+{
+  "scope": "generated_combined_block_prototype_only",
+  "qualified_for_secure_export": false,
+  "dPDF_secure_export_enabled": false,
+  "binary_version": "dPDF 0.1.21 (reader development preview)",
+  "binary_sha256": "9cbc448e953253048dd9b192dbe2ba36116beb222329a420e6e281bf6c7a4ebb",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "checks": [
+    {
+      "name": "combined_raster_replaces_live_label_line_date_and_overlay",
+      "result": "PASS",
+      "outside_changed_pixels": 0,
+      "whole_page_mean_abs_channel_error": 0.20468088888888888,
+      "block_mean_abs_channel_error": 1.6159017543859648,
+      "output_images": 1,
+      "removable_objects_in_block": 1,
+      "untouched_page_exact": true
+    },
+    {
+      "name": "crossing-path",
+      "result": "REFUSED before mutation",
+      "reason": "object crosses block boundary"
+    },
+    {
+      "name": "crossing-text",
+      "result": "REFUSED before mutation",
+      "reason": "object crosses block boundary"
+    },
+    {
+      "name": "shared-ActualText",
+      "result": "REFUSED before mutation",
+      "reason": "marked content / alternate extraction text"
+    },
+    {
+      "name": "independent-remark",
+      "result": "REFUSED before mutation",
+      "reason": "annotations require independent review handling"
+    },
+    {
+      "name": "form",
+      "result": "REFUSED before mutation",
+      "reason": "form/shading or unsupported page object"
+    },
+    {
+      "name": "rotated-page",
+      "result": "REFUSED before mutation",
+      "reason": "experiment supports only generated unrotated 400x300 pages"
+    }
+  ],
+  "unverified": [
+    "arbitrary input preflight/catalog references and resource reachability",
+    "rotations/crop/UserUnit and arbitrary clipping/transparency",
+    "nested forms and shared resources",
+    "tag trees and alternate extraction metadata",
+    "independent remarks export integration",
+    "Windows execution and editor interoperability",
+    "production Rust worker/UI integration and safety review"
+  ],
+  "bake": {
+    "removed_objects": 5,
+    "removed_types": [
+      1,
+      2,
+      1,
+      3,
+      3
+    ],
+    "block_pixels": [
+      924,
+      389
+    ],
+    "nominal_dpi": 350
+  },
+  "poppler": {
+    "render_dpi": 350,
+    "outside_changed_pixels": 0,
+    "block_mean_abs_channel_error": 2.3203392340089497,
+    "extraction_inside_absent_outside_present": true
+  }
+}

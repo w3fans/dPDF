@@ -1,0 +1,300 @@
+{
+  "hosted": {
+    "schema": 1,
+    "source_commit": "54163eee742c15468683c7efc3f5992fc8447845",
+    "source_ref": "v0.1.32",
+    "run_url": "https://github.com/w3fans/dPDF/actions/runs/41043147730",
+    "status": "PASS",
+    "desktop_context": {
+      "session_id": 2,
+      "station_visible": true,
+      "input_desktop_accessible": true
+    },
+    "binary_sha256": "eeda70d43994eb362fa21b908363b9a1abb503515d191f01d026e6c5261b4224",
+    "report_branch": "validation/ci-windows-hosted-41043147730-1",
+    "checks": [
+      {
+        "name": "ci-contract",
+        "status": "PASS"
+      },
+      {
+        "name": "powershell-syntax",
+        "status": "PASS"
+      },
+      {
+        "name": "build",
+        "status": "PASS",
+        "seconds": 215.719
+      },
+      {
+        "name": "unit-tests",
+        "status": "PASS",
+        "seconds": 52.578
+      },
+      {
+        "name": "clippy",
+        "status": "PASS",
+        "seconds": 22.188
+      },
+      {
+        "name": "format",
+        "status": "PASS",
+        "seconds": 1.812
+      },
+      {
+        "name": "reader",
+        "status": "PASS",
+        "seconds": 1.203
+      },
+      {
+        "name": "pages",
+        "status": "PASS",
+        "seconds": 5.438
+      },
+      {
+        "name": "marks",
+        "status": "PASS",
+        "seconds": 0.265
+      },
+      {
+        "name": "overlays",
+        "status": "PASS",
+        "seconds": 14.11
+      },
+      {
+        "name": "review",
+        "status": "PASS",
+        "seconds": 5.672
+      },
+      {
+        "name": "aliases",
+        "status": "PASS",
+        "seconds": 0.437
+      },
+      {
+        "name": "geometry",
+        "status": "PASS",
+        "seconds": 1.578
+      },
+      {
+        "name": "engine-paths",
+        "status": "PASS",
+        "seconds": 0.641
+      },
+      {
+        "name": "block-probe",
+        "status": "PASS",
+        "seconds": 38.578
+      },
+      {
+        "name": "staged-reader",
+        "status": "PASS",
+        "seconds": 2.906
+      },
+      {
+        "name": "user-registration",
+        "status": "PASS",
+        "seconds": 13.078
+      }
+    ]
+  },
+  "desktop": {
+    "schema": 1,
+    "source_commit": "54163eee742c15468683c7efc3f5992fc8447845",
+    "source_ref": "v0.1.32",
+    "run_url": "https://github.com/w3fans/dPDF/actions/runs/41043147730",
+    "status": "PASS",
+    "desktop_context": {
+      "session_id": 2,
+      "station_visible": true,
+      "input_desktop_accessible": true
+    },
+    "binary_sha256": "11e20891059123c9c47f95ddaac1d96226c682ba8c19b9cf2cb86392a6aa8620",
+    "report_branch": "validation/ci-windows-desktop-41043147730-1",
+    "checks": [
+      {
+        "name": "ci-contract",
+        "status": "PASS"
+      },
+      {
+        "name": "powershell-syntax",
+        "status": "PASS"
+      },
+      {
+        "name": "build",
+        "status": "PASS",
+        "seconds": 195.594
+      },
+      {
+        "name": "unit-tests",
+        "status": "PASS",
+        "seconds": 57.25
+      },
+      {
+        "name": "clippy",
+        "status": "PASS",
+        "seconds": 26.078
+      },
+      {
+        "name": "format",
+        "status": "PASS",
+        "seconds": 1.719
+      },
+      {
+        "name": "reader",
+        "status": "PASS",
+        "seconds": 1.422
+      },
+      {
+        "name": "pages",
+        "status": "PASS",
+        "seconds": 6.266
+      },
+      {
+        "name": "marks",
+        "status": "PASS",
+        "seconds": 0.297
+      },
+      {
+        "name": "overlays",
+        "status": "PASS",
+        "seconds": 15.016
+      },
+      {
+        "name": "review",
+        "status": "PASS",
+        "seconds": 5.875
+      },
+      {
+        "name": "aliases",
+        "status": "PASS",
+        "seconds": 0.468
+      },
+      {
+        "name": "geometry",
+        "status": "PASS",
+        "seconds": 1.672
+      },
+      {
+        "name": "engine-paths",
+        "status": "PASS",
+        "seconds": 0.516
+      },
+      {
+        "name": "block-probe",
+        "status": "PASS",
+        "seconds": 33.765
+      },
+      {
+        "name": "staged-reader",
+        "status": "PASS",
+        "seconds": 1.672
+      },
+      {
+        "name": "user-registration",
+        "status": "PASS",
+        "seconds": 6.781
+      },
+      {
+        "name": "native-file-drop-1",
+        "status": "PASS",
+        "seconds": 4.079
+      },
+      {
+        "name": "viewport-1",
+        "status": "PASS",
+        "seconds": 6.937
+      },
+      {
+        "name": "document-tabs-1",
+        "status": "PASS",
+        "seconds": 0.656
+      },
+      {
+        "name": "clipboard-placement-1",
+        "status": "PASS",
+        "seconds": 6.047
+      },
+      {
+        "name": "clipboard-image-1",
+        "status": "PASS",
+        "seconds": 1.204
+      },
+      {
+        "name": "native-file-drop-1-5",
+        "status": "PASS",
+        "seconds": 2.891
+      },
+      {
+        "name": "viewport-1-5",
+        "status": "PASS",
+        "seconds": 7.875
+      },
+      {
+        "name": "document-tabs-1-5",
+        "status": "PASS",
+        "seconds": 0.735
+      },
+      {
+        "name": "clipboard-placement-1-5",
+        "status": "PASS",
+        "seconds": 6.094
+      },
+      {
+        "name": "clipboard-image-1-5",
+        "status": "PASS",
+        "seconds": 1.266
+      },
+      {
+        "name": "native-file-drop-2",
+        "status": "PASS",
+        "seconds": 2.86
+      },
+      {
+        "name": "viewport-2",
+        "status": "PASS",
+        "seconds": 8.844
+      },
+      {
+        "name": "document-tabs-2",
+        "status": "PASS",
+        "seconds": 0.906
+      },
+      {
+        "name": "clipboard-placement-2",
+        "status": "PASS",
+        "seconds": 6.234
+      },
+      {
+        "name": "clipboard-image-2",
+        "status": "PASS",
+        "seconds": 1.203
+      },
+      {
+        "name": "about",
+        "status": "PASS",
+        "seconds": 2.25
+      },
+      {
+        "name": "review-ui",
+        "status": "PASS",
+        "seconds": 9.781
+      },
+      {
+        "name": "passwords",
+        "status": "PASS",
+        "seconds": 27.61
+      },
+      {
+        "name": "recovery",
+        "status": "PASS",
+        "seconds": 21.828
+      },
+      {
+        "name": "windows-print",
+        "status": "PASS",
+        "seconds": 29.0
+      }
+    ]
+  }
+}

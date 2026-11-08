@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "private_compilation": "controlled-local-adapters",
+  "untrusted_pull_requests": "no-privileged-worker-dispatch",
+  "copr_publication": "local-operator",
+  "windows_acceptance": "controlled-native-harness",
+  "artifact_reuse": "exact-commit-toolchain-flags-and-binary-hash"
+}

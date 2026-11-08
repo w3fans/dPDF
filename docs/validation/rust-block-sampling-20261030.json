@@ -1,0 +1,87 @@
+{
+  "rust": {
+    "block_points": [
+      190.0,
+      80.01000213623047
+    ],
+    "bounds": [
+      90.0,
+      59.99998474121094,
+      280.0,
+      140.00999450683594
+    ],
+    "image_matrix": [
+      190.0,
+      0.0,
+      0.0,
+      80.010009765625,
+      90.0,
+      59.99998474121094
+    ],
+    "normalized": [
+      0.22499999403953552,
+      0.53329998254776,
+      0.4749999940395355,
+      0.26669999957084656
+    ],
+    "points": [
+      400.0,
+      300.0
+    ]
+  },
+  "python": {
+    "normalized": [
+      0.225,
+      0.5333,
+      0.475,
+      0.2667
+    ],
+    "effective_pdf_region": [
+      90.0,
+      59.99998474121094,
+      280.0,
+      140.00999450683594
+    ],
+    "image_matrix": [
+      190.0,
+      0.0,
+      0.0,
+      80.010009765625,
+      90.0,
+      59.99998474121094
+    ],
+    "page_points": [
+      400.0,
+      300.0
+    ],
+    "displayed_block_points": [
+      190.0,
+      80.00999999999999
+    ]
+  },
+  "rust_reader": {
+    "outside_changed_pixels": 0,
+    "block_mean_abs_channel_error": 5.19741052631579
+  },
+  "rust_print": {
+    "outside_changed_pixels": 0,
+    "block_mean_abs_channel_error": 3.457652173590477
+  },
+  "python_reader": {
+    "outside_changed_pixels": 0,
+    "block_mean_abs_channel_error": 5.201754385964913
+  },
+  "python_print": {
+    "outside_changed_pixels": 0,
+    "block_mean_abs_channel_error": 3.457653100969296
+  },
+  "scope": "generated_thin_image_rust_python_comparison",
+  "qualified_for_secure_export": false,
+  "binary_sha256": "2a08308ec9e81b3e780e57b529371ee66586eac9254af718f9dd1daaddc7f301",
+  "binary_version": "dPDF 0.1.28 (reader development preview)",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "source_sha256": "74fba530fac13626b0c905ff79fd3f0b67726134ea6a559beed19cbb2c6014d6",
+  "python_probe_sha256": "9859e555f97b2a72927079085be7945244e4cbec618d282d72f9a62c3189e761",
+  "preview_width": 1000,
+  "print_dpi": 350
+}

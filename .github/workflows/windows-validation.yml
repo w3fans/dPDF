@@ -1,0 +1,82 @@
+name: Native Windows validation
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      release_ref:
+        description: 'main, vMAJOR.MINOR.PATCH tag, or full commit SHA'
+        default: main
+        required: true
+      lane:
+        description: Validation lane
+        type: choice
+        options: [all, hosted, self-hosted, desktop]
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dpdf-windows-${{ github.ref }}-${{ inputs.release_ref || 'event' }}
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+# Distinct tags retain their own jobs. A single shared concurrency group would
+# replace older pending runs. The one Windows test machine runner executes its queue serially.
+jobs:
+  resolve:
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      commit: ${{ steps.source.outputs.commit }}
+      ref: ${{ steps.source.outputs.ref }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: source
+        env:
+          REQUESTED_REF: ${{ inputs.release_ref }}
+        run: python3 scripts/ci/resolve_ref.py
+
+  hosted:
+    needs: resolve
+    if: ${{ !github.event.repository.private && (github.event_name != 'workflow_dispatch' || (inputs.lane == 'all' || inputs.lane == 'hosted')) }}
+    permissions:
+      contents: write # Separate Ubuntu publisher; Windows worker remains read-only.
+      actions: read
+    uses: ./.github/workflows/windows-lane.yml
+    with:
+      commit: ${{ needs.resolve.outputs.commit }}
+      source_ref: ${{ needs.resolve.outputs.ref }}
+      lane: hosted
+      cache_native: true
+      runner_labels: '["windows-latest"]'
+
+  self-hosted:
+    needs: resolve
+    if: ${{ !github.event.repository.private && (github.event_name == 'workflow_dispatch' && (inputs.lane == 'all' || inputs.lane == 'self-hosted')) }}
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/windows-lane.yml
+    with:
+      commit: ${{ needs.resolve.outputs.commit }}
+      source_ref: ${{ needs.resolve.outputs.ref }}
+      lane: self-hosted
+      runner_labels: '["self-hosted", "Windows", "X64", "dpdf-windows"]'
+
+  hosted-desktop:
+    needs: resolve
+    if: ${{ !github.event.repository.private && (github.event_name == 'workflow_dispatch' && (inputs.lane == 'all' || inputs.lane == 'desktop')) }}
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/windows-lane.yml
+    with:
+      commit: ${{ needs.resolve.outputs.commit }}
+      source_ref: ${{ needs.resolve.outputs.ref }}
+      lane: desktop
+      cache_native: true
+      runner_labels: '["windows-latest"]'

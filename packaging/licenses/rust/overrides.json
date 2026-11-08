@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "scope": "Reviewed missing crate notice files; exact upstream publish revisions",
+  "packages": {
+    "lyon_algorithms@1.0.22": {
+      "registry_checksum": "f3a6b9d4e8b48acd531fbf1241ad9b270df6e60b6b92bdea1469f4f40899d805",
+      "source_revision": "db98d26a1a90076a7a894262dcb51117eef643c8",
+      "notices": [
+        {
+          "path": "LICENSE-MIT",
+          "url": "https://raw.githubusercontent.com/nical/lyon/db98d26a1a90076a7a894262dcb51117eef643c8/LICENSE-MIT",
+          "sha256": "80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e",
+          "text": "texts/80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e.txt",
+          "origin": "upstream-exact-revision"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "url": "https://raw.githubusercontent.com/nical/lyon/db98d26a1a90076a7a894262dcb51117eef643c8/LICENSE-APACHE",
+          "sha256": "216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06",
+          "text": "texts/216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06.txt",
+          "origin": "upstream-exact-revision"
+        }
+      ]
+    },
+    "lyon_extra@1.1.0": {
+      "registry_checksum": "7755f08423275157ad1680aaecc9ccb7e0cc633da3240fea2d1522935cc15c72",
+      "source_revision": "56219c95c658d4f39de7b190d98e57d5773ba241",
+      "notices": [
+        {
+          "path": "LICENSE-MIT",
+          "url": "https://raw.githubusercontent.com/nical/lyon/56219c95c658d4f39de7b190d98e57d5773ba241/LICENSE-MIT",
+          "sha256": "80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e",
+          "text": "texts/80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e.txt",
+          "origin": "upstream-exact-revision"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "url": "https://raw.githubusercontent.com/nical/lyon/56219c95c658d4f39de7b190d98e57d5773ba241/LICENSE-APACHE",
+          "sha256": "216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06",
+          "text": "texts/216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06.txt",
+          "origin": "upstream-exact-revision"
+        }
+      ]
+    },
+    "lyon_geom@1.0.20": {
+      "registry_checksum": "d82dd26aa4dc0b5b70b9115de59824842bcb43cf4a28e1b1e6d0ad148c93f93e",
+      "source_revision": "db98d26a1a90076a7a894262dcb51117eef643c8",
+      "notices": [
+        {
+          "path": "LICENSE-MIT",
+          "url": "https://raw.githubusercontent.com/nical/lyon/db98d26a1a90076a7a894262dcb51117eef643c8/LICENSE-MIT",
+          "sha256": "80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e",
+          "text": "texts/80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e.txt",
+          "origin": "upstream-exact-revision"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "url": "https://raw.githubusercontent.com/nical/lyon/db98d26a1a90076a7a894262dcb51117eef643c8/LICENSE-APACHE",
+          "sha256": "216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06",
+          "text": "texts/216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06.txt",
+          "origin": "upstream-exact-revision"
+        }
+      ]
+    },
+    "lyon_path@1.0.19": {
+      "registry_checksum": "5c463f9c428b7fc5ec885dcd39ce4aa61e29111d0e33483f6f98c74e89d8621e",
+      "source_revision": "56219c95c658d4f39de7b190d98e57d5773ba241",
+      "notices": [
+        {
+          "path": "LICENSE-MIT",
+          "url": "https://raw.githubusercontent.com/nical/lyon/56219c95c658d4f39de7b190d98e57d5773ba241/LICENSE-MIT",
+          "sha256": "80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e",
+          "text": "texts/80f275e90d799911ed3830a7f242a2ef5a4ade2092fe0aa07bfb2d2cf2f2b95e.txt",
+          "origin": "upstream-exact-revision"
+        },
+        {
+          "path": "LICENSE-APACHE",
+          "url": "https://raw.githubusercontent.com/nical/lyon/56219c95c658d4f39de7b190d98e57d5773ba241/LICENSE-APACHE",
+          "sha256": "216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06",
+          "text": "texts/216486f29671a4262efe32af6d84a75bef398127f8c5f369b5c8305983887a06.txt",
+          "origin": "upstream-exact-revision"
+        }
+      ]
+    },
+    "rspolib@0.1.2": {
+      "registry_checksum": "4fda9a7796aff63a7b1b39ccc93fffaaf65e20042984b4843041a49ca4677535",
+      "source_revision": "8170d99ebad29d894712ccb3dc6d0be2198d3055",
+      "notices": [
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mondeja/rspolib/8170d99ebad29d894712ccb3dc6d0be2198d3055/LICENSE",
+          "sha256": "4fe9b5fce8fd028261959d039d19ef66182be088ab48ffa97dbeaef7b35e39c3",
+          "text": "texts/4fe9b5fce8fd028261959d039d19ef66182be088ab48ffa97dbeaef7b35e39c3.txt",
+          "origin": "upstream-exact-revision"
+        }
+      ]
+    },
+    "taffy@0.10.1": {
+      "registry_checksum": "aea22054047c16c3f34d3ac473a2170be1424b1115b2a3adcf28cfb067c88859",
+      "source_revision": "639f0acdd20f914f847abffbeaa903d66cae4882",
+      "notices": [
+        {
+          "path": "LICENSE.md",
+          "url": "https://raw.githubusercontent.com/DioxusLabs/taffy/639f0acdd20f914f847abffbeaa903d66cae4882/LICENSE.md",
+          "sha256": "a7083ef3dd41a65eeb2162c2c091b0082e2724fb4c6ed029b363c7840d244ecd",
+          "text": "texts/a7083ef3dd41a65eeb2162c2c091b0082e2724fb4c6ed029b363c7840d244ecd.txt",
+          "origin": "upstream-exact-revision"
+        }
+      ]
+    },
+    "clipboard-win@5.4.3": {
+      "registry_checksum": "052af7878466feccda12ba7a6a67d019d712f296809559b47c12c8cc196d3a9a",
+      "source_revision": "ed27008ae5d1f10cfbb266de039f0fb35fd05a56",
+      "notices": [
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/DoumanAsh/clipboard-win/ed27008ae5d1f10cfbb266de039f0fb35fd05a56/LICENSE",
+          "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+          "text": "texts/c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566.txt",
+          "origin": "upstream-exact-revision"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "version_prefix": "v",
+  "channels": {
+    "stable": {
+      "minor_parity": "even"
+    },
+    "beta": {
+      "minor_parity": "odd"
+    }
+  },
+  "allow_explicit_version": false,
+  "rollover": {
+    "patch_soft_ceiling": 84,
+    "patch_hard_ceiling": 99,
+    "minor_ceiling": 9
+  }
+}

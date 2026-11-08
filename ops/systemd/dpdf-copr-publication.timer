@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for new reviewed dPDF publication tags
+
+[Timer]
+OnBootSec=1min
+OnUnitInactiveSec=1min
+Unit=dpdf-copr-publication.service
+
+[Install]
+WantedBy=timers.target

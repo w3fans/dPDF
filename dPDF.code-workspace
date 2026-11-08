@@ -1,0 +1,38 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "window.title": "dPDF | ${dirty}${activeEditorShort}",
+    "workbench.colorTheme": "Dark Modern",
+    "workbench.colorCustomizations": {
+      "activityBar.background": "#20425A",
+      "activityBar.foreground": "#F6FBFF",
+      "activityBar.inactiveForeground": "#F6FBFF",
+      "activityBar.activeBorder": "#38BDF8",
+      "activityBarBadge.background": "#38BDF8",
+      "activityBarBadge.foreground": "#102738",
+      "statusBar.background": "#17364C",
+      "statusBar.foreground": "#F6FBFF",
+      "statusBar.noFolderBackground": "#17364C",
+      "statusBar.debuggingBackground": "#2B6F8F",
+      "statusBar.debuggingForeground": "#F6FBFF",
+      "titleBar.activeBackground": "#1A3B52",
+      "titleBar.activeForeground": "#F6FBFF",
+      "titleBar.inactiveBackground": "#132D40",
+      "titleBar.inactiveForeground": "#F6FBFF",
+      "commandCenter.background": "#17364C",
+      "commandCenter.foreground": "#F6FBFF",
+      "commandCenter.activeBackground": "#132D40",
+      "commandCenter.activeForeground": "#F6FBFF",
+      "commandCenter.border": "#38BDF8",
+      "sideBar.border": "#132D40",
+      "panel.border": "#132D40"
+    },
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "editor.formatOnSave": true
+  }
+}

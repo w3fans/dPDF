@@ -1,0 +1,46 @@
+.agents/runtime/
+.agents/
+.claude/
+.codex/
+.kimi/
+.githooks/
+.vscode/
+ops/runner.yaml
+.claude/settings.local.json
+.kimi/settings.local.json
+.codex/settings.local.json
+.env
+.env.*
+*.env
+ops/project.env
+.creditentials/
+SECRETS.local.md
+credentials.local.md
+*.secret.md
+
+/target/
+
+# Generated development/runtime artifacts
+/dist/
+/artifacts/
+__pycache__/
+*.pyc
+
+# Private platform credentials
+.aws/
+.ssh/
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdbx
+
+# Local signature/stamp libraries and unfinished imports are private user data.
+**/asset-*/
+**/.import-*/
+
+# Local crash-recovery snapshots contain private document and signature data.
+*.dpdf
+**/recovery/
+**/.checkpoint-*
+**/.session-*/

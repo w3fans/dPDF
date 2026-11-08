@@ -1,0 +1,103 @@
+import { Button, ScrollView, Palette, AboutSlint } from "std-widgets.slint";
+
+component InfoRow inherits Rectangle {
+    in property <string> label;
+    in property <string> value;
+    background: Palette.alternate-background;
+    border-radius: 4px;
+    min-height: max(58px, label-text.preferred-height + value-text.preferred-height + 23px);
+    VerticalLayout {
+        padding: 10px; spacing: 3px;
+        label-text := Text { text: root.label; font-weight: 600; color: Palette.foreground; }
+        value-text := Text { text: root.value; wrap: word-wrap; color: Palette.foreground; }
+    }
+}
+
+component ProjectRow inherits Rectangle {
+    in property <string> label;
+    in property <string> detail;
+    in property <string> action;
+    callback activated();
+    background: Palette.alternate-background;
+    min-height: max(66px, heading.preferred-height + description.preferred-height + 23px);
+    HorizontalLayout {
+        padding: 10px; spacing: 14px;
+        VerticalLayout {
+            spacing: 3px; horizontal-stretch: 1;
+            heading := Text { text: root.label; color: Palette.foreground; }
+            description := Text { text: root.detail; wrap: word-wrap; color: Palette.foreground; font-size: 12px; }
+        }
+        Button { text: root.action; clicked => { root.activated(); } }
+    }
+}
+
+export component AboutWindow inherits Window {
+    title: "About dPDF";
+    preferred-width: 570px; preferred-height: 700px;
+    min-width: 480px; min-height: 420px;
+    default-font-size: 13px;
+    background: Palette.background;
+    in property <string> app-version;
+    in property <string> support-url;
+    in-out property <bool> dark: false;
+    changed dark => { Palette.color-scheme = root.dark ? ColorScheme.dark : ColorScheme.light; }
+    in-out property <bool> qr-visible: false;
+    in-out property <length> scroll-y;
+    out property <length> scroll-min: min(0px, about-scroll.height - about-scroll.content-height);
+    in-out property <string> status;
+    callback open-link(int);
+    callback close-about();
+    forward-focus: keys;
+    keys := FocusScope {
+        key-pressed(event) => {
+            if event.text == Key.Escape { root.close-about(); return accept; }
+            return reject;
+        }
+        VerticalLayout {
+            padding: 0px; spacing: 0px;
+            about-scroll := ScrollView {
+                horizontal-stretch: 1; vertical-stretch: 1;
+                content-y <=> root.scroll-y;
+                VerticalLayout {
+                    padding: 20px; spacing: 10px;
+                    Text { text: "dPDF"; font-size: 30px; font-weight: 700; color: Palette.accent-background; horizontal-alignment: center; }
+                    Text { text: "A compact workspace for everyday PDFs"; color: Palette.foreground; horizontal-alignment: center; wrap: word-wrap; }
+                    VerticalLayout {
+                        spacing: 1px;
+                        InfoRow { label: "Description"; value: "Read, print and assemble PDF pages, prepare visual signatures and stamps, and review documents in separate revision sets."; }
+                        InfoRow { label: "Author"; value: "Denis Zvegelj, 2026"; }
+                        InfoRow { label: "License"; value: "GPLv3 application · Apache-2.0 owned source"; }
+                        InfoRow { label: "Installed version"; value: root.app-version + " · development preview"; }
+                    }
+                    Text { text: "Project"; font-weight: 600; color: Palette.foreground; }
+                    VerticalLayout {
+                        spacing: 1px;
+                        ProjectRow { label: "Source and contributions"; detail: "Explore the code, build dPDF or help improve it."; action: "GitHub"; activated => { root.open-link(0); } }
+                        ProjectRow { label: "Feedback and bug reports"; detail: "Tell us what happened and which version you used."; action: "Report an issue"; activated => { root.open-link(1); } }
+                        ProjectRow { label: "License"; detail: "dPDF-owned code and third-party terms."; action: "View license"; activated => { root.open-link(2); } }
+                    }
+                    Text { text: "Support"; font-weight: 600; color: Palette.foreground; }
+                    VerticalLayout {
+                        spacing: 1px;
+                        ProjectRow { label: "Support further development"; detail: "If dPDF is useful to you, you can support its development on idz.si. Donations are optional."; action: "Open donation page"; activated => { root.open-link(3); } }
+                        ProjectRow { label: "Open on another device"; detail: "Scan the QR code for dPDF’s support page."; action: root.qr-visible ? "▴" : "▾"; activated => { root.qr-visible = !root.qr-visible; } }
+                    }
+                    if root.qr-visible: VerticalLayout {
+                        spacing: 5px;
+                        Image { source: @image-url("assets/support-qr.svg"); width: 196px; height: 196px; image-fit: contain; horizontal-stretch: 0; }
+                        Text { text: root.support-url; wrap: word-wrap; color: Palette.foreground; }
+                    }
+                    Text { text: "Slint uses its GPL-3.0-only option for this open-source application. dPDF-owned source remains Apache-2.0. PDFium, qpdf and other components retain their own notices."; wrap: word-wrap; color: Palette.foreground; }
+                    AboutSlint { horizontal-stretch: 0; }
+                    Text { text: "Reader development preview. Secure Signature Block baking and digital seals are still in development."; wrap: word-wrap; color: Palette.foreground; }
+                    if root.status != "": Text { text: root.status; wrap: word-wrap; color: Palette.foreground; }
+                }
+            }
+            HorizontalLayout {
+                padding: 8px;
+                Rectangle { horizontal-stretch: 1; }
+                Button { text: "Close"; clicked => { root.close-about(); } }
+            }
+        }
+    }
+}

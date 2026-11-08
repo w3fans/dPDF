@@ -1,0 +1,106 @@
+{
+  "hosted": {
+    "schema": 1,
+    "source_commit": "a3500067dbfbe6dcb9ef0ea1c8b6baebd58b2b8d",
+    "source_ref": "v0.1.40",
+    "run_url": "https://github.com/w3fans/dPDF/actions/runs/41501465648",
+    "status": "PASS",
+    "desktop_context": {
+      "session_id": 2,
+      "station_visible": true,
+      "input_desktop_accessible": true
+    },
+    "binary_sha256": "d2958e7cba217234ad5a33a4707b9641d2ef217c2020f97d8923e284018fa6ed",
+    "report_branch": "validation/ci-windows-hosted-41501465648-1",
+    "checks": [
+      {
+        "name": "ci-contract",
+        "status": "PASS"
+      },
+      {
+        "name": "powershell-syntax",
+        "status": "PASS"
+      },
+      {
+        "name": "build",
+        "status": "PASS",
+        "seconds": 297.891
+      },
+      {
+        "name": "unit-tests",
+        "status": "PASS",
+        "seconds": 73.781
+      },
+      {
+        "name": "clippy",
+        "status": "PASS",
+        "seconds": 22.75
+      },
+      {
+        "name": "format",
+        "status": "PASS",
+        "seconds": 4.078
+      },
+      {
+        "name": "reader",
+        "status": "PASS",
+        "seconds": 1.0
+      },
+      {
+        "name": "pages",
+        "status": "PASS",
+        "seconds": 5.515
+      },
+      {
+        "name": "marks",
+        "status": "PASS",
+        "seconds": 0.219
+      },
+      {
+        "name": "overlays",
+        "status": "PASS",
+        "seconds": 14.969
+      },
+      {
+        "name": "page-units",
+        "status": "PASS",
+        "seconds": 1.5
+      },
+      {
+        "name": "review",
+        "status": "PASS",
+        "seconds": 4.453
+      },
+      {
+        "name": "aliases",
+        "status": "PASS",
+        "seconds": 0.359
+      },
+      {
+        "name": "geometry",
+        "status": "PASS",
+        "seconds": 1.594
+      },
+      {
+        "name": "engine-paths",
+        "status": "PASS",
+        "seconds": 0.469
+      },
+      {
+        "name": "block-probe",
+        "status": "PASS",
+        "seconds": 25.953
+      },
+      {
+        "name": "staged-reader",
+        "status": "PASS",
+        "seconds": 5.438
+      },
+      {
+        "name": "user-registration",
+        "status": "PASS",
+        "seconds": 10.532
+      }
+    ]
+  }
+}

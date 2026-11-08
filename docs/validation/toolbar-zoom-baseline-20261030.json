@@ -1,0 +1,11 @@
+{
+  "scope": "diagnostic_only_keyboard_zoom_baseline",
+  "source_base": "11306b220dd48463b4919427cd9375a52dbda021",
+  "reader_source_unchanged": true,
+  "binary_version": "dPDF 0.1.31",
+  "binary_sha256": "e893483843dbf22af5302d04fbb84a69e52a4527ac471d65341b7c251e1a8ead",
+  "diagnostic_sha256": "84d40bc5921981ea94ca68ecc63791ca299ac081fb35807a0689dca4c52add8a",
+  "scale": 1,
+  "result": "EXPECTED_FAILURE",
+  "failure": "Error: Reading point jumped during Ctrl+plus zoom, case=0: expected=(-798.95996, -1386.0481), actual=(0, 0)"
+}

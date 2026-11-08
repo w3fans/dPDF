@@ -1,0 +1,51 @@
+[package]
+name = "dpdf"
+version = "0.1.53"
+edition = "2024"
+description = "A compact native PDF workspace"
+license = "Apache-2.0"
+rust-version = "1.92"
+
+[features]
+# Compile the Windows print adapter during a Linux metadata-only Cargo check.
+# This is not a runnable Windows build or native acceptance.
+check-windows-print = []
+
+[dependencies]
+anyhow = "1"
+pdfium-render = { version = "=0.9.4", default-features = false, features = ["pdfium_7881", "thread_safe", "image_025"] }
+image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg"] }
+arboard = { version = "=3.7.0", default-features = false, features = ["wayland-data-control", "image-data"] }
+rfd = { version = "0.15", default-features = false, features = ["xdg-portal", "async-std"] }
+slint = { version = "=1.18.1", default-features = false, features = ["std", "backend-winit", "renderer-software", "compat-1-2", "unstable-winit-030"] }
+tempfile = "3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+same-file = "=1.0.6"
+uuid = { version = "=1.29.0", features = ["v4"] }
+windows-sys = { version = "=0.61.2", features = ["Win32_Foundation", "Win32_Graphics_Gdi", "Win32_Storage_Xps", "Win32_System_Com", "Win32_System_Memory", "Win32_UI_Controls_Dialogs", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libloading = "=0.8.9"
+# The native URI receive parser is also exercised by the normal Linux test gate.
+percent-encoding = "=2.3.2"
+
+[build-dependencies]
+slint-build = "=1.18.1"
+
+# Keep stack-trace line information without the generated UI's full type DWARF.
+# Scope this to dPDF so the shared dependency cache remains reusable on remote build service.
+[profile.dev.package.dpdf]
+debug = 1
+
+[profile.test.package.dpdf]
+debug = 1
+
+# Reduce application compiler memory near the shared host's soft limit.
+# Dependency release profiles stay unchanged.
+[profile.release.package.dpdf]
+opt-level = 1
+
+# Slint 1.18 requires Winit 0.30; retain that ABI with a focused Wayland receive fix.
+[patch.crates-io]
+winit = { path = "third_party/winit" }

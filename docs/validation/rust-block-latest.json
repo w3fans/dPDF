@@ -1,0 +1,952 @@
+{
+  "schema": 1,
+  "scope": "generated_rust_block_probe_only",
+  "status": "PASS",
+  "qualified_for_secure_export": false,
+  "dPDF_secure_export_enabled": false,
+  "recorded_at": "2026-11-07T05:12:05.907112+00:00",
+  "binary_version": "dPDF 0.1.53 (reader development preview)",
+  "binary_sha256": "67fbb1bf2d3f47e62ec7404ff3c9f902973fdd5275439b457e347d1df1f72a2e",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "driver_sha256": "97692d7adbd529225e0435950e1918d71dfef9326d1d3202cf26c6b59ab23561",
+  "qpdf_version": "qpdf version 12.4.2",
+  "quality_limits": {
+    "outside_changed_pixels": 0,
+    "preview_mean_channel_error": 8,
+    "print_mean_channel_error": 4,
+    "print_dpi": 400,
+    "resampled_mean_channel_error": 8,
+    "resampled_print_dpi": 350
+  },
+  "cases": [
+    {
+      "case": 0,
+      "source_sha256": "74fba530fac13626b0c905ff79fd3f0b67726134ea6a559beed19cbb2c6014d6",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.709168421052632
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4139878514878514
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.4038512187612446
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 1,
+      "source_sha256": "0f749d20992c52a2adf883cdf3c975c7679a27bd5e9a0731f1c910cd7a44f75e",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.3860631623719564
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4145957036582038
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.314357307930573
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 2,
+      "source_sha256": "41846aed4a4aaeb483ced33608b1b23ee999ccd90c6ac197a5445f9906bacab3",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.787609321811993
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.3456851738101738
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.6353611398598544
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 3,
+      "source_sha256": "70b62ae8ff181a86a76125eac1bd1cd2729c74666a527a2d2d6bc053d5af0a36",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.3862396527596594
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4137425778050778
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.7281676478334576
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 4,
+      "source_sha256": "1409fbe6fdb700f37420180e20301b13946a17e96de95277011eee21bdeea88f",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.709168421052632
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4139878514878514
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.4038512187612446
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 5,
+      "source_sha256": "9cd5449482498cf42e421b49f476bdf38ea35de8480943272c82fca5a5774a01",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.3860631623719564
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4145957036582038
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.314357307930573
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 6,
+      "source_sha256": "5a6e9bd038068601cfc585a0d1c83a5bf195a50e79dcd7661d2d6ebad7a8755d",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.787609321811993
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.3456851738101738
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.6353611398598544
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 7,
+      "source_sha256": "1fbefc49dbd8d2e6ad6a4784194bea888ec362f8b9407a60a9d45d65a8ea72a3",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.3862396527596594
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4137425778050778
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.7281676478334576
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 8,
+      "source_sha256": "6954ee9457ea0a402ba087f87cd15ed6ae79295f8be353076a9f22c818614e15",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.201536764036764
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.417192760942761
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.314854786884911
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 9,
+      "source_sha256": "576efe4383d3d7d8a36c5692c3f032af96061a5fbf22260459148eb0068036b2",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.3830028840288757
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.1256746803621804
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6027678827562966
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 10,
+      "source_sha256": "fba3f2ef2b3881b0998f68c922e85eb46b1ba0840a421d2be61f8dce7f36647f",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.3599423286923287
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4164121507871508
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6277701805056162
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 11,
+      "source_sha256": "f93770eee0a41b95ae2e77f2e279eb7149292554c3f585a4b5312afab23ba6b4",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.656371216562735
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.1208218161343162
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.5463518703679462
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 12,
+      "source_sha256": "67178942851b83b2353213a35a85a5c6927108f5e00450e3b5bc5968e7e82fc5",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.201536764036764
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.417192760942761
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.314854786884911
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 13,
+      "source_sha256": "50d99632b69bd5254a655a6916db902a5c0cbd211accffb7e1184dee8e095585",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.3830028840288757
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.1256746803621804
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6027678827562966
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 14,
+      "source_sha256": "3838eb900c8b711e66ebc454e86bb038cede11ac064dafbfd959806717740d2f",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.3599423286923287
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4164121507871508
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6277701805056162
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 15,
+      "source_sha256": "809f2e0664460fb0f81ed016396aae92bf9f3953870bebc1a08f6edd0154eae7",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.656371216562735
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.1208218161343162
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.5463518703679462
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 16,
+      "source_sha256": "cf08b924b7202b56ed1d604821ebc04a04bce67ca77a2b1319e62ca84d3eb5db",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.2539257691968615
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0441415560095337
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6706237920890876
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 17,
+      "source_sha256": "8b8201b4bdcc43ff85aa1596274536ae6a79753426faea7ca7f88018b23b0098",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.740200537971069
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.043479031891953
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.1905531629182016
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 18,
+      "source_sha256": "baed7f216e217d3c5a26fdb7c48fc154507d809e2aac23b79821377843d9ba22",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.9068112492285993
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0454474520485757
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.8716572630454378
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 19,
+      "source_sha256": "d5cc2c09c2f670f6078c5763b1eab5e4b499c09d42bd61e44edfb26de79be1c5",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.806887683770681
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0446636306889117
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.864952314181106
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 20,
+      "source_sha256": "37f8bbae31f3d2105ec7c19f241d5fe0eb3f5b12526e9de43c859facf372b250",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.2539257691968615
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0441415560095337
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6706237920890876
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 21,
+      "source_sha256": "3f38b9834ed4a25a9256f63ddfa31e8f38070009b3368f9e6e3eb741d0b30b65",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.740200537971069
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.043479031891953
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.1905531629182016
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 22,
+      "source_sha256": "9d812f72e3398acf844a82adbed2a34cf32c3c33f82e214d008818aef38bcd08",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.9068112492285993
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0454474520485757
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.8716572630454378
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 23,
+      "source_sha256": "2df7bf61e0354e41c12f6231d23766f2d8c55279808049862adfcbef48ff0507",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": true,
+      "cropped": false,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.806887683770681
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0446636306889117
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.864952314181106
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 24,
+      "source_sha256": "a3edea2e140391864843d95c936b58cae48c5f89950034e86ad76de3f9fb2bcd",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.3294544544544546
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.0869512978887979
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.772596159648551
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 25,
+      "source_sha256": "504d47363c89cf004e0c9fb165b3408f58dda075b4fb725a0bc2eb89eda70c5b",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.5607348647704327
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0117757632504825
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6213346256432537
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 26,
+      "source_sha256": "66afa9840f202aecfbcaf6050a20d4cf7e04c36162f93cf0bc332ddced040964",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.091079716079716
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.0989028801528802
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.5711536372675443
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 27,
+      "source_sha256": "105e331eea07a38ed7dd629cb441fe84213e869829ae29b38b89cb6443e6d89f",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": false,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.76848117682591
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0138335603223245
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.97072435270777
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 28,
+      "source_sha256": "fafafbf482b44cb474c8827bd99ae44ede4c5fbf5501b89ae8636fb57dac23c3",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 3.3294544544544546
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.0869512978887979
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.772596159648551
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 29,
+      "source_sha256": "368a76279c8662989a904f7707408c9a893a7487dc399b8f83324439b554d8d3",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 90,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.5607348647704327
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0117757632504825
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.6213346256432537
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 30,
+      "source_sha256": "a3b9daf13da38646dc7e66edbe779e7b428a71d0f3d0c1cfbe67fcc0e435ac97",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 180,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.091079716079716
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.0989028801528802
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.5711536372675443
+      },
+      "untouched_page_exact": true
+    },
+    {
+      "case": 31,
+      "source_sha256": "2d6919087d57199b98e5421ad6805853815875ae0f934b4d6908f6a2e6ec60b0",
+      "block_pixels": [
+        445,
+        1056
+      ],
+      "rotation": 270,
+      "inherited": true,
+      "cropped": true,
+      "negative_origin": true,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.76848117682591
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.0138335603223245
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.97072435270777
+      },
+      "untouched_page_exact": true
+    }
+  ],
+  "graph_cases": [
+    {
+      "case": "indirect-resources",
+      "source_sha256": "a65a80d987a41567d6c751e90dfc26706e703a38517c7b6c407d6eb925b4c9ef",
+      "block_pixels": [
+        1056,
+        445
+      ],
+      "rotation": 0,
+      "inherited": false,
+      "cropped": false,
+      "negative_origin": false,
+      "pdfium_preview": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 4.709168421052632
+      },
+      "pdfium_print": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 1.4139878514878514
+      },
+      "pdfium_resampled": {
+        "outside_changed_pixels": 0,
+        "block_mean_abs_channel_error": 2.4038512187612446
+      },
+      "untouched_page_exact": true
+    }
+  ],
+  "refusals": [
+    {
+      "case": "crossing-path",
+      "reason": "REFUSED: object crosses region boundary"
+    },
+    {
+      "case": "crossing-text",
+      "reason": "REFUSED: object crosses region boundary"
+    },
+    {
+      "case": "marked",
+      "reason": "REFUSED: marked content / alternate extraction text"
+    },
+    {
+      "case": "text-clip",
+      "reason": "REFUSED: text clipping or unknown render mode"
+    },
+    {
+      "case": "path-clip",
+      "reason": "REFUSED: clipping requires unsupported graphics-state handling"
+    },
+    {
+      "case": "annotation",
+      "reason": "REFUSED: page/tree properties require unsupported reachability handling"
+    },
+    {
+      "case": "form",
+      "reason": "REFUSED: form/shading or unsupported object"
+    },
+    {
+      "case": "empty",
+      "reason": "REFUSED: empty block"
+    },
+    {
+      "case": "catalog-stream",
+      "reason": "REFUSED: catalog references require unsupported reachability handling"
+    },
+    {
+      "case": "catalog-attachment",
+      "reason": "REFUSED: catalog references require unsupported reachability handling"
+    },
+    {
+      "case": "page-tree-stream",
+      "reason": "REFUSED: page/tree properties require unsupported reachability handling"
+    },
+    {
+      "case": "untouched-page-pieceinfo",
+      "reason": "REFUSED: page/tree properties require unsupported reachability handling"
+    },
+    {
+      "case": "untouched-page-resources",
+      "reason": "REFUSED: resource properties require unsupported reachability handling"
+    },
+    {
+      "case": "shared-contents",
+      "reason": "REFUSED: shared page content requires unsupported ownership handling"
+    }
+  ],
+  "poppler": false,
+  "unqualified": [
+    "arbitrary input preflight/catalog/resource reachability",
+    "UserUnit/fractional boxes",
+    "arbitrary clipping/transparency and nested forms",
+    "tag trees/alternate extraction metadata",
+    "independent review integration",
+    "production worker/UI",
+    "common editors and physical printers"
+  ],
+  "requested_cases": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ]
+}

@@ -1,0 +1,3 @@
+# Preserve hash-addressed upstream notices verbatim, including their line endings
+# and original whitespace. Project source keeps the normal whitespace checks.
+packaging/licenses/rust/texts/*.txt -text -whitespace
