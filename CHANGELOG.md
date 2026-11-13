@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Bound Linux CUPS discovery and submission helpers; report uncertain submission without automatically resubmitting.
+
+- Expose active-review revision selection in the reader toolbar and narrow More menu, sharing existing review state; check revision/filter synchronization independently of remark and mark visibility.
+
 - Bound Linux noninteractive helper pipes, deadlines and output for decryption, metadata, page assembly/bookmarks/units, review exports and compact-print preparation, with generated failure/retry tests. Windows supervision and app-level cancellation remain pending.
 
 - Make release-adapter unit tests portable in public CI, separate installed-controller integration, use the verified tracked policy, and reject three-digit preview results before writing files.

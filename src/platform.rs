@@ -168,14 +168,19 @@ pub fn discover_printers() -> Result<Vec<String>> {
 
 #[cfg(target_os = "linux")]
 fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
-    let output = Command::new(executable)
-        .arg("-e")
-        .output()
-        .context("Discover system printers with lpstat")?;
+    let output = cups_output(
+        Command::new(executable).arg("-e"),
+        std::time::Duration::from_secs(5),
+        false,
+    )?;
     if !output.status.success() {
         bail!(
             "Printer discovery failed: {}",
-            String::from_utf8_lossy(&output.stderr).trim()
+            String::from_utf8_lossy(&output.stderr)
+                .chars()
+                .take(2000)
+                .collect::<String>()
+                .trim()
         );
     }
     let mut names: Vec<_> = String::from_utf8_lossy(&output.stdout)
@@ -190,6 +195,33 @@ fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
 }
 
 #[cfg(target_os = "linux")]
+fn cups_output(
+    command: &mut Command,
+    timeout: std::time::Duration,
+    submission: bool,
+) -> Result<std::process::Output> {
+    crate::helper_process::run(
+        command,
+        b"",
+        crate::helper_process::Limits {
+            timeout,
+            stdout: 64 * 1024,
+            stderr: 64 * 1024,
+        },
+        None,
+    )
+    .map_err(|error| {
+        if submission {
+            anyhow::anyhow!(
+                "CUPS did not confirm submission: {error}. The job may already be queued; check the print queue before submitting again"
+            )
+        } else {
+            anyhow::anyhow!("Discover system printers with lpstat: {error}")
+        }
+    })
+}
+
+#[cfg(target_os = "linux")]
 fn submit_cups(
     executable: &Path,
     path: &Path,
@@ -197,7 +229,17 @@ fn submit_cups(
     printer: &str,
     fit: bool,
 ) -> Result<String> {
-    let mut command = Command::new(executable);
+    submit_cups_with_command(&mut Command::new(executable), path, range, printer, fit)
+}
+
+#[cfg(target_os = "linux")]
+fn submit_cups_with_command(
+    command: &mut Command,
+    path: &Path,
+    range: &str,
+    printer: &str,
+    fit: bool,
+) -> Result<String> {
     if !printer.trim().is_empty() {
         command.args(["-d", printer.trim()]);
     }
@@ -212,15 +254,19 @@ fn submit_cups(
             "print-scaling=none"
         },
     ]);
-    let output = command
-        .arg("--")
-        .arg(path)
-        .output()
-        .context("Start CUPS lp; install cups-client and configure a printer")?;
+    let output = cups_output(
+        command.arg("--").arg(path),
+        std::time::Duration::from_secs(30),
+        true,
+    )?;
     if !output.status.success() {
         bail!(
-            "Printer rejected job: {}",
-            String::from_utf8_lossy(&output.stderr).trim()
+            "CUPS did not confirm submission: {}. The job may already be queued; check the print queue before submitting again",
+            String::from_utf8_lossy(&output.stderr)
+                .chars()
+                .take(2000)
+                .collect::<String>()
+                .trim()
         );
     }
     Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
@@ -370,9 +416,23 @@ mod tests {
         std::fs::write(&source, b"%PDF-1.7 original signed bytes").unwrap();
         std::fs::write(&mock, format!("#!/bin/sh\nprintf '%s\\n' \"$@\" > {}\nfor last do :; done\ncat \"$last\" > {}\nprintf 'request id is mock-7\\n'\n", quote(&capture), quote(&captured_pdf))).unwrap();
         std::fs::set_permissions(&mock, std::fs::Permissions::from_mode(0o700)).unwrap();
+        // Invoke the generated fixture through an existing interpreter. A
+        // concurrent fork can transiently inherit a newly written script's fd
+        // before exec closes it, making direct execution fail with ETXTBSY.
+        // Production submission still executes lp directly, without a retry.
+        let writable = std::fs::OpenOptions::new().write(true).open(&mock).unwrap();
+        let direct_error = Command::new(&mock).spawn().unwrap_err();
+        assert_eq!(direct_error.raw_os_error(), Some(26));
         let printer = "Office$(not-a-command)";
         assert_eq!(
-            submit_cups(&mock, &source, "1-3,7", printer, false).unwrap(),
+            submit_cups_with_command(
+                Command::new("/bin/sh").arg(&mock),
+                &source,
+                "1-3,7",
+                printer,
+                false
+            )
+            .unwrap(),
             "request id is mock-7"
         );
         let arguments = std::fs::read_to_string(&capture).unwrap();
@@ -393,7 +453,8 @@ mod tests {
             std::fs::read(&captured_pdf).unwrap(),
             std::fs::read(&source).unwrap()
         );
-        submit_cups(&mock, &source, "", "", true).unwrap();
+        submit_cups_with_command(Command::new("/bin/sh").arg(&mock), &source, "", "", true)
+            .unwrap();
         assert_eq!(
             std::fs::read_to_string(&capture)
                 .unwrap()
@@ -404,11 +465,75 @@ mod tests {
         );
         std::fs::write(&mock, "#!/bin/sh\necho 'printer offline' >&2\nexit 42\n").unwrap();
         assert!(
-            submit_cups(&mock, &source, "7", "", true)
+            submit_cups_with_command(Command::new("/bin/sh").arg(&mock), &source, "7", "", true)
                 .unwrap_err()
                 .to_string()
                 .contains("printer offline")
         );
+        drop(writable);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn cups_stalls_and_floods_report_ambiguity_without_resubmitting() {
+        use std::time::{Duration, Instant};
+        let folder = tempfile::tempdir().unwrap();
+        let attempts = folder.path().join("attempts");
+        let source = folder.path().join("source.pdf");
+        std::fs::write(&source, b"%PDF unchanged source").unwrap();
+        let command = |delay: &str| {
+            let mut command = Command::new("/bin/sh");
+            command
+                .args([
+                    "-c",
+                    "printf 'submitted\\n' >> \"$1\"; sleep \"$2\"",
+                    "fixture",
+                ])
+                .arg(&attempts)
+                .arg(delay);
+            command
+        };
+        // Characterize the previous Command::output boundary with a finite
+        // stall before exercising the replacement against the same fixture.
+        let start = Instant::now();
+        assert!(command("0.25").output().unwrap().status.success());
+        assert!(start.elapsed() >= Duration::from_millis(200));
+        assert_eq!(std::fs::read_to_string(&attempts).unwrap(), "submitted\n");
+        std::fs::write(&attempts, b"").unwrap();
+        let start = Instant::now();
+        let error = cups_output(&mut command("30"), Duration::from_millis(150), true)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("deadline") && error.contains("may already be queued"));
+        assert!(error.contains("check the print queue"));
+        assert!(start.elapsed() < Duration::from_secs(3));
+        assert_eq!(std::fs::read_to_string(&attempts).unwrap(), "submitted\n");
+        for stream in ["cat /dev/zero", "cat /dev/zero >&2"] {
+            let error = cups_output(
+                Command::new("/bin/sh").args(["-c", stream]),
+                Duration::from_secs(3),
+                true,
+            )
+            .unwrap_err()
+            .to_string();
+            assert!(error.contains("byte limit") && error.contains("may already be queued"));
+        }
+        let error = cups_output(
+            Command::new("/bin/sh").args(["-c", "sleep 30"]),
+            Duration::from_millis(150),
+            false,
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(error.contains("deadline") && !error.contains("queued"));
+        let retry = cups_output(
+            Command::new("/bin/sh").args(["-c", "printf 'request id is retry-1'"]),
+            Duration::from_secs(3),
+            true,
+        )
+        .unwrap();
+        assert_eq!(retry.stdout, b"request id is retry-1");
+        assert_eq!(std::fs::read(&source).unwrap(), b"%PDF unchanged source");
     }
 
     #[cfg(target_os = "linux")]
