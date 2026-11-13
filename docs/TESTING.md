@@ -794,3 +794,35 @@ broker child or claim that a manual Explorer Open With interaction was performed
 Production registration follows Microsoft's [application registration](https://learn.microsoft.com/en-us/windows/win32/shell/app-registration)
 and [file type registration](https://learn.microsoft.com/en-us/windows/win32/shell/fa-file-types)
 interfaces using the current-user hive.
+
+## Windows MSI upgrade and user-data retention
+
+Use the existing `packaging/windows/test-msi.ps1` in a fresh disposable Windows
+account. It now refuses preexisting dPDF data as well as an existing installation,
+seeds generated preferences and mark/recovery retention sentinels at the actual
+APPDATA/LOCALAPPDATA locations, and checks exact bytes after install and uninstall.
+The sentinels are not valid saved mark/recovery models; native recovery/studio
+corpora still prove those models reopen. Success removes only fixture-created
+data roots; failure retains them and MSI logs for diagnosis. Do not rerun against
+retained failed-fixture state as though it were a clean account.
+
+For major-upgrade coverage supply both optional parameters with an existing
+qualified older package (no new version allocation or publication):
+
+```powershell
+.\packaging\windows\test-msi.ps1 -Msi C:\fixtures\candidate.msi `
+  -Version 0.1.54 -Fixture C:\fixtures\generated-50-pages.pdf `
+  -WorkDirectory C:\fixtures\upgrade-check `
+  -PreviousMsi C:\fixtures\qualified-older.msi -PreviousVersion 0.1.53
+```
+
+Substitute actual candidate/previous versions; the previous version must be
+strictly older. The harness checks the previous installed executable version,
+then installs the candidate through the same MajorUpgrade path, checks the new
+version, runtime/registration/default association and user-data retention, and
+uninstalls the candidate. Both MSI hashes are printed for source-bound receipts.
+A failed install retains state for diagnosis rather than retrying other packages.
+Without the optional pair it runs fresh-install coverage only.
+
+These candidate test additions have not run natively in the current restricted
+checkout; PowerShell/native MSI and upgraded saved-data acceptance remain pending.

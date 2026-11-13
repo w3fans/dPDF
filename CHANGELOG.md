@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Extend disposable-account MSI validation with exact default-association preservation, generated user-data retention checks, and an optional prior-version upgrade; repair the existing probe loop for current strict Clippy.
+
 - Record verified public preview delivery and the selected public Actions/local COPR publication roles.
 
 - Run bounded Windows installer packaging under the current PowerShell host so required hashing commands resolve consistently.
