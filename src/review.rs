@@ -332,7 +332,7 @@ fn view_bounds(page: &PdfPage<'_>, rect: [f32; 4]) -> Result<NormalizedRect> {
 }
 
 fn checked(command: &mut Command, action: &str) -> Result<()> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
     {
         checked_with_limits(
             command,
@@ -344,7 +344,7 @@ fn checked(command: &mut Command, action: &str) -> Result<()> {
             },
         )
     }
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     {
         let output = command
             .output()
@@ -359,7 +359,7 @@ fn checked(command: &mut Command, action: &str) -> Result<()> {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "windows"))]
 fn checked_with_limits(
     command: &mut Command,
     action: &str,

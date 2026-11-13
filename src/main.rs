@@ -12,6 +12,9 @@ mod document;
 mod encrypted;
 #[cfg(target_os = "linux")]
 mod helper_process;
+#[cfg(target_os = "windows")]
+#[path = "helper_process_windows.rs"]
+mod helper_process;
 mod image_pages;
 mod imaging;
 mod mark_studio;

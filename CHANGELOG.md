@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Prepare owned Windows helper jobs with bounded pipes, deadlines and cancellation for qpdf and silent Quick Print; keep native dialog handling separate.
+
 - Bound Linux CUPS discovery and submission helpers; report uncertain submission without automatically resubmitting.
 
 - Expose active-review revision selection in the reader toolbar and narrow More menu, sharing existing review state; check revision/filter synchronization independently of remark and mark visibility.

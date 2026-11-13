@@ -293,15 +293,26 @@ pub fn print_pdf(path: &Path, range: &str, printer: &str, fit: bool) -> Result<S
         } else {
             format!("{range},{}", if fit { "fit" } else { "noscale" })
         };
-        let output = command
-            .args(["-silent", "-print-settings", &settings])
-            .arg(path)
-            .output()
-            .context("Start configured Windows print helper")?;
+        let output = crate::helper_process::run(
+            command
+                .args(["-silent", "-print-settings", &settings])
+                .arg(path),
+            b"",
+            crate::helper_process::Limits {
+                timeout: std::time::Duration::from_secs(60),
+                stdout: 64 * 1024,
+                stderr: 64 * 1024,
+            },
+            None,
+        )
+        .map_err(|error| anyhow::anyhow!("Windows print helper did not confirm submission: {error}. The job may already be queued; check the print queue before submitting again"))?;
         if !output.status.success() {
             bail!(
-                "Windows print helper failed: {}",
+                "Windows print helper did not confirm submission: {}. The job may already be queued; check the print queue before submitting again",
                 String::from_utf8_lossy(&output.stderr)
+                    .chars()
+                    .take(2000)
+                    .collect::<String>()
             );
         }
         Ok("Sent to configured Windows print helper".into())

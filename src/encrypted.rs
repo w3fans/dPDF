@@ -1,6 +1,6 @@
 //! Passwords travel in process memory / private stdin pipes, never command arguments.
 use anyhow::{Context, Result, bail};
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "windows")))]
 use std::{
     io::{Read, Write},
     process::Stdio,
@@ -29,7 +29,7 @@ fn decrypt_with(
     let scratch = tempfile::tempdir().context("Create private encrypted-PDF workspace")?;
     let input = scratch.path().join("encrypted.pdf");
     std::fs::write(&input, bytes)?;
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
     let (data, status) = {
         let mut private_input = password.as_bytes().to_vec();
         private_input.push(b'\n');
@@ -50,7 +50,7 @@ fn decrypt_with(
         )?;
         (result.stdout, result.status)
     };
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     let (data, status) = {
         let mut child = Command::new(executable)
             .arg("--password-file=-")

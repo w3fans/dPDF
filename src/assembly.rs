@@ -8,7 +8,7 @@ use std::{
     process::{Command, Output},
     sync::Arc,
 };
-#[cfg(not(target_os = "linux"))]
+#[cfg(not(any(target_os = "linux", target_os = "windows")))]
 use std::{io::Read, process::Stdio};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -109,7 +109,7 @@ fn checked(output: Output, action: &str) -> Result<Output> {
 
 /// Bounded scalar/status qpdf calls. Metadata uses its separate 64-MiB policy.
 pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
     let output = crate::helper_process::run(
         command,
         b"",
@@ -121,7 +121,7 @@ pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
         None,
     )
     .with_context(|| format!("Run qpdf: {action}"))?;
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     let output = command
         .output()
         .with_context(|| format!("Run qpdf: {action}"))?;
@@ -129,7 +129,7 @@ pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
 }
 
 pub(crate) fn inspect_metadata(path: &Path) -> Result<Value> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
     {
         inspect_metadata_with(
             path,
@@ -141,7 +141,7 @@ pub(crate) fn inspect_metadata(path: &Path) -> Result<Value> {
             },
         )
     }
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     {
         let mut child = Command::new(qpdf_executable())
             .arg("--json")
@@ -171,7 +171,7 @@ pub(crate) fn inspect_metadata(path: &Path) -> Result<Value> {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "windows"))]
 fn inspect_metadata_with(
     path: &Path,
     executable: &Path,
