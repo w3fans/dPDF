@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "PREPARED; compiled/native qualification pending",
+  "status": "QUALIFIED code candidate a4e4896f; final documentation commit gates remain independently required",
   "baseline": "de7a53d1c9c23f8389984a6d17df79f669c510d7",
   "recorded_at": "2026-11-13T21:07:12.970782+00:00",
   "package": "pulldown-cmark",
@@ -36,5 +36,232 @@
     "options": "ENABLE_STRIKETHROUGH only; no ENABLE_WIKILINKS or Options::all in observed parser call",
     "assessment": "Advisory version matches, but required option absent in inspected transitive caller; upgrade to patched version remains recommended as separate qualified work"
   },
-  "only_one_locked_package_identity_changed": true
+  "only_one_locked_package_identity_changed": true,
+  "qualification": {
+    "candidate": "a4e4896f278a8a3bf9a5861aa31bcf5f02993b3d",
+    "run_id": 43508365932,
+    "jobs": {
+      "linux": 132171825645,
+      "windows": 132171824941,
+      "policy": 132171825370
+    },
+    "all_jobs": "SUCCESS",
+    "linux": {
+      "artifact_id": 14076464998,
+      "archive_sha256": "50ee11c0a8d15f2b4a30c89b953f65549b0623ce224380bab7ffc18c86afb8e8",
+      "source_commit": "5f16d23bde0de75ab08b43f66e1a22912728fe0e",
+      "binary_sha256": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+      "suites": 33,
+      "inventory_exact": true,
+      "components": 349,
+      "notice_references": 648
+    },
+    "windows": {
+      "artifact_id": 14077383892,
+      "archive_sha256": "e58c9808b6a09a5f0acf3d4fbc310c8934364d6ea5a54ee29ec9d8d7bf3d0d9d",
+      "source_commit": "a4e4896f278a8a3bf9a5861aa31bcf5f02993b3d",
+      "binary_sha256": "b76735d5ca17559e1d60e420fea097b7a9f1df532150c824ea82c1ab291e6bda",
+      "checks": 18,
+      "inventory_exact": true,
+      "components": 255,
+      "notice_references": 485,
+      "build_peak_job_commit_bytes": 1766981632,
+      "unchanged_limit_bytes": 2147483648
+    },
+    "native_ui": {
+      "status": "PASS",
+      "display": "private authenticated X11; software renderer; native XTest input",
+      "before": "17148ceecfe0c7d73c0413b66087c2b800773f6e0a13661e18f6f2eea13e1191",
+      "after": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+      "comparisons": [
+        {
+          "scale": 1,
+          "file": "light.ppm",
+          "size": [
+            570,
+            700
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "133c9896440a87a03fadd5155b3f5f3d20bea20eb0b9885e3200d0b78d57daea"
+        },
+        {
+          "scale": 1,
+          "file": "light-details.ppm",
+          "size": [
+            570,
+            700
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "d823ef367d77f50abafbeb62db9112f3e7b732b0cae10b3b987554b616322f2f"
+        },
+        {
+          "scale": 1,
+          "file": "dark.ppm",
+          "size": [
+            570,
+            700
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "31157cb84a12142ad2e62403b9533318f4f09c353deac11176609db451230bb8"
+        },
+        {
+          "scale": 1,
+          "file": "dark-details.ppm",
+          "size": [
+            570,
+            700
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "61a56ee777aa06faf7b92db02f42c9cdec162a23ced891634b1fba302c2671ef"
+        },
+        {
+          "scale": 1,
+          "file": "native-about.png",
+          "size": [
+            570,
+            700
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "7085643d012b563d12de06feced31117eaa3a96c971bbe52104f966d9f215f1d"
+        },
+        {
+          "scale": 1,
+          "file": "native-about-details.png",
+          "size": [
+            570,
+            700
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "26d5f909b1010ee15dd410554a2def80c4af9eaaa2c7487e3507adbeafbd321d"
+        },
+        {
+          "scale": 1.5,
+          "file": "light.ppm",
+          "size": [
+            855,
+            1050
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "bbd32aac85aafda53498f7a5f7c492a3c6ff1b14cded9bdc768fcb3a05eb7668"
+        },
+        {
+          "scale": 1.5,
+          "file": "light-details.ppm",
+          "size": [
+            855,
+            1050
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "bcf108c8311083d8c271452f9e15bdc999874d0c571de52121c6b76261057e66"
+        },
+        {
+          "scale": 1.5,
+          "file": "dark.ppm",
+          "size": [
+            855,
+            1050
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "5c4660681ceea64969822391bee4a15a180a52ae0d64c6c1e1e869e0ff5406ae"
+        },
+        {
+          "scale": 1.5,
+          "file": "dark-details.ppm",
+          "size": [
+            855,
+            1050
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "923a74d3cda6f3bcd1db59037f35233fcdf7e2561383f0fc933cdf0296e4d156"
+        },
+        {
+          "scale": 1.5,
+          "file": "native-about.png",
+          "size": [
+            855,
+            1050
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "933837f150f06c20fc178550f14eff2b5d94921b9cb724e980ec19db8b51243d"
+        },
+        {
+          "scale": 1.5,
+          "file": "native-about-details.png",
+          "size": [
+            855,
+            1050
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "4367fd00f635aae0e0cac3b2b58b6dd0cd7ba010c6a3a9557730166b48b8d666"
+        },
+        {
+          "scale": 2,
+          "file": "light.ppm",
+          "size": [
+            1140,
+            1400
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "044d5fb2aa645d448a3775821ecc349a7faec809e1e4a652452629d9ccb12b4f"
+        },
+        {
+          "scale": 2,
+          "file": "light-details.ppm",
+          "size": [
+            1140,
+            1400
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "cf5aade00108e6f0028a95ddce6dfb8294640e760d29a8c724d80d32d8fd2a63"
+        },
+        {
+          "scale": 2,
+          "file": "dark.ppm",
+          "size": [
+            1140,
+            1400
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "30fb32ea05e23fe30a5387e7d5011ccbfd568a867968c374c3afb88b583c42b6"
+        },
+        {
+          "scale": 2,
+          "file": "dark-details.ppm",
+          "size": [
+            1140,
+            1400
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "77896d2539902c5054c2734358a9fb83571bd8ad0889f05b6ffa61762e60cf8e"
+        },
+        {
+          "scale": 2,
+          "file": "native-about.png",
+          "size": [
+            1140,
+            1400
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "47690e7584d0543d759349daec86adb2f1641d91f0ea29316a7e8f295e9f2c7e"
+        },
+        {
+          "scale": 2,
+          "file": "native-about-details.png",
+          "size": [
+            1140,
+            1400
+          ],
+          "changed_pixels": 0,
+          "pixel_sha256": "bd620dd3e511db04a82ae12f4eeeab13297ae8840d8ddaadfe28a29be09c1fe5"
+        }
+      ],
+      "scope": "18 About image comparisons; main reader remains open after Close; prior Escape behavior recorded separately; generated sources unchanged; no link opened; no claim of native Wayland/Windows acceptance"
+    },
+    "limitations": [
+      "Real Wayland/Windows input not qualified",
+      "Physical printing and manual owner acceptance not qualified",
+      "Advisory mitigation for one package; no release-wide security clearance"
+    ],
+    "recorded_at": "2026-11-13T21:26:15.682976+00:00"
+  }
 }
