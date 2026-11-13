@@ -1,4 +1,4 @@
-"""Collect Windows-target notices inside the validator's bounded child Job Object."""
+"""Collect target-scoped Cargo notices without retaining machine-local paths."""
 import argparse
 import importlib.util
 import json
@@ -10,14 +10,17 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--source', type=Path, required=True)
 parser.add_argument('--cargo', required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--target', choices=['x86_64-pc-windows-msvc', 'x86_64-unknown-linux-gnu'],
+                    default='x86_64-pc-windows-msvc')
+parser.add_argument('--retained', type=Path, help='Require the collected inventory to match this retained JSON')
 args = parser.parse_args()
 source = args.source.resolve()
 tools = Path(__file__).resolve().parents[2]
 args.output.mkdir(parents=True, exist_ok=True)
 metadata_path, tree_path = args.output / 'metadata.json', args.output / 'tree.txt'
 for output, command in [
-    (metadata_path, ['metadata', '--locked', '--format-version', '1', '--filter-platform', 'x86_64-pc-windows-msvc']),
-    (tree_path, ['tree', '--locked', '--target', 'x86_64-pc-windows-msvc', '--edges', 'normal,build', '--prefix', 'none', '--format', '{p}'])
+    (metadata_path, ['metadata', '--locked', '--format-version', '1', '--filter-platform', args.target]),
+    (tree_path, ['tree', '--locked', '--target', args.target, '--edges', 'normal,build', '--prefix', 'none', '--format', '{p}'])
 ]:
     with output.open('wb') as file:
         subprocess.run([args.cargo, *command, '--manifest-path', str(source / 'Cargo.toml')],
@@ -26,7 +29,7 @@ spec = importlib.util.spec_from_file_location('notices', tools / 'scripts' / 'co
 notices = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(notices)
 inventory = notices.collect(json.loads(metadata_path.read_text(encoding='utf-8')),
-    tomllib.loads((source / 'Cargo.lock').read_text(encoding='utf-8')), 'x86_64-pc-windows-msvc',
+    tomllib.loads((source / 'Cargo.lock').read_text(encoding='utf-8')), args.target,
     args.output / 'bundle', tree_path.read_text(encoding='utf-8'),
     tools / 'packaging' / 'licenses' / 'rust' / 'overrides.json',
     tomllib.loads((source / 'Cargo.toml').read_text(encoding='utf-8')))
@@ -42,3 +45,6 @@ metadata_path.unlink()  # The portable inventory contains no machine-local manif
 tree_path.unlink()
 print(json.dumps(dict(packages=len(inventory['components']), missing=inventory['missing_license_text'],
                       status='inventory_only', qualified_for_binary_distribution=False)))
+
+if args.retained and json.loads(args.retained.read_text(encoding='utf-8')) != inventory:
+    raise RuntimeError('Collected Cargo notice inventory differs from retained target inventory')

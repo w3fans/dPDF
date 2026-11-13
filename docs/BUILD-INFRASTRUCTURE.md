@@ -302,12 +302,27 @@ inside the application. There is no new external crate version, license selectio
 engine ownership or runtime worker. The internal crate retains the project's
 existing LICENSE and NOTICE; native notice readback must confirm the inventories.
 
-This is an experiment pending native measurements and reader/output comparisons.
-The proposed build-memory target remains at most 1.75 GiB. Cargo concurrency,
-dependency optimization and the CPU/memory caps remain unchanged. Verify both the
-UI library and application compiler-artifacts have `fresh: false`; a Cargo cache
-hit does not measure compilation. Retain exact source/compiler identity, job peak
-and original failed logs. No compiler-memory improvement is yet claimed.
+The first separated build (source 87fadf2b, run 43497797523) passed every CI
+job. Both UI and application compiled fresh at optimization level 1. The native
+Windows build peaked at 1,779,228,672 committed bytes, below the proposed
+1.75-GiB target, leaving 368,254,976 bytes (~351 MiB) under the unchanged cap.
+This single measured run is not a universal bound. Same-machine generated reader
+medians (five repeats per fixture) showed no >10% median first-page/render/RSS
+regression on the 50-page office, 1000-page text and 50-page vector fixtures;
+32 geometry cases and full Linux/Windows PDF regressions passed. GUI latency and
+representative-office/native acceptance remain separate performance work.
+
+Native Windows inventory readback matched all prior external components but
+found CRLF conversions in the new internal crate's LICENSE/NOTICE. The final
+candidate preserves those copies verbatim through Git attributes and requires
+fresh Linux target collection to equal the retained Linux inventory as well.
+Windows native readback must be compared again after that correction. No license
+selection changes; the unsuccessful original measurements remain retained.
+
+The final combined candidate also includes the merged focused-text fix. Repeat
+its full gates, check fresh UI/application identities and native job peaks, and
+compare exact native notice inventories before merge. Cargo concurrency,
+dependency optimization and the CPU/memory caps remain unchanged.
 
 References: [Cargo profiles](https://doc.rust-lang.org/cargo/reference/profiles.html#codegen-units)
 and [QueryInformationJobObject](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-queryinformationjobobject).

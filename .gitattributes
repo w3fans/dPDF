@@ -1,3 +1,7 @@
 # Preserve hash-addressed upstream notices verbatim, including their line endings
 # and original whitespace. Project source keeps the normal whitespace checks.
 packaging/licenses/rust/texts/*.txt -text -whitespace
+
+# Keep the internal crate copies byte-identical to the project notices.
+crates/ui/LICENSE -text -whitespace
+crates/ui/NOTICE -text -whitespace
