@@ -280,9 +280,16 @@ and command identity; they do not independently qualify a binary.
 
 The explicit 16-unit baseline in run 43489953584 (source fe081869) compiled
 fresh and peaked at 2,125,107,200 committed bytes against the 2,147,483,648-byte
-cap, leaving about 21 MiB. The next candidate evaluates 256 application codegen
-units with a proposed build-memory target of at most 1.75 GiB. This is an
-experiment pending native measurements and reader comparisons, not a claimed fix.
+cap, leaving about 21 MiB. The 256-unit candidate (source bd71a8f5,
+run 43492468459) failed in application LLVM code generation with out-of-memory;
+its job recorded 2,153,193,472 committed bytes. Retain this failed measurement,
+including the original logs; it supplies no usable application binary.
+
+The next candidate evaluates one application codegen unit. Cargo documents that
+this also avoids the default local ThinLTO, so this experiment tests a different
+compiler path rather than assuming more partitions reduce peak memory. The
+proposed build-memory target remains at most 1.75 GiB. This is an experiment
+pending native measurements and reader comparisons, not a claimed fix.
 Dependency profiles, optimization level, Cargo concurrency and resource limits
 are unchanged. Before comparing a codegen experiment, verify the application
 compiler-artifact has `fresh: false`;
