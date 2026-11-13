@@ -472,6 +472,66 @@ impl SmokeCheck {
                     );
                     app.tabs[app.active].view.rotation = 1;
                     app.relayout(ui, true);
+                    self.stage = 30;
+                }
+                30 if ready => {
+                    // A recovered review can have empty history while mark edits
+                    // remain undoable. Exercise real key dispatch at that boundary.
+                    app.tabs[app.active]
+                        .review
+                        .as_mut()
+                        .unwrap()
+                        .clear_history();
+                    app.review_controls(ui);
+                    if ui.get_can_undo_remark() || !ui.get_can_undo_mark() {
+                        anyhow::bail!("History isolation fixture lacks independent mark Undo");
+                    }
+                    self.pending_key = Some((true, "z".into()));
+                    self.stage = 31;
+                }
+                31 => {
+                    if app.tabs[app.active].marks.items.len() != 1 || !ui.get_can_undo_mark() {
+                        anyhow::bail!("Empty Review Undo fell through to mark history");
+                    }
+                    app.history_mark(ui, false);
+                    if !app.tabs[app.active].marks.items.is_empty() || !ui.get_can_redo_mark() {
+                        anyhow::bail!("History isolation fixture lacks independent mark Redo");
+                    }
+                    self.pending_key = Some((true, "y".into()));
+                    self.stage = 32;
+                }
+                32 => {
+                    if !app.tabs[app.active].marks.items.is_empty() || !ui.get_can_redo_mark() {
+                        anyhow::bail!("Empty Review Ctrl+Y fell through to mark history");
+                    }
+                    self.pending_key = Some((true, "Z".into()));
+                    self.pending_shift = true;
+                    self.stage = 33;
+                }
+                33 => {
+                    if !app.tabs[app.active].marks.items.is_empty() || !ui.get_can_redo_mark() {
+                        anyhow::bail!("Empty Review Ctrl+Shift+Z fell through to mark history");
+                    }
+                    ui.set_review_visible(false);
+                    self.pending_key = Some((true, "y".into()));
+                    self.stage = 34;
+                }
+                34 => {
+                    if app.tabs[app.active].marks.items.len() != 1 || ui.get_can_redo_mark() {
+                        anyhow::bail!("Closed Review did not return Redo to mark history");
+                    }
+                    self.pending_key = Some((true, "z".into()));
+                    self.stage = 35;
+                }
+                35 => {
+                    if !app.tabs[app.active].marks.items.is_empty() || !ui.get_can_redo_mark() {
+                        anyhow::bail!("Closed Review did not return Undo to mark history");
+                    }
+                    app.history_mark(ui, true);
+                    ui.set_review_visible(true);
+                    println!(
+                        "review: exhausted Review history does not consume independent mark Undo or Redo"
+                    );
                     self.stage = 5;
                 }
                 5 if ready => {
