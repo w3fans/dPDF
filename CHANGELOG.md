@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
+
 - Expose active-review revision selection in the reader toolbar and narrow More menu, sharing existing review state; check revision/filter synchronization independently of remark and mark visibility.
 
 - Keep Linux staging and summary in separate workflow steps and guard duplicate step keys with a source-only regression test.

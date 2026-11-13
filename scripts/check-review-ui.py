@@ -73,6 +73,7 @@ def main():
                 if case_name == 'edit':
                     assert 'remark Undo/Redo restored remarks and revisions' in report
                     assert 'revision selector state follows current filter and preserves hidden remarks and marks' in report
+                    assert 'exhausted Review history does not consume independent mark Undo or Redo' in report
                 subprocess.run([qpdf, '--check', str(output)], capture_output=True, check=True)
                 result = subprocess.run([binary, '--review', 'inspect', str(output)], env=env,
                                         capture_output=True, text=True, check=True)
