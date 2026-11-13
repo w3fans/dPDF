@@ -584,7 +584,9 @@ fn recovery_completed(
                 }
                 Ok(info)
             }
-            Ok(ReviewData::Cleaned(_)) => bail!("Unexpected recovery metadata result"),
+            Ok(ReviewData::Cleaned(_) | ReviewData::Decrypted(_)) => {
+                bail!("Unexpected recovery metadata result")
+            }
             Err(error) => bail!("{error}"),
         }
     })();
