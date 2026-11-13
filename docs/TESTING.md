@@ -358,11 +358,27 @@ cryptographic seal, and modified output invalidates existing digital signatures.
 
 ## Release-file consistency
 
-`PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-release-version.py` exercises the
-project version adapter against temporary files and the actual portable standard
-controller. It checks patch calculation, changelog preservation, synchronized
-versions, retry state and mismatched-tag/lockfile refusal without compiling or
-changing the project's version. The patch-release command runs it automatically.
+`PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-release-version.py` runs public
+adapter unit tests using temporary generated project files and mocked controller
+process results. CI runs this suite without private tooling. It checks adapter
+arguments, synchronized versions, changelog/notes and licensing, resume, mismatches,
+controller failures and refusal of stable/three-digit preview targets. These tests
+do not implement or qualify the controller's version-allocation algorithm.
+
+On the release authority, explicitly test the installed standard controller:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-release-version.py --integration-policy ops/release-policy.json
+```
+
+This requires the controller under `${ORIG_HOME:-/www/0rig}` and Ruby; missing
+prerequisites exit with an error. It copies the policy and public shell adapter to
+a temporary project and exercises real preflight/validation there. The two injected
+process/result tests are skipped in integration mode and covered by the unit run.
+No project release version, tag or published artifact changes. Retain the command,
+source/controller identity and platform with the receipt; a local pass does not
+qualify a different authority installation. The adapter uses the tracked
+`ops/release-policy.json`; do not substitute an unverified policy schema.
 
 ## Graphical mark studio acceptance
 
