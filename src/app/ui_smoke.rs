@@ -41,6 +41,86 @@ pub(super) struct SmokeCheck {
 }
 
 impl SmokeCheck {
+    fn helper_advance(&mut self, app: &mut Application, ui: &Workspace, mode: &str) {
+        let result = (|| -> anyhow::Result<()> {
+            if !matches!(mode, "close" | "retry" | "shutdown") {
+                anyhow::bail!("Unknown helper diagnostic mode");
+            }
+            let marker = PathBuf::from(
+                std::env::var_os("DPDF_SMOKE_HELPER_READY")
+                    .ok_or_else(|| anyhow::anyhow!("Missing helper readiness path"))?,
+            );
+            match self.stage {
+                0 if marker.exists()
+                    && app.tabs.len() == 1
+                    && app.pages.iter().any(|p| p.ready) =>
+                {
+                    if ui.get_review_ready() {
+                        anyhow::bail!("Metadata fixture was not stalled");
+                    }
+                    self.tab_identity = Some(app.tabs[app.active].info.id);
+                    self.tab_reopen = Some(app.tabs[app.active].info.path.clone());
+                    app.go_to(ui, 24);
+                    self.stage = 1;
+                }
+                1 if app.pages.iter().any(|p| p.page == 24 && p.ready) => {
+                    if ui.get_review_ready() {
+                        anyhow::bail!("Metadata completed before navigation could be checked");
+                    }
+                    println!("helper: rendered page 25 while metadata remained stalled");
+                    match mode {
+                        "close" => {
+                            app.close(ui, app.active);
+                            self.stage = 2;
+                        }
+                        "retry" => {
+                            app.retry_review(ui);
+                            self.stage = 4;
+                        }
+                        _ => {
+                            println!("helper: quitting with a live metadata helper");
+                            use std::io::Write;
+                            std::io::stdout().flush()?;
+                            self.stage = 99;
+                            let _ = slint::quit_event_loop();
+                        }
+                    }
+                }
+                2 if app.tabs.is_empty() => {
+                    app.open(ui, self.tab_reopen.clone().unwrap());
+                    self.stage = 3;
+                }
+                3 if ui.get_review_ready() && app.pages.iter().any(|p| p.ready) => {
+                    if app.tabs[app.active].info.id == self.tab_identity.unwrap() {
+                        anyhow::bail!("Reopened document reused its closed identity");
+                    }
+                    println!(
+                        "helper: closed stalled document and reopened without a stale completion"
+                    );
+                    let _ = slint::quit_event_loop();
+                    self.stage = 99;
+                }
+                4 if ui.get_review_ready() => {
+                    if app.tabs[app.active].info.id != self.tab_identity.unwrap()
+                        || app.tabs[app.active].review_error.is_some()
+                    {
+                        anyhow::bail!("Retry accepted a stale metadata result");
+                    }
+                    println!(
+                        "helper: retry replaced stalled metadata without accepting its cancelled completion"
+                    );
+                    let _ = slint::quit_event_loop();
+                    self.stage = 99;
+                }
+                _ => {}
+            }
+            Ok(())
+        })();
+        if let Err(error) = result {
+            self.failure = Some(format!("{error:#}"));
+            let _ = slint::quit_event_loop();
+        }
+    }
     fn tabs_advance(&mut self, app: &mut Application, ui: &Workspace) {
         let result = (|| -> anyhow::Result<()> {
             let ready = app.pages.iter().any(|p| p.ready);
@@ -880,6 +960,10 @@ impl SmokeCheck {
         if let Some(error) = &app.engine_error {
             self.failure = Some(error.clone());
             let _ = slint::quit_event_loop();
+            return;
+        }
+        if let Ok(mode) = std::env::var("DPDF_SMOKE_HELPER") {
+            self.helper_advance(app, ui, &mode);
             return;
         }
         if std::env::var_os("DPDF_SMOKE_PHYSICAL").is_some() {

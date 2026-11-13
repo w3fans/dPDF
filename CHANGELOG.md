@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Prepare cancellable background review metadata and annotation-cleaning jobs so stalled helpers can leave reader navigation responsive; reject stale document/request completions and join helper cleanup on normal shutdown.
+
 - Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
 
 - Refresh Windows notices from the native target graph, retaining exact notice bytes and excluding Linux build-host packages.

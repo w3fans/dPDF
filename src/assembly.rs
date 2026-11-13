@@ -129,9 +129,16 @@ pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
 }
 
 pub(crate) fn inspect_metadata(path: &Path) -> Result<Value> {
+    inspect_metadata_cancellable(path, None)
+}
+pub(crate) fn inspect_metadata_cancellable(
+    path: &Path,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<Value> {
+    crate::background_jobs::check_cancelled(cancel)?;
     #[cfg(any(target_os = "linux", target_os = "windows"))]
     {
-        inspect_metadata_with(
+        inspect_metadata_with_cancel(
             path,
             &qpdf_executable(),
             crate::helper_process::Limits {
@@ -139,6 +146,7 @@ pub(crate) fn inspect_metadata(path: &Path) -> Result<Value> {
                 stdout: 64 * 1024 * 1024,
                 stderr: 0,
             },
+            cancel,
         )
     }
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
@@ -171,11 +179,21 @@ pub(crate) fn inspect_metadata(path: &Path) -> Result<Value> {
     }
 }
 
-#[cfg(any(target_os = "linux", target_os = "windows"))]
+#[cfg(all(test, target_os = "linux"))]
 fn inspect_metadata_with(
     path: &Path,
     executable: &Path,
     limits: crate::helper_process::Limits,
+) -> Result<Value> {
+    inspect_metadata_with_cancel(path, executable, limits, None)
+}
+
+#[cfg(any(target_os = "linux", target_os = "windows"))]
+fn inspect_metadata_with_cancel(
+    path: &Path,
+    executable: &Path,
+    limits: crate::helper_process::Limits,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
 ) -> Result<Value> {
     let output = crate::helper_process::run(
         Command::new(executable)
@@ -184,7 +202,7 @@ fn inspect_metadata_with(
             .arg(path_string(path)?.as_ref()),
         b"",
         limits,
-        None,
+        cancel,
     )
     .context("Inspect PDF metadata")?;
     if !output.status.success() {
@@ -195,12 +213,19 @@ fn inspect_metadata_with(
 
 /// One immutable metadata snapshot shared by independent page-unit/review readers.
 pub(crate) fn inspect_snapshot(bytes: &[u8]) -> Result<Value> {
+    inspect_snapshot_cancellable(bytes, None)
+}
+pub(crate) fn inspect_snapshot_cancellable(
+    bytes: &[u8],
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<Value> {
+    crate::background_jobs::check_cancelled(cancel)?;
     let directory = tempfile::Builder::new()
         .prefix("dpdf-metadata-")
         .tempdir()?;
     let input = directory.path().join("snapshot.pdf");
     std::fs::write(&input, bytes).context("Stage PDF metadata snapshot")?;
-    inspect_metadata(&input)
+    inspect_metadata_cancellable(&input, cancel)
 }
 
 pub(crate) fn page_count(executable: &Path, path: &Path) -> Result<usize> {

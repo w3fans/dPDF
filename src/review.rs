@@ -331,10 +331,15 @@ fn view_bounds(page: &PdfPage<'_>, rect: [f32; 4]) -> Result<NormalizedRect> {
     Ok(bounds)
 }
 
-fn checked(command: &mut Command, action: &str) -> Result<()> {
+fn checked(
+    command: &mut Command,
+    action: &str,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<()> {
+    crate::background_jobs::check_cancelled(cancel)?;
     #[cfg(any(target_os = "linux", target_os = "windows"))]
     {
-        checked_with_limits(
+        checked_with_limits_cancel(
             command,
             action,
             crate::helper_process::Limits {
@@ -342,6 +347,7 @@ fn checked(command: &mut Command, action: &str) -> Result<()> {
                 stdout: 64 * 1024,
                 stderr: 0,
             },
+            cancel,
         )
     }
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
@@ -359,13 +365,22 @@ fn checked(command: &mut Command, action: &str) -> Result<()> {
     }
 }
 
-#[cfg(any(target_os = "linux", target_os = "windows"))]
+#[cfg(all(test, target_os = "linux"))]
 fn checked_with_limits(
     command: &mut Command,
     action: &str,
     limits: crate::helper_process::Limits,
 ) -> Result<()> {
-    let output = crate::helper_process::run(command, b"", limits, None)
+    checked_with_limits_cancel(command, action, limits, None)
+}
+#[cfg(any(target_os = "linux", target_os = "windows"))]
+fn checked_with_limits_cancel(
+    command: &mut Command,
+    action: &str,
+    limits: crate::helper_process::Limits,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<()> {
+    let output = crate::helper_process::run(command, b"", limits, cancel)
         .with_context(|| format!("Run qpdf to {action}"))?;
     if !output.status.success() {
         bail!(
@@ -743,6 +758,14 @@ impl Prepared {
         self.source.bytes = bytes;
     }
     pub fn save(self, destination: &Path) -> Result<ExportResult> {
+        self.save_cancellable(destination, None)
+    }
+    pub(crate) fn save_cancellable(
+        self,
+        destination: &Path,
+        cancel: Option<&std::sync::atomic::AtomicBool>,
+    ) -> Result<ExportResult> {
+        crate::background_jobs::check_cancelled(cancel)?;
         let parent = destination
             .parent()
             .filter(|p| !p.as_os_str().is_empty())
@@ -758,7 +781,7 @@ impl Prepared {
         let input = scratch.path().join("source.pdf");
         let patch = scratch.path().join("review.json");
         std::fs::write(&input, self.source.bytes.as_slice())?;
-        let document = inspect(&input)?;
+        let document = crate::assembly::inspect_metadata_cancellable(&input, cancel)?;
         if document["pages"].as_array().map(Vec::len) != Some(self.pages) {
             bail!("Review page count differs from its opened snapshot");
         }
@@ -779,14 +802,16 @@ impl Prepared {
                 .arg("--object-streams=preserve")
                 .arg(path_string(&output)?.as_ref()),
             "write review annotations",
+            cancel,
         )?;
         checked(
             Command::new(qpdf_executable())
                 .arg("--check")
                 .arg(path_string(&output)?.as_ref()),
             "validate review output",
+            cancel,
         )?;
-        let verify = inspect(&output)?;
+        let verify = crate::assembly::inspect_metadata_cancellable(&output, cancel)?;
         if verify["pages"].as_array().map(Vec::len) != Some(self.pages) {
             bail!("Review output lost pages");
         }
@@ -801,6 +826,7 @@ impl Prepared {
             .open(&output)?
             .sync_all()?;
         crate::storage::ensure_separate_output(&destination, &[&self.source.path])?;
+        crate::background_jobs::check_cancelled(cancel)?;
         output
             .persist(&destination)
             .map_err(|e| e.error)
@@ -865,6 +891,35 @@ pub fn run_cli(mut args: impl Iterator<Item = std::ffi::OsString>) -> Result<()>
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn cancelled_review_save_preserves_source_and_existing_destination() {
+        let folder = tempfile::tempdir().unwrap();
+        let source = folder.path().join("source.pdf");
+        let destination = folder.path().join("existing.pdf");
+        std::fs::write(&source, b"generated immutable source").unwrap();
+        std::fs::write(&destination, b"existing destination").unwrap();
+        let prepared = super::Prepared {
+            source: crate::assembly::SourceSnapshot {
+                path: source.clone(),
+                bytes: std::sync::Arc::new(std::fs::read(&source).unwrap()),
+            },
+            model: super::Review::default(),
+            mode: super::ExportMode::Clean,
+            geometry: vec![],
+            pages: 1,
+        };
+        let cancelled = std::sync::atomic::AtomicBool::new(true);
+        let error = prepared
+            .save_cancellable(&destination, Some(&cancelled))
+            .err()
+            .unwrap();
+        assert!(error.to_string().contains("cancelled"));
+        assert_eq!(
+            std::fs::read(source).unwrap(),
+            b"generated immutable source"
+        );
+        assert_eq!(std::fs::read(destination).unwrap(), b"existing destination");
+    }
     #[cfg(target_os = "linux")]
     #[test]
     fn review_helper_errors_and_stalls_are_bounded_and_retryable() {

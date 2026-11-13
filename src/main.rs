@@ -6,6 +6,7 @@ mod wayland_uri_list_tests;
 mod about;
 mod app;
 mod assembly;
+mod background_jobs;
 mod block_probe;
 mod cache;
 mod document;

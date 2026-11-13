@@ -1,4 +1,5 @@
 //! PDFium lives on one worker thread. No PDFium handles or borrowed objects enter the UI.
+use crate::background_jobs::{Cancellation, Jobs, Reply, Request};
 use crate::{cache::ByteCache, document::*};
 use anyhow::{Context, Result, bail, ensure};
 use pdfium_render::prelude::*;
@@ -35,7 +36,7 @@ pub enum Command {
     OpenSnapshot(DocumentId, PathBuf, Arc<Vec<u8>>),
     Snapshot(DocumentId),
     Unlock(DocumentId, String),
-    LoadReview(DocumentId),
+    LoadReview(DocumentId, u64),
     PrintReviewed {
         id: DocumentId,
         review: crate::review::Review,
@@ -102,8 +103,12 @@ pub enum Event {
     Snapshot(DocumentId, Arc<Vec<u8>>),
     OpenFailed(DocumentId, String),
     PasswordRequired(DocumentId, PathBuf, bool),
-    ReviewLoaded(DocumentId, Result<Option<crate::review::Review>, String>),
-    PageUnitsLoaded(DocumentId, Result<Vec<f64>, String>),
+    ReviewLoaded(
+        DocumentId,
+        u64,
+        Result<Option<crate::review::Review>, String>,
+    ),
+    PageUnitsLoaded(DocumentId, u64, Result<Vec<f64>, String>),
     Rendered {
         generation: u64,
         key: RenderKey,
@@ -136,6 +141,25 @@ pub struct Worker {
     pub events: Receiver<Event>,
     pub generation: Arc<AtomicU64>,
     pub search_token: Arc<AtomicU64>,
+    shutdown: Cancellation,
+    thread: Option<thread::JoinHandle<()>>,
+}
+impl Drop for Worker {
+    fn drop(&mut self) {
+        self.shutdown.stop();
+        // Release blocked response sends before joining the PDF worker. It
+        // drops its helper pool (cancel/kill/reap/join) before normal engine
+        // destruction on that same worker thread.
+        let (_, empty) = mpsc::channel();
+        drop(std::mem::replace(&mut self.events, empty));
+        drop(std::mem::replace(
+            &mut self.commands,
+            mpsc::sync_channel(1).0,
+        ));
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
 }
 
 pub fn bind_pdfium() -> Result<Pdfium> {
@@ -416,6 +440,199 @@ struct SearchJob {
     truncated: bool,
 }
 
+enum ReviewWork {
+    Inspect {
+        bytes: Arc<Vec<u8>>,
+        password: Option<String>,
+    },
+    Clean {
+        prepared: crate::review::Prepared,
+        max_bytes: usize,
+    },
+}
+enum ReviewData {
+    Inspected {
+        bytes: Arc<Vec<u8>>,
+        metadata: serde_json::Value,
+    },
+    Cleaned(Arc<Vec<u8>>),
+}
+struct ReviewPending {
+    request: Request,
+    load_generation: u64,
+    clean: Option<(Result<Vec<f64>, String>, crate::review::Review)>,
+}
+
+fn review_work(work: ReviewWork, cancel: &std::sync::atomic::AtomicBool) -> Result<ReviewData> {
+    let data = match work {
+        ReviewWork::Inspect { bytes, password } => {
+            let bytes = match password {
+                Some(password) => {
+                    crate::encrypted::decrypt_cancellable(&bytes, &password, Some(cancel))?
+                }
+                None => bytes,
+            };
+            let metadata = crate::assembly::inspect_snapshot_cancellable(&bytes, Some(cancel))?;
+            ReviewData::Inspected { bytes, metadata }
+        }
+        ReviewWork::Clean {
+            prepared,
+            max_bytes,
+        } => {
+            use std::io::Read;
+            let folder = tempfile::tempdir()?;
+            let path = folder.path().join("reading-base.pdf");
+            prepared.save_cancellable(&path, Some(cancel))?;
+            let mut input = std::fs::File::open(path)?;
+            let mut bytes = Vec::new();
+            loop {
+                crate::background_jobs::check_cancelled(Some(cancel))?;
+                let mut chunk = [0; 64 * 1024];
+                let count = input.read(&mut chunk)?;
+                if count == 0 {
+                    break;
+                }
+                ensure!(
+                    count <= max_bytes.saturating_sub(bytes.len()),
+                    "Clean reader snapshot exceeds its source-relative byte limit"
+                );
+                bytes.extend_from_slice(&chunk[..count]);
+            }
+            ReviewData::Cleaned(Arc::new(bytes))
+        }
+    };
+    crate::background_jobs::check_cancelled(Some(cancel))?;
+    Ok(data)
+}
+
+fn review_finished(
+    responses: &SyncSender<Event>,
+    id: DocumentId,
+    generation: u64,
+    units: Option<Result<Vec<f64>, String>>,
+    result: Result<Option<crate::review::Review>, String>,
+) {
+    let units = units.unwrap_or_else(|| {
+        Err(result
+            .as_ref()
+            .err()
+            .cloned()
+            .unwrap_or_else(|| "Page dimensions unavailable".into()))
+    });
+    let _ = responses.send(Event::PageUnitsLoaded(id, generation, units));
+    let _ = responses.send(Event::ReviewLoaded(id, generation, result));
+}
+
+fn review_completed<'a>(
+    pdfium: &'a Pdfium,
+    documents: &mut HashMap<DocumentId, OpenDocument<'a>>,
+    cache: &mut ByteCache<RenderKey, Frame>,
+    pending: &mut HashMap<DocumentId, ReviewPending>,
+    jobs: &Jobs<ReviewWork, ReviewData>,
+    responses: &SyncSender<Event>,
+    completion: Reply<ReviewData>,
+) {
+    let id = completion.ticket.request.id;
+    if !documents.contains_key(&id)
+        || !pending
+            .get(&id)
+            .is_some_and(|state| state.request.matches(&completion.ticket))
+    {
+        return; // Closed/retried document: drop bytes and its admission lease.
+    }
+    let mut state = pending.remove(&id).unwrap();
+    let generation = state.load_generation;
+    match completion.result {
+        Err(error) => review_finished(
+            responses,
+            id,
+            generation,
+            state.clean.map(|(units, _)| units),
+            Err(error),
+        ),
+        Ok(ReviewData::Inspected { bytes, metadata }) => {
+            let max_bytes = bytes.len().saturating_add(64 * 1024 * 1024);
+            let document = documents.get_mut(&id).unwrap();
+            if document.password.is_some() {
+                let _ = document.unlocked.set(bytes.clone());
+            }
+            let units =
+                crate::pdf_units::from_metadata(&metadata, document.pdf.pages().len() as usize)
+                    .map_err(|e| format!("{e:#}"));
+            let prepared = (|| -> Result<_> {
+                let model = crate::review::from_metadata(&metadata, &document.pdf)?;
+                model
+                    .map(|model| {
+                        let source = crate::assembly::SourceSnapshot {
+                            path: document.path.clone(),
+                            bytes,
+                        };
+                        let prepared = crate::review::prepare(
+                            source,
+                            &document.pdf,
+                            &model,
+                            crate::review::ExportMode::Clean,
+                        )?;
+                        Ok((model, prepared))
+                    })
+                    .transpose()
+            })();
+            match prepared {
+                Ok(Some((model, prepared))) => {
+                    match jobs.continue_task(
+                        completion.ticket,
+                        ReviewWork::Clean {
+                            prepared,
+                            max_bytes,
+                        },
+                    ) {
+                        Ok(()) => {
+                            state.clean = Some((units, model));
+                            pending.insert(id, state);
+                        }
+                        Err(error) => review_finished(
+                            responses,
+                            id,
+                            generation,
+                            Some(units),
+                            Err(format!("{error:#}")),
+                        ),
+                    }
+                }
+                Ok(None) => review_finished(responses, id, generation, Some(units), Ok(None)),
+                Err(error) => review_finished(
+                    responses,
+                    id,
+                    generation,
+                    Some(units),
+                    Err(format!("{error:#}")),
+                ),
+            }
+        }
+        Ok(ReviewData::Cleaned(bytes)) => {
+            let Some((units, model)) = state.clean.take() else {
+                review_finished(
+                    responses,
+                    id,
+                    generation,
+                    None,
+                    Err("Unexpected review preparation phase".into()),
+                );
+                return;
+            };
+            let loaded = load_shared_pdf(pdfium, bytes, None).map_err(|error| format!("{error:#}"));
+            match loaded {
+                Ok(pdf) => {
+                    documents.get_mut(&id).unwrap().pdf = pdf;
+                    cache.retain(|key| key.document != id);
+                    review_finished(responses, id, generation, Some(units), Ok(Some(model)));
+                }
+                Err(error) => review_finished(responses, id, generation, Some(units), Err(error)),
+            }
+        }
+    }
+}
+
 pub fn start() -> Worker {
     let (commands, requests) = mpsc::sync_channel(64);
     let (responses, events) = mpsc::sync_channel(8);
@@ -423,19 +640,33 @@ pub fn start() -> Worker {
     let search_token = Arc::new(AtomicU64::new(0));
     let active = generation.clone();
     let search_active = search_token.clone();
-    thread::Builder::new().name("dpdf-pdf".into()).spawn(move || {
+    let shutdown = Cancellation::default();
+    let stopping = shutdown.clone();
+    let worker_thread = thread::Builder::new().name("dpdf-pdf".into()).spawn(move || {
         let pdfium = match bind_pdfium() {
             Ok(pdfium) => pdfium,
             Err(error) => { let _ = responses.send(Event::Unavailable(format!("{error:#}"))); return; }
         };
         let _ = responses.send(Event::Ready);
+        let mut background = Jobs::new(stopping.clone(), review_work);
+        let mut review_pending: HashMap<DocumentId, ReviewPending> = HashMap::new();
         let mut documents: HashMap<DocumentId, OpenDocument<'_>> = HashMap::new();
         let mut passwords:HashMap<DocumentId,PendingDocument>=HashMap::new();
         let mut cache = ByteCache::new(64 * 1024 * 1024);
         let mut search: Option<SearchJob> = None;
         loop {
+            if stopping.stopped() { break; }
+            if let Ok(jobs) = &background {
+                while let Some(completion) = jobs.poll() {
+                    review_completed(&pdfium, &mut documents, &mut cache, &mut review_pending, jobs, &responses, completion);
+                }
+            }
             let command = if search.is_some() { requests.try_recv().ok() } else {
-                match requests.recv() { Ok(command) => Some(command), Err(_) => break }
+                match requests.recv_timeout(Duration::from_millis(20)) {
+                    Ok(command) => Some(command),
+                    Err(mpsc::RecvTimeoutError::Timeout) => None,
+                    Err(mpsc::RecvTimeoutError::Disconnected) => break,
+                }
             };
             match command {
                 Some(request @ (Command::Open(..) | Command::OpenSnapshot(..))) => {
@@ -505,25 +736,20 @@ pub fn start() -> Worker {
                         Err(e)=>{let _=responses.send(Event::PrintFinished(Err(format!("{e:#}"))));}
                     }
                 }
-                Some(Command::LoadReview(id))=>{
-                    let mut units = None;
-                    let result=(||->Result<Option<crate::review::Review>> {
-                        let document=documents.get_mut(&id).context("Document was closed")?;
-                        let source=crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?};
-                        let metadata=crate::assembly::inspect_snapshot(source.bytes.as_slice())?;
-                        units=Some(crate::pdf_units::from_metadata(&metadata,document.pdf.pages().len() as usize).map_err(|e|format!("{e:#}")));
-                        let model=crate::review::from_metadata(&metadata,&document.pdf)?;
-                        if let Some(model)=&model {
-                            let folder=tempfile::tempdir()?;let path=folder.path().join("reading-base.pdf");
-                            crate::review::prepare(source,&document.pdf,model,crate::review::ExportMode::Clean)?.save(&path)?;
-                            document.pdf=pdfium.load_pdf_from_byte_vec(std::fs::read(path)?,None)?;
-                            cache.retain(|key:&RenderKey|key.document!=id);
-                        }
-                        Ok(model)
-                    })().map_err(|e|format!("{e:#}"));
-                    let units=units.unwrap_or_else(||Err(result.as_ref().err().cloned().unwrap_or_else(||"Page dimensions unavailable".into())));
-                    let _=responses.send(Event::PageUnitsLoaded(id,units));
-                    let _=responses.send(Event::ReviewLoaded(id,result));
+                Some(Command::LoadReview(id, generation))=>{
+                    if let Some(previous) = review_pending.remove(&id) { previous.request.cancel(); }
+                    let request = (|| -> Result<Request> {
+                        let document = documents.get(&id).context("Document was closed")?;
+                        let (bytes, password) = match document.unlocked.get() {
+                            Some(bytes) => (bytes.clone(), None),
+                            None => (document.original.clone(), document.password.clone()),
+                        };
+                        background.as_mut().map_err(|e| anyhow::anyhow!("{e:#}"))?.submit(id, ReviewWork::Inspect {bytes, password})
+                    })();
+                    match request {
+                        Ok(request) => { review_pending.insert(id, ReviewPending { request, load_generation: generation, clean: None }); }
+                        Err(error) => review_finished(&responses, id, generation, None, Err(format!("{error:#}"))),
+                    }
                 }
                 Some(Command::ExportWorkspace{id,placements,review,mode,destination})=>{
                     let result=(||->Result<_> {
@@ -548,6 +774,7 @@ pub fn start() -> Worker {
                     if let Some(document)=documents.get(&id) {let _=responses.send(Event::Snapshot(id,document.original.clone()));}
                 }
                 Some(Command::Close(id)) => {
+                    if let Some(pending) = review_pending.remove(&id) { pending.request.cancel(); }
                     passwords.remove(&id);
                     documents.remove(&id);
                     cache.retain(|k: &RenderKey| k.document != id);
@@ -665,12 +892,15 @@ pub fn start() -> Worker {
                 }
             }
         }
+        stopping.stop();
     }).expect("start PDF worker");
     Worker {
         commands,
         events,
         generation,
         search_token,
+        shutdown,
+        thread: Some(worker_thread),
     }
 }
 

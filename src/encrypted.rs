@@ -5,7 +5,10 @@ use std::{
     io::{Read, Write},
     process::Stdio,
 };
-use std::{process::Command, sync::Arc};
+use std::{
+    process::Command,
+    sync::{Arc, atomic::AtomicBool},
+};
 
 pub fn validate_password(password: &str) -> Result<()> {
     if password.len() > 4096 || password.chars().any(|c| matches!(c, '\0' | '\r' | '\n')) {
@@ -15,13 +18,30 @@ pub fn validate_password(password: &str) -> Result<()> {
 }
 
 pub fn decrypt(bytes: &[u8], password: &str) -> Result<Arc<Vec<u8>>> {
-    decrypt_with(bytes, password, &crate::assembly::qpdf_executable())
+    decrypt_cancellable(bytes, password, None)
 }
+pub(crate) fn decrypt_cancellable(
+    bytes: &[u8],
+    password: &str,
+    cancel: Option<&AtomicBool>,
+) -> Result<Arc<Vec<u8>>> {
+    decrypt_with_cancel(bytes, password, &crate::assembly::qpdf_executable(), cancel)
+}
+#[cfg(all(test, unix))]
 fn decrypt_with(
     bytes: &[u8],
     password: &str,
     executable: &std::path::Path,
 ) -> Result<Arc<Vec<u8>>> {
+    decrypt_with_cancel(bytes, password, executable, None)
+}
+fn decrypt_with_cancel(
+    bytes: &[u8],
+    password: &str,
+    executable: &std::path::Path,
+    cancel: Option<&AtomicBool>,
+) -> Result<Arc<Vec<u8>>> {
+    crate::background_jobs::check_cancelled(cancel)?;
     validate_password(password)?;
     if bytes.len() > 256 * 1024 * 1024 {
         bail!("Encrypted editing/printing supports PDF snapshots up to 256 MiB");
@@ -46,7 +66,7 @@ fn decrypt_with(
                 stdout: 256 * 1024 * 1024,
                 stderr: 0,
             },
-            None,
+            cancel,
         )?;
         (result.stdout, result.status)
     };
@@ -97,6 +117,7 @@ fn decrypt_with(
     if data.is_empty() {
         bail!("qpdf returned an empty unlocked PDF");
     }
+    crate::background_jobs::check_cancelled(cancel)?;
     Ok(Arc::new(data))
 }
 

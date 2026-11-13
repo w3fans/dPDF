@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+"""Generated Linux helper stalls: reader navigation, retry, tab close and shutdown."""
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shlex
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+
+
+def module(name, filename):
+    spec = importlib.util.spec_from_file_location(name, Path(__file__).with_name(filename))
+    value = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(value)
+    return value
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--binary', type=Path, required=True)
+    parser.add_argument('--pdfium', type=Path, required=True)
+    parser.add_argument('--qpdf', type=Path, required=True)
+    parser.add_argument('--xvfb', default='Xvfb')
+    args = parser.parse_args()
+    if sys.platform != 'linux':
+        raise RuntimeError('This helper/process-identity fixture requires Linux; native Windows remains separate')
+    sample = module('helper_sample', 'make-sample.py')
+    private = module('helper_display', 'private-display.py')
+    with tempfile.TemporaryDirectory(prefix='dpdf-helper-window-') as directory:
+        root = Path(directory)
+        for mode in ('close', 'retry', 'shutdown'):
+            folder = root / mode
+            folder.mkdir()
+            source = folder / 'generated50.pdf'
+            source.write_bytes(sample.make_pdf(50))
+            original = hashlib.sha256(source.read_bytes()).hexdigest()
+            ready = folder / 'ready.json'
+            driver = folder / 'helper.py'
+            # One owned process, no shell children. Only the first metadata call
+            # stalls; cancellation/retry must allow a subsequent real qpdf call.
+            driver.write_text(
+                'import json,os,time,sys\nfrom pathlib import Path\n'
+                f'ready=Path({str(ready)!r})\n'
+                'if sys.argv[1:2]==["--json"] and not ready.exists():\n'
+                ' ready.write_text(json.dumps({"pid":os.getpid()}))\n'
+                ' deadline=time.monotonic()+30\n'
+                ' while time.monotonic()<deadline:time.sleep(.02)\n'
+                f'os.execv({str(args.qpdf.resolve())!r}, [{str(args.qpdf.resolve())!r}, *sys.argv[1:]])\n',
+                encoding='utf-8')
+            helper = folder / 'qpdf-fixture'
+            helper.write_text('#!/bin/sh\nexec ' + shlex.quote(sys.executable) + ' ' +
+                              shlex.quote(str(driver)) + ' "$@"\n', encoding='utf-8')
+            helper.chmod(0o700)
+
+            def owned_pid():
+                if not ready.exists():
+                    return None
+                pid = json.loads(ready.read_text())['pid']
+                command = Path(f'/proc/{pid}/cmdline')
+                try:
+                    data = command.read_bytes()
+                except FileNotFoundError:
+                    return None
+                if str(driver).encode() in data.split(b'\0'):
+                    return pid
+                # An unreaped zombie still retains its process identity.
+                if not data and Path(f'/proc/{pid}').exists():
+                    return pid
+                return None
+
+            try:
+                with private.display(folder, args.xvfb) as env:
+                    env.update(DPDF_SMOKE_HELPER=mode, DPDF_SMOKE_HELPER_READY=str(ready),
+                               DPDF_PDFIUM_LIBRARY=str(args.pdfium.resolve()), DPDF_QPDF_BINARY=str(helper),
+                               SLINT_SCALE_FACTOR='1')
+                    started = time.monotonic()
+                    result = subprocess.run([str(args.binary.resolve()), '--smoke-ui', str(source)],
+                                            env=env, capture_output=True, text=True, timeout=15)
+                    print(result.stdout, end='', flush=True)
+                    if result.returncode:
+                        print(result.stderr, end='', flush=True)
+                    result.check_returncode()
+                    assert ready.is_file(), 'Generated helper never started'
+                    assert 'rendered page 25 while metadata remained stalled' in result.stdout
+                    expected = {'close': 'closed stalled document and reopened without a stale completion',
+                                'retry': 'retry replaced stalled metadata without accepting its cancelled completion',
+                                'shutdown': 'quitting with a live metadata helper'}[mode]
+                    assert expected in result.stdout, expected
+                    deadline = time.monotonic() + 1
+                    while owned_pid() is not None and time.monotonic() < deadline:
+                        time.sleep(.01)
+                    assert owned_pid() is None, 'Owned helper remained live/unreaped after completion'
+                    assert hashlib.sha256(source.read_bytes()).hexdigest() == original
+                    print(f'PASS: helper {mode}, reader responsive, child reaped, source unchanged '
+                          f'({time.monotonic() - started:.2f}s)', flush=True)
+            except subprocess.TimeoutExpired as error:
+                print(error.stdout or '', error.stderr or '', flush=True)
+                raise
+            finally:
+                pid = owned_pid()
+                if pid is not None:
+                    # Failure cleanup only for this generated fixture identity.
+                    try:
+                        if os.getpgid(pid) == pid:
+                            os.killpg(pid, signal.SIGKILL)
+                        else:
+                            os.kill(pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+
+
+if __name__ == '__main__':
+    main()
