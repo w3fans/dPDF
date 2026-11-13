@@ -332,8 +332,6 @@ mod tests {
         .unwrap();
         assert!(result.stderr.is_empty());
         assert!(!result.status.success());
-        use std::os::unix::process::ExitStatusExt;
-        assert_eq!(result.status.signal(), Some(9));
     }
     #[test]
     fn dialog_has_no_interaction_deadline_but_cancels_blocked_io_and_bounds_output() {
@@ -432,6 +430,8 @@ mod tests {
         )
         .unwrap();
         assert!(!result.status.success());
+        use std::os::unix::process::ExitStatusExt;
+        assert_eq!(result.status.signal(), Some(9));
         assert!(start.elapsed() < Duration::from_secs(3));
         let pid = std::fs::read_to_string(path).unwrap();
         let stat = std::fs::read_to_string(format!("/proc/{}/stat", pid.trim()));

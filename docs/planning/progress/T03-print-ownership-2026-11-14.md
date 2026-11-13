@@ -87,3 +87,14 @@ tab-close/user-cancel and held nested-helper replay, source/scratch/child cleanu
 reviewed-print preparation responsiveness, then experienced lifecycle review.
 Existing fifteen helper windows and all native geometry/interop/print-plan/alias
 checks remain applicable. Both parent drafts stay unmerged; no releases or pins.
+
+
+## First hosted result and test correction
+
+Head bdfdaf9e / tree f0ab685a, run 43529700684: policy passed; Linux passed
+both strict Clippy modes but failed debug tests (97 passed, 1 failed, 1 intentional
+subprocess fixture ignored). New actor/supervisor tests passed. The new SIGKILL
+assertion was accidentally placed in the existing private-diagnostics test, whose
+fixture deliberately exits 1. Moved that assertion to the intended owned nested
+helper-abort test; no product policy or old fixture expectation weakened. Current
+corrected source must repeat all gates before any qualification is claimed.
