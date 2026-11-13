@@ -285,13 +285,17 @@ run 43492468459) failed in application LLVM code generation with out-of-memory;
 its job recorded 2,153,193,472 committed bytes. Retain this failed measurement,
 including the original logs; it supplies no usable application binary.
 
-The next candidate evaluates one application codegen unit. Cargo documents that
-this also avoids the default local ThinLTO, so this experiment tests a different
-compiler path rather than assuming more partitions reduce peak memory. The
-proposed build-memory target remains at most 1.75 GiB. This is an experiment
-pending native measurements and reader comparisons, not a claimed fix.
-Dependency profiles, optimization level, Cargo concurrency and resource limits
-are unchanged. Before comparing a codegen experiment, verify the application
+The single-unit candidate (source 21df7bdf, run 43493985255) also failed in LLVM
+with out-of-memory, recording 2,147,762,176 committed bytes. Avoiding local
+ThinLTO with one unit did not establish a memory improvement.
+
+The next candidate restores 16 application codegen units and evaluates application
+optimization level 0, leaving dependencies at their existing release profiles.
+The proposed build-memory target remains at most 1.75 GiB. This is an experiment
+pending native measurements and reader comparisons, not a claimed fix. Runtime
+cost must be measured before accepting a lower application optimization level.
+Cargo concurrency and resource limits are unchanged. Before comparing a compiler
+experiment, verify the application
 compiler-artifact has `fresh: false`;
 a Cargo cache hit does not measure application compilation. Retain the exact
 source, compiler identity, memory log and original failed receipt. Any later

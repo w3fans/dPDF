@@ -44,9 +44,9 @@ debug = 1
 # Reduce application compiler memory near the shared host's soft limit.
 # Dependency release profiles stay unchanged.
 [profile.release.package.dpdf]
-opt-level = 1
-# One application codegen unit avoids local ThinLTO; qualify under the same cap.
-codegen-units = 1
+# Application-only compiler-memory experiment; runtime qualification is required.
+opt-level = 0
+codegen-units = 16
 
 # Slint 1.18 requires Winit 0.30; retain that ABI with a focused Wayland receive fix.
 [patch.crates-io]
