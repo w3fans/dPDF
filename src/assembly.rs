@@ -162,6 +162,7 @@ fn checked(output: Output, action: &str) -> Result<Output> {
 }
 
 /// Bounded scalar/status qpdf calls. Metadata uses its separate 64-MiB policy.
+#[cfg(target_os = "linux")]
 pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
     run_qpdf_cancellable(command, action, None)
 }
