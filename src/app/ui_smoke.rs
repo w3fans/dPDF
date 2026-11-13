@@ -97,7 +97,7 @@ impl SmokeCheck {
                             quarter_turns: 0,
                         },
                         opacity: 0.7,
-                        image: Arc::new(std::fs::read(image)?),
+                        image: std::sync::Arc::new(std::fs::read(image)?),
                     }];
                     let command = if mode == "overlay-save" || mode == "overlay-review" {
                         Command::ExportWorkspace {
