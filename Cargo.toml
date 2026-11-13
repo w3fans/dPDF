@@ -12,6 +12,7 @@ rust-version = "1.92"
 check-windows-print = []
 
 [dependencies]
+dpdf-ui = { path = "crates/ui" }
 anyhow = "1"
 pdfium-render = { version = "=0.9.4", default-features = false, features = ["pdfium_7881", "thread_safe", "image_025"] }
 image = { version = "=0.25.10", default-features = false, features = ["png", "jpeg"] }
@@ -30,9 +31,6 @@ libloading = "=0.8.9"
 # The native URI receive parser is also exercised by the normal Linux test gate.
 percent-encoding = "=2.3.2"
 
-[build-dependencies]
-slint-build = "=1.18.1"
-
 # Keep stack-trace line information without the generated UI's full type DWARF.
 # Scope this to dPDF so the shared dependency cache remains reusable on remote build service.
 [profile.dev.package.dpdf]
@@ -44,9 +42,17 @@ debug = 1
 # Reduce application compiler memory near the shared host's soft limit.
 # Dependency release profiles stay unchanged.
 [profile.release.package.dpdf]
-# Application-only compiler-memory experiment; runtime qualification is required.
-opt-level = 0
-codegen-units = 16
+opt-level = 1
+
+# Generated UI has the same optimization/debug levels it had inside dPDF.
+[profile.dev.package.dpdf-ui]
+debug = 1
+
+[profile.test.package.dpdf-ui]
+debug = 1
+
+[profile.release.package.dpdf-ui]
+opt-level = 1
 
 # Slint 1.18 requires Winit 0.30; retain that ABI with a focused Wayland receive fix.
 [patch.crates-io]

@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Retain observed Windows job committed-memory peaks beside native validation logs and evaluate application codegen settings under the existing build limits.
+- Retain observed Windows job committed-memory peaks beside native validation logs and compile generated UI separately from application code under the existing build limits.
 
 - Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
 

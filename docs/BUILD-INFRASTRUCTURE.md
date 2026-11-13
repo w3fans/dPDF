@@ -289,18 +289,25 @@ The single-unit candidate (source 21df7bdf, run 43493985255) also failed in LLVM
 with out-of-memory, recording 2,147,762,176 committed bytes. Avoiding local
 ThinLTO with one unit did not establish a memory improvement.
 
-The next candidate restores 16 application codegen units and evaluates application
-optimization level 0, leaving dependencies at their existing release profiles.
-The proposed build-memory target remains at most 1.75 GiB. This is an experiment
-pending native measurements and reader comparisons, not a claimed fix. Runtime
-cost must be measured before accepting a lower application optimization level.
-Cargo concurrency and resource limits are unchanged. Before comparing a compiler
-experiment, verify the application
-compiler-artifact has `fresh: false`;
-a Cargo cache hit does not measure application compilation. Retain the exact
-source, compiler identity, memory log and original failed receipt. Any later
-partition change needs native build checks plus same-machine reader performance
-and output comparisons. No compiler-memory improvement is yet claimed.
+The level-0 candidate (source 8849548f, run 43495457705) passed all CI jobs,
+but its fresh application compile peaked at 2,137,460,736 committed bytes, leaving
+only 10,022,912 bytes below the cap. Lower optimization did not meet the target
+and is not accepted as a memory fix.
+
+The next candidate restores application optimization level 1 and the default
+codegen partition count. Generated Slint types move unchanged into the internal
+`dpdf-ui` path crate, allowing UI and application compilation to finish separately.
+Its release optimization and dev/test debug levels match their previous settings
+inside the application. There is no new external crate version, license selection,
+engine ownership or runtime worker. The internal crate retains the project's
+existing LICENSE and NOTICE; native notice readback must confirm the inventories.
+
+This is an experiment pending native measurements and reader/output comparisons.
+The proposed build-memory target remains at most 1.75 GiB. Cargo concurrency,
+dependency optimization and the CPU/memory caps remain unchanged. Verify both the
+UI library and application compiler-artifacts have `fresh: false`; a Cargo cache
+hit does not measure compilation. Retain exact source/compiler identity, job peak
+and original failed logs. No compiler-memory improvement is yet claimed.
 
 References: [Cargo profiles](https://doc.rust-lang.org/cargo/reference/profiles.html#codegen-units)
 and [QueryInformationJobObject](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-queryinformationjobobject).
