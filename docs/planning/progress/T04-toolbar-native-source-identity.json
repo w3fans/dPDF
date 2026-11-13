@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+  "source_commit": "c9153a54197ac8725c30b662f723378e9323672b",
+  "scale": 1,
+  "screenshots": [
+    {
+      "path": "/tmp/dpdf-t04-layout/long-label-dropdown.png",
+      "sha256": "d345517d485bd38a85b6be69de8e3524184f32ded608addbbb14642a8854cffb"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout/long-label-more.png",
+      "sha256": "502ee0dace332fe702182ec7874b8341791ca840052783985a1b86c11352705f"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout/long-label-wide.png",
+      "sha256": "df75d12ddfb200bff0c16739dd6a4aab951f792b0f619756b5601e61eda0aaec"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout/selected-first-revision.png",
+      "sha256": "1d0bd0371e7fac14ed276b6e587c5767f494b84b4aee6f5f300e846b053f8128"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout/width-1119.png",
+      "sha256": "6b0869f0f6889445ba2ac56379918d8cc0665a4bdf3678efabc9691d9d53653a"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout/width-1120.png",
+      "sha256": "78255358685b3bfba6b9513e2f23101b58bec7f4f4ed387e0fdea7ac727810da"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout/width-1140.png",
+      "sha256": "dc6421c6c354ef70ea8292e30eb4ea62b375d4f9b77e06a16015bdf4b5a2acd6"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout/width-900.png",
+      "sha256": "bd9b03e7af72c4afd904f09836a9a03e2f0aedaf54c3f175ed6bc483aeca317c"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout-pointer/after-page-down.png",
+      "sha256": "3945af2b4d8e129ca886fef822b9e116e96841872e89bde3b75ef839e0c8dbf3"
+    },
+    {
+      "path": "/tmp/dpdf-t04-layout-pointer/pointer-first-revision.png",
+      "sha256": "49bc0e5ac3ae90ffcff41369506aeeefe6e7ca1e952133d366845f0b4a161dce"
+    }
+  ]
+}

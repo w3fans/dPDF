@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
+
+- Keep overlay preflight and final exports in the owned helper queue, staging validated bytes for publication by the document owner and discarding late results after tab close.
+
 - Update the locked pulldown-cmark parser to 0.13.6 for the nested-wikilink parsing fix, preserving dependency requirements and MIT notice bytes.
 
 - Defer missing protected print/export working bytes through the bounded helper queue, preserving reader navigation and cancelling queued preparation when its tab closes.

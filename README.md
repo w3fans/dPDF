@@ -20,7 +20,9 @@ light/dark themes, occurrence search with temporary highlights, and unchanged-by
 printing uses a native GTK dialog and direct CUPS Quick Print; Windows has a native
 system dialog/GDI print adapter tested with Microsoft Print to PDF on hosted Windows, plus an optional
 explicit Quick Print helper.
-See [milestones](docs/MILESTONES.md) for remaining acceptance gates.
+See [milestones](docs/MILESTONES.md) for remaining acceptance gates and the
+[delivery record](docs/RELEASE-STATUS.md) for source-bound v0.1.54 package and
+hosted results; those receipts do not qualify later development changes.
 
 The reader honors physical page-unit multipliers in 100% and fitted layouts,
 including mixed-unit documents. Dimensions load after the first frame; mark
@@ -277,6 +279,7 @@ are used for the session.
 ## Architecture and validation
 
 - [Product specification](docs/PRODUCT_SPEC.md)
+- [Current-state audit and implementation plan](docs/planning/CURRENT-STATE-2026-11-13.md)
 - [Development and release workflow (pull requests, CI, release checkout)](docs/DEVELOPMENT_WORKFLOW.md)
 - [Requirements and implementation matrix](docs/REQUIREMENTS_MATRIX.md)
 - [Local handoff audit / working without the owner's machines](docs/LOCAL_HANDOFF_AUDIT.md)

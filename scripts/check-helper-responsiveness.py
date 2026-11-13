@@ -34,11 +34,12 @@ def main():
     private = module('helper_display', 'private-display.py')
     with tempfile.TemporaryDirectory(prefix='dpdf-helper-window-') as directory:
         root = Path(directory)
-        for mode in ('close', 'retry', 'shutdown', 'recovery', 'protected-print', 'protected-export'):
+        for mode in ('close', 'retry', 'shutdown', 'recovery', 'protected-print', 'protected-export',
+                     'overlay-close', 'overlay-save', 'overlay-units', 'overlay-review'):
             folder = root / mode
             folder.mkdir()
             source = folder / 'generated50.pdf'
-            source.write_bytes(sample.make_pdf(50))
+            source.write_bytes(sample.make_pdf(50, user_unit=2 if mode == 'overlay-units' else 1))
             if mode.startswith('protected-'):
                 encrypted = folder / 'protected50.pdf'
                 job = folder / 'generated-encryption.json'
@@ -61,11 +62,21 @@ def main():
             driver = folder / 'helper.py'
             # Helpers exec directly without shell children. Metadata modes stall
             # the first inspection; protected modes stall every decryption.
-            condition = ('"--decrypt" in sys.argv' if mode.startswith('protected-') else
-                         'sys.argv[1:2]==["--json"] and not ready.exists()' +
-                         (' and arm.exists()' if mode == 'recovery' else ''))
+            if mode == 'overlay-save':
+                condition = 'arm.exists() and any(arg.startswith("--job-json-file=") for arg in sys.argv[1:])'
+            elif mode == 'overlay-review':
+                condition = 'arm.exists() and sys.argv[1:2]==["--json"] and Path(sys.argv[-1]).name=="source.pdf"'
+            elif mode == 'overlay-units':
+                condition = ('arm.exists() and sys.argv[1:2]==["--json"] and '
+                             f'subprocess.check_output([{str(args.qpdf.resolve())!r}, "--show-npages", sys.argv[-1]]).strip()==b"1"')
+            elif mode == 'overlay-close':
+                condition = 'arm.exists() and sys.argv[1:2]==["--json"]'
+            else:
+                condition = ('"--decrypt" in sys.argv' if mode.startswith('protected-') else
+                             'sys.argv[1:2]==["--json"] and not ready.exists()' +
+                             (' and arm.exists()' if mode == 'recovery' else ''))
             driver.write_text(
-                'import json,os,time,sys\nfrom pathlib import Path\n'
+                'import json,os,time,sys,subprocess\nfrom pathlib import Path\n'
                 f'ready=Path({str(ready)!r});arm=Path({str(arm)!r})\n'
                 f'if {condition}:\n'
                 ' identity=json.dumps({"pid":os.getpid(),"start":Path(f"/proc/{os.getpid()}/stat").read_text().rsplit(")",1)[1].split()[19]})\n'
@@ -110,7 +121,8 @@ def main():
                         assert 'durable checkpoint written' in prepared.stdout
                         assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1
                         env['DPDF_SMOKE_RECOVERY'] = 'read'
-                    env.update(DPDF_SMOKE_PASSWORD_VALUE='generated-only helper test',
+                    env.update(DPDF_SMOKE_PLACEMENT_IMAGE=str(Path(__file__).with_name('fixtures').joinpath('page-photo.jpg').resolve()),
+                               DPDF_SMOKE_PASSWORD_VALUE='generated-only helper test',
                                DPDF_SMOKE_HELPER_DESTINATION=str(destination),
                                GTK_PRINT_BACKENDS='file', GTK_USE_PORTAL='0',
                                DPDF_SMOKE_HELPER=mode, DPDF_SMOKE_HELPER_READY=str(ready),
@@ -125,13 +137,19 @@ def main():
                         print(result.stderr, end='', flush=True)
                     result.check_returncode()
                     assert ready.is_file(), 'Generated helper never started'
-                    assert 'rendered page 25 while metadata remained stalled' in result.stdout
+                    rendered = ('rendered page 25 while export helper remained stalled' if mode.startswith('overlay-') else
+                                'rendered page 25 while metadata remained stalled')
+                    assert rendered in result.stdout
                     expected = {'close': 'closed stalled document and reopened without a stale completion',
                                 'retry': 'retry replaced stalled metadata without accepting its cancelled completion',
                                 'shutdown': 'quitting with a live metadata helper',
                                 'recovery': 'recovery metadata stayed pending until normal shutdown',
                                 'protected-print': 'protected print preparation stayed pending until normal shutdown',
-                                'protected-export': 'tab close cancelled protected export without publishing a late result'}[mode]
+                                'protected-export': 'tab close cancelled protected export without publishing a late result',
+                                'overlay-close': 'tab close cancelled overlay export without publishing a late result',
+                                'overlay-units': 'tab close cancelled overlay export without publishing a late result',
+                                'overlay-save': 'owned overlay save stayed pending until normal shutdown',
+                                'overlay-review': 'owned overlay save stayed pending until normal shutdown'}[mode]
                     assert expected in result.stdout, expected
                     deadline = time.monotonic() + 1
                     while owned_pids() and time.monotonic() < deadline:
@@ -141,6 +159,8 @@ def main():
                         assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1, 'Cancelled recovery lost its durable checkpoint'
                     if mode.startswith('protected-'):
                         assert len(list(folder.glob('helper-*.json'))) == 1, 'Cancelled queued decryption was started'
+                    if mode.startswith('overlay-'):
+                        assert not [p for p in folder.iterdir() if p.name.startswith(('.tmp', '.dpdf'))], 'Cancelled export left destination staging files'
                     assert destination.read_bytes() == destination_before, 'Cancelled operation changed its existing destination'
                     assert hashlib.sha256(source.read_bytes()).hexdigest() == original
                     print(f'PASS: helper {mode}, reader responsive, child reaped, source unchanged '

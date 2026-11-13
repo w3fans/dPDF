@@ -53,6 +53,10 @@ impl SmokeCheck {
                     | "recovery"
                     | "protected-print"
                     | "protected-export"
+                    | "overlay-close"
+                    | "overlay-save"
+                    | "overlay-units"
+                    | "overlay-review"
             ) {
                 anyhow::bail!("Unknown helper diagnostic mode");
             }
@@ -66,6 +70,88 @@ impl SmokeCheck {
                     .ok_or_else(|| anyhow::anyhow!("Missing helper readiness path"))?,
             );
             match self.stage {
+                0 if mode.starts_with("overlay-")
+                    && ui.get_review_ready()
+                    && app.pages.iter().any(|page| page.ready) =>
+                {
+                    let arm = PathBuf::from(
+                        std::env::var_os("DPDF_SMOKE_HELPER_ARM")
+                            .ok_or_else(|| anyhow::anyhow!("Missing overlay helper arm path"))?,
+                    );
+                    let destination = PathBuf::from(
+                        std::env::var_os("DPDF_SMOKE_HELPER_DESTINATION")
+                            .ok_or_else(|| anyhow::anyhow!("Missing overlay destination"))?,
+                    );
+                    let image = PathBuf::from(
+                        std::env::var_os("DPDF_SMOKE_PLACEMENT_IMAGE")
+                            .ok_or_else(|| anyhow::anyhow!("Missing generated overlay image"))?,
+                    );
+                    let tab = &app.tabs[app.active];
+                    let placements = vec![crate::overlay::Placement {
+                        page: 0,
+                        geometry: crate::overlay::Geometry {
+                            x_mm: 20.0,
+                            y_mm: 20.0,
+                            width_mm: 35.0,
+                            height_mm: 25.0,
+                            quarter_turns: 0,
+                        },
+                        opacity: 0.7,
+                        image: Arc::new(std::fs::read(image)?),
+                    }];
+                    let command = if mode == "overlay-save" || mode == "overlay-review" {
+                        Command::ExportWorkspace {
+                            id: tab.info.id,
+                            placements,
+                            review: tab
+                                .review
+                                .as_ref()
+                                .ok_or_else(|| anyhow::anyhow!("Missing review model"))?
+                                .model
+                                .clone(),
+                            mode: crate::review::ExportMode::Current,
+                            destination,
+                        }
+                    } else {
+                        Command::ExportMarks {
+                            id: tab.info.id,
+                            placements,
+                            destination,
+                        }
+                    };
+                    std::fs::write(arm, b"armed")?;
+                    if !app.command(ui, command) {
+                        anyhow::bail!("Overlay export was not admitted");
+                    }
+                    app.export_pending = true;
+                    ui.set_export_busy(true);
+                    self.stage = 8;
+                }
+                8 if marker.exists() => {
+                    app.go_to(ui, 24);
+                    self.stage = 9;
+                }
+                9 if app.pages.iter().any(|page| page.page == 24 && page.ready) => {
+                    if !app.export_pending || !ui.get_export_busy() {
+                        anyhow::bail!("Overlay export completed before the held helper");
+                    }
+                    println!("helper: rendered page 25 while export helper remained stalled");
+                    if mode == "overlay-close" || mode == "overlay-units" {
+                        app.close(ui, app.active);
+                        self.stage = 10;
+                    } else {
+                        println!("helper: owned overlay save stayed pending until normal shutdown");
+                        self.stage = 99;
+                        let _ = slint::quit_event_loop();
+                    }
+                }
+                10 if app.tabs.is_empty() && !app.export_pending && !ui.get_export_busy() => {
+                    println!(
+                        "helper: tab close cancelled overlay export without publishing a late result"
+                    );
+                    self.stage = 99;
+                    let _ = slint::quit_event_loop();
+                }
                 0 if mode == "recovery"
                     && ui.get_review_ready()
                     && !app.recovery_candidates.is_empty()

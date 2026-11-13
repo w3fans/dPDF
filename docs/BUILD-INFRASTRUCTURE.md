@@ -29,6 +29,10 @@ submitter remains off, preventing duplicate builds and credential transfers.
 Public hosted Linux and Windows validation is independent of controlled desktop
 and physical-printer acceptance. Skipped jobs are never passing test evidence.
 
+The v0.1.54 delivery record binds these public roles to source
+`e06b05b5f1e91e9e9e99b97967842bad4996bc67`; see
+[RELEASE-STATUS.md](RELEASE-STATUS.md). It is not a new check of this branch.
+
 The local-recovery instructions below describe the private/fallback lane;
 they do not require disabling the selected public release workflow.
 
@@ -78,7 +82,7 @@ PR, main, tag and installer. Do not relabel an older binary as a newer release.
 Skipped hosted compilation is not a local PASS. Preserve missing/failed receipt
 states and report unavailable Windows targets or publication setup as PENDING.
 
-## Expected hosted usage and setup
+## Private/fallback hosted usage and setup
 
 The existing release preflight already runs source-policy/contract tests before
 version preparation; it now also runs the four Git trust tests. The duplicate
@@ -89,7 +93,10 @@ Private hosted Linux/Windows compilation, hosted desktop fallback, installer
 compilation and the long COPR submit/wait job are guarded off. Windows ref-resolution
 and queued-receipt jobs share the private-repository guard with their workers;
 they do not allocate Ubuntu runners for a validation lane that cannot execute.
-The release-page publisher runs locally; its hosted workflow is disabled after local readback. Public hosted validation remains available. Normal qualified patch releases continue; stable/platform acceptance
+In the private/fallback lane the release-page publisher runs locally and its
+hosted workflow is disabled after local readback. The active public repository
+uses the public publisher selected above; do not activate the competing timer.
+Public hosted validation remains available. Normal qualified patch releases continue; stable/platform acceptance
 retains its additional gates.
 
 Required local setup is the established release-to-build-service adapter, local publisher access
@@ -227,13 +234,14 @@ recording pending plans for all selected tags. A successful timer exit therefore
 cannot be inferred from a pending-authentication no-op. Dry runs remain successful
 preflight observations. Existing verified receipts are preserved.
 
-## Routine local delivery
+## Private/fallback local delivery
 
 After the standard controller pushes its immutable preview tag, that tag is the
 persistent input to the existing local COPR and release-page timers. On the
 publication operator, the adapter also wakes the same release-page service.
 The release authority needs its existing Git SSH access; API authorization stays
-in the publication account's GitHub CLI. No hosted job is required for delivery.
+in the publication account's GitHub CLI. No hosted job is required for this fallback lane. The active public publication
+roles are recorded above and in RELEASE-STATUS; select one publisher per component.
 A pushed tag reports `TAGGED` and `PUBLICATION_QUEUED`, never completed delivery.
 
 ```sh

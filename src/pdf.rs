@@ -1,4 +1,5 @@
 //! PDFium lives on one worker thread. No PDFium handles or borrowed objects enter the UI.
+mod overlay_jobs;
 use crate::background_jobs::{Cancellation, Jobs, Reply, Request};
 use crate::{cache::ByteCache, document::*};
 use anyhow::{Context, Result, bail, ensure};
@@ -452,6 +453,7 @@ struct SearchJob {
 }
 
 enum ReviewWork {
+    SaveOverlay(Box<overlay_jobs::Save>),
     Decrypt {
         bytes: Arc<Vec<u8>>,
         password: String,
@@ -466,6 +468,7 @@ enum ReviewWork {
     },
 }
 enum ReviewData {
+    Exported(crate::assembly::StagedExport),
     Decrypted(Arc<Vec<u8>>),
     Inspected {
         bytes: Arc<Vec<u8>>,
@@ -584,7 +587,7 @@ fn recovery_completed(
                 }
                 Ok(info)
             }
-            Ok(ReviewData::Cleaned(_) | ReviewData::Decrypted(_)) => {
+            Ok(ReviewData::Cleaned(_) | ReviewData::Decrypted(_) | ReviewData::Exported(_)) => {
                 bail!("Unexpected recovery metadata result")
             }
             Err(error) => bail!("{error}"),
@@ -602,6 +605,7 @@ fn recovery_completed(
 
 fn review_work(work: ReviewWork, cancel: &std::sync::atomic::AtomicBool) -> Result<ReviewData> {
     let data = match work {
+        ReviewWork::SaveOverlay(save) => ReviewData::Exported(save.run(cancel)?),
         ReviewWork::Decrypt { bytes, password } => ReviewData::Decrypted(
             crate::encrypted::decrypt_cancellable(&bytes, &password, Some(cancel))?,
         ),
@@ -770,7 +774,7 @@ fn review_completed<'a>(
                 Err(error) => review_finished(responses, id, generation, Some(units), Err(error)),
             }
         }
-        Ok(ReviewData::Decrypted(_)) => review_finished(
+        Ok(ReviewData::Decrypted(_) | ReviewData::Exported(_)) => review_finished(
             responses,
             id,
             generation,
@@ -799,6 +803,7 @@ pub fn start() -> Worker {
         let mut review_pending: HashMap<DocumentId, ReviewPending> = HashMap::new();
         let mut recovery_pending: HashMap<DocumentId, RecoveryPending> = HashMap::new();
         let mut working_pending: HashMap<u64, WorkingPending> = HashMap::new();
+        let mut overlay_pending: HashMap<u64, overlay_jobs::Pending> = HashMap::new();
         let mut prepared_commands = VecDeque::new();
         let mut documents: HashMap<DocumentId, OpenDocument<'_>> = HashMap::new();
         let mut passwords:HashMap<DocumentId,PendingDocument>=HashMap::new();
@@ -809,7 +814,9 @@ pub fn start() -> Worker {
             if let Ok(jobs) = &background {
                 while let Some(completion) = jobs.poll() {
                     let generation = completion.ticket.request.generation;
-                    if let Some(state) = working_pending.remove(&generation) {
+                    if overlay_pending.contains_key(&generation) {
+                        overlay_jobs::completed(&pdfium, &documents, &mut overlay_pending, jobs, &responses, completion);
+                    } else if let Some(state) = working_pending.remove(&generation) {
                         if let Some(command) = working_completed(&documents, &responses, state, completion) {
                             prepared_commands.push_back(command);
                         }
@@ -922,29 +929,25 @@ pub fn start() -> Worker {
                         Err(error) => review_finished(&responses, id, generation, None, Err(format!("{error:#}"))),
                     }
                 }
-                Some(Command::ExportWorkspace{id,placements,review,mode,destination})=>{
-                    let result=(||->Result<_> {
-                        let document=documents.get(&id).context("Document was closed")?;
-                        let source=crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?};
-                        let review=crate::review::prepare(source.clone(),&document.pdf,&review,mode)?;
-                        let overlays=if placements.is_empty(){None}else{Some(crate::overlay::prepare(&pdfium,&document.pdf,source,&placements)?)};
-                        Ok((review,overlays))
-                    })();
+                Some(command @ (Command::ExportWorkspace { .. } | Command::ExportMarks { .. })) => {
+                    let result = background.as_mut().map_err(|error| anyhow::anyhow!("{error:#}"))
+                        .and_then(|jobs| overlay_jobs::start(&pdfium, &documents, jobs, command));
                     match result {
-                        Ok((mut review,overlays))=>{let reply=responses.clone();thread::spawn(move || {
-                            let result=(||->Result<_>{
-                                if let Some(overlays)=overlays {let folder=tempfile::tempdir()?;let path=folder.path().join("marked-base.pdf");overlays.save(&path)?;review.set_source_bytes(Arc::new(std::fs::read(path)?));}
-                                review.save(&destination)
-                            })().map_err(|e|format!("{e:#}"));
-                            let _=reply.send(Event::ExportFinished(result));
-                        });},
-                        Err(e)=>{let _=responses.send(Event::ExportFinished(Err(format!("{e:#}"))));}
+                        Ok(state) => { overlay_pending.insert(state.request.generation, state); }
+                        Err(error) => { let _ = responses.send(Event::ExportFinished(Err(format!("{error:#}")))); }
                     }
                 }
                 Some(Command::Snapshot(id)) => {
                     if let Some(document)=documents.get(&id) {let _=responses.send(Event::Snapshot(id,document.original.clone()));}
                 }
                 Some(Command::Close(id)) => {
+                    let cancelled: Vec<_> = overlay_pending.iter()
+                        .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
+                    for generation in cancelled {
+                        let state = overlay_pending.remove(&generation).unwrap();
+                        state.request.cancel();
+                        let _ = responses.send(Event::ExportFinished(Err("Export cancelled: document was closed".into())));
+                    }
                     let cancelled: Vec<_> = working_pending.iter()
                         .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
                     for generation in cancelled {
@@ -1003,16 +1006,6 @@ pub fn start() -> Worker {
                             .map_err(|error| format!("{error:#}"));
                         let _ = reply.send(Event::ExportFinished(result));
                     });
-                }
-                Some(Command::ExportMarks { id, placements, destination }) => {
-                    let result=(|| -> Result<_> {
-                        let document=documents.get(&id).context("Document was closed")?;
-                        crate::overlay::prepare(&pdfium,&document.pdf,crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?},&placements)
-                    })();
-                    match result {
-                        Ok(prepared)=> {let reply=responses.clone();thread::spawn(move || {let _=reply.send(Event::ExportFinished(prepared.save(&destination).map_err(|e|format!("{e:#}"))));});},
-                        Err(error)=>{let _=responses.send(Event::ExportFinished(Err(format!("{error:#}"))));},
-                    }
                 }
                 #[cfg(any(target_os="linux",target_os="windows"))]
                 Some(Command::PrintNative { id,current,range,printer,fit }) => {

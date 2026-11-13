@@ -1,6 +1,6 @@
 //! qpdf page assembly against immutable snapshots, validated before atomic destination replacement.
 use crate::pages::{PagePlan, parse_selection, ranges};
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result, bail, ensure};
 use serde_json::{Value, json};
 use std::{
     borrow::Cow,
@@ -67,6 +67,60 @@ pub struct SourceSnapshot {
     pub bytes: Arc<Vec<u8>>,
 }
 
+/// Helper-produced bytes awaiting publication by the document-owning worker.
+/// Dropping a stale/cancelled completion deletes its staging file.
+pub(crate) struct StagedExport {
+    temporary: tempfile::TempPath,
+    destination: PathBuf,
+    protected: Vec<PathBuf>,
+    pages: usize,
+}
+
+impl StagedExport {
+    pub fn new(destination: &Path, protected: Vec<PathBuf>) -> Result<Self> {
+        let parent = destination
+            .parent()
+            .filter(|path| !path.as_os_str().is_empty())
+            .unwrap_or(Path::new("."))
+            .canonicalize()
+            .context("Find output directory")?;
+        let destination = parent.join(
+            destination
+                .file_name()
+                .context("Choose an output PDF filename")?,
+        );
+        let inputs: Vec<_> = protected.iter().map(PathBuf::as_path).collect();
+        crate::storage::ensure_separate_output(&destination, &inputs)?;
+        let temporary = tempfile::NamedTempFile::new_in(&parent)?.into_temp_path();
+        Ok(Self {
+            temporary,
+            destination,
+            protected,
+            pages: 0,
+        })
+    }
+    pub fn path(&self) -> &Path {
+        &self.temporary
+    }
+    pub fn with_pages(mut self, pages: usize) -> Self {
+        self.pages = pages;
+        self
+    }
+    pub fn publish(self) -> Result<ExportResult> {
+        ensure!(self.pages > 0, "Prepared export has no pages");
+        let inputs: Vec<_> = self.protected.iter().map(PathBuf::as_path).collect();
+        crate::storage::ensure_separate_output(&self.destination, &inputs)?;
+        self.temporary
+            .persist(&self.destination)
+            .map_err(|error| error.error)
+            .context("Atomically save prepared PDF")?;
+        Ok(ExportResult {
+            path: self.destination,
+            pages: self.pages,
+        })
+    }
+}
+
 pub struct ExportResult {
     pub path: PathBuf,
     pub pages: usize,
@@ -109,6 +163,15 @@ fn checked(output: Output, action: &str) -> Result<Output> {
 
 /// Bounded scalar/status qpdf calls. Metadata uses its separate 64-MiB policy.
 pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
+    run_qpdf_cancellable(command, action, None)
+}
+
+pub(crate) fn run_qpdf_cancellable(
+    command: &mut Command,
+    action: &str,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<Output> {
+    crate::background_jobs::check_cancelled(cancel)?;
     #[cfg(any(target_os = "linux", target_os = "windows"))]
     let output = crate::helper_process::run(
         command,
@@ -118,7 +181,7 @@ pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
             stdout: 64 * 1024,
             stderr: 64 * 1024,
         },
-        None,
+        cancel,
     )
     .with_context(|| format!("Run qpdf: {action}"))?;
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
@@ -229,11 +292,20 @@ pub(crate) fn inspect_snapshot_cancellable(
 }
 
 pub(crate) fn page_count(executable: &Path, path: &Path) -> Result<usize> {
-    let output = run_qpdf(
+    page_count_cancellable(executable, path, None)
+}
+
+fn page_count_cancellable(
+    executable: &Path,
+    path: &Path,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<usize> {
+    let output = run_qpdf_cancellable(
         Command::new(executable)
             .arg("--show-npages")
             .arg(path_string(path)?.as_ref()),
         "Inspect PDF",
+        cancel,
     )?;
     let count: usize = String::from_utf8(output.stdout)?
         .trim()
@@ -420,6 +492,17 @@ pub fn export_plan(
     preserve_catalog: bool,
     create_plan: impl FnOnce(Vec<usize>) -> Result<PagePlan>,
 ) -> Result<ExportResult> {
+    export_plan_cancellable(sources, destination, preserve_catalog, create_plan, None)
+}
+
+pub(crate) fn export_plan_cancellable(
+    sources: &[SourceSnapshot],
+    destination: &Path,
+    preserve_catalog: bool,
+    create_plan: impl FnOnce(Vec<usize>) -> Result<PagePlan>,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<ExportResult> {
+    crate::background_jobs::check_cancelled(cancel)?;
     if sources.is_empty() {
         bail!("Open a PDF before assembling pages");
     }
@@ -437,7 +520,11 @@ pub fn export_plan(
     let protected: Vec<_> = sources.iter().map(|source| source.path.as_path()).collect();
     crate::storage::ensure_separate_output(&destination, &protected)?;
     let executable = qpdf_executable();
-    let version = run_qpdf(Command::new(&executable).arg("--version"), "Check qpdf")?;
+    let version = run_qpdf_cancellable(
+        Command::new(&executable).arg("--version"),
+        "Check qpdf",
+        cancel,
+    )?;
     let text = String::from_utf8_lossy(&version.stdout);
     let major = text
         .split_whitespace()
@@ -451,9 +538,10 @@ pub fn export_plan(
     let mut snapshots = Vec::new();
     let mut counts = Vec::new();
     for (index, source) in sources.iter().enumerate() {
+        crate::background_jobs::check_cancelled(cancel)?;
         let path = scratch.path().join(format!("source-{index}.pdf"));
         std::fs::write(&path, &*source.bytes)?;
-        counts.push(page_count(&executable, &path)?);
+        counts.push(page_count_cancellable(&executable, &path, cancel)?);
         snapshots.push(path);
     }
     let plan = create_plan(counts)?;
@@ -461,7 +549,7 @@ pub fn export_plan(
         bail!("Select between 1 and 100,000 output pages");
     }
     let bookmarks = if preserve_catalog {
-        crate::page_bookmarks::capture(&snapshots[0], &plan)?
+        crate::page_bookmarks::capture(&snapshots[0], &plan, cancel)?
     } else {
         Vec::new()
     };
@@ -481,18 +569,20 @@ pub fn export_plan(
             major,
         )?)?,
     )?;
-    run_qpdf(
+    run_qpdf_cancellable(
         Command::new(&executable).arg(format!("--job-json-file={}", path_string(&job_path)?)),
         "Assemble pages",
+        cancel,
     )?;
-    crate::page_bookmarks::restore(&bookmarks, &temporary, scratch.path())?;
-    run_qpdf(
+    crate::page_bookmarks::restore(&bookmarks, &temporary, scratch.path(), cancel)?;
+    run_qpdf_cancellable(
         Command::new(&executable)
             .arg("--check")
             .arg(path_string(&temporary)?.as_ref()),
         "Validate assembled PDF",
+        cancel,
     )?;
-    if page_count(&executable, &temporary)? != plan.pages().len() {
+    if page_count_cancellable(&executable, &temporary, cancel)? != plan.pages().len() {
         bail!("Assembled PDF has an unexpected page count");
     }
     // Flush with write access (required by Windows), then close before atomic rename.
@@ -501,6 +591,7 @@ pub fn export_plan(
         .open(&temporary)?
         .sync_all()?;
     crate::storage::ensure_separate_output(&destination, &protected)?;
+    crate::background_jobs::check_cancelled(cancel)?;
     temporary
         .persist(&destination)
         .map_err(|error| error.error)
@@ -514,6 +605,42 @@ pub fn export_plan(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn staged_exports_preserve_destination_until_publication_and_recheck_aliases() {
+        let folder = tempfile::tempdir().unwrap();
+        let source = folder.path().join("source.pdf");
+        let destination = folder.path().join("existing.pdf");
+        std::fs::write(&source, b"immutable generated source").unwrap();
+        std::fs::write(&destination, b"previous output").unwrap();
+        let staged = StagedExport::new(&destination, vec![source.clone()]).unwrap();
+        let scratch = staged.path().to_owned();
+        std::fs::write(&scratch, b"prepared bytes").unwrap();
+        drop(staged.with_pages(1)); // Closed document / stale reply.
+        assert_eq!(std::fs::read(&destination).unwrap(), b"previous output");
+        assert!(!scratch.exists());
+
+        let staged = StagedExport::new(&destination, vec![source.clone()]).unwrap();
+        let scratch = staged.path().to_owned();
+        std::fs::write(&scratch, b"prepared bytes").unwrap();
+        std::fs::remove_file(&destination).unwrap();
+        std::fs::hard_link(&source, &destination).unwrap();
+        assert!(staged.with_pages(1).publish().is_err());
+        assert_eq!(
+            std::fs::read(&source).unwrap(),
+            b"immutable generated source"
+        );
+        assert!(!scratch.exists());
+
+        std::fs::remove_file(&destination).unwrap();
+        let staged = StagedExport::new(&destination, vec![source]).unwrap();
+        std::fs::write(staged.path(), b"validated prepared bytes").unwrap();
+        let result = staged.with_pages(2).publish().unwrap();
+        assert_eq!(result.pages, 2);
+        assert_eq!(
+            std::fs::read(result.path).unwrap(),
+            b"validated prepared bytes"
+        );
+    }
     #[test]
     fn helper_paths_normalize_drive_and_unc_without_changing_rust_paths() {
         for (input, expected) in [

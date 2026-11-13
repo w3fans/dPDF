@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "status": "BUILT; memory target FAIL",
+  "task": "T19 bounded compiler memory investigation",
+  "candidate": "8849548f9f0143e8bf6d835811a0e8339c31076b",
+  "run": 43495457705,
+  "artifact": 14072106343,
+  "archive_sha256": "6fce58ca35645022416f5c417c6110f071df847b9ece566fbe47b4a146445061",
+  "binary_sha256": "e65b0976c408adf36ac37295e27b9e70de4d094717a2ea1e71e3e637d181299b",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "compiler_artifact_fresh": false,
+  "optimization_level": 0,
+  "application_codegen_units": 16,
+  "measurement": {
+    "schema": 1,
+    "status": "observed",
+    "measurement": "Windows job committed memory; not RSS",
+    "job_memory_limit_bytes": 2147483648,
+    "peak_job_memory_bytes": 2137460736,
+    "peak_process_memory_bytes": 1757634560,
+    "limit_flags": 8704
+  },
+  "headroom_bytes": 10022912,
+  "proposed_target_bytes": 1879048192,
+  "result": "All CI jobs passed; compiler peak remained near cap and exceeded proposed target. No memory fix; lower optimization level not accepted.",
+  "next": "Restore opt-level 1 and investigate separating generated UI compilation from application compilation"
+}

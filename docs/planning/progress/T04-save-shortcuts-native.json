@@ -1,0 +1,17 @@
+{
+  "binary_sha256": "a85939aa202d149a315e8b1f81295b86d0b6625e02223a4b39ff01d1b0b52995",
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "saved_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "private_dbus": true,
+  "private_portal": true,
+  "cancel_and_save_shortcuts": true,
+  "source_commit": "43d3dc5bce9835dc1c28e27596373e114ca3cda8",
+  "scope": "Private authenticated X11 and independent private D-Bus/GTK portal at scale 1; not Wayland/Windows manual acceptance",
+  "screenshots": {
+    "ctrl-shift-s-save-returned.png": "fbaac1c641833fdfc528530ebc74af24b8b31230de2f47afb140a3242151c26c",
+    "ctrl-s-cancel-returned.png": "8269005b48dc9cf55529c8ae81d6c29db6fdc68ecc1f4824de800cc14ac7fb40"
+  },
+  "script_sha256": "9baacb2e6644e9649da5e97e9ba2ba176bd46fee42381b99cdc747c4fdc0a5bd",
+  "expected_generated_fixture_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "source_unchanged": true
+}

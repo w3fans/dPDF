@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "task": "T03 helper supervision + native notice import",
+  "candidate_commit": "daa2914af43dfbe57473251a8f67fe4293f0b40e",
+  "tree": "22fd6c9bd42d81374d7ec0f43f315ecffd99bfc5",
+  "parents": [
+    "05154d3a1482b1279c6c90fa86ba917c687b2de9",
+    "87560c34b2d05c956d193cccb8a8c26eeec27d3a"
+  ],
+  "local_base": "87560c34b2d05c956d193cccb8a8c26eeec27d3a",
+  "prior_native_windows_run": 43478128715,
+  "native_notice_artifact": 14064048896,
+  "checks": {
+    "linux_retained_notices": "PASS: 348 packages / 646 references",
+    "windows_retained_notices": "PASS: 254 packages / 483 references",
+    "new_combined_source_ci": "PENDING",
+    "prior_windows_native_supervisor": "PASS: 68 unit tests; one explicit subprocess fixture ignored at outer level; full hosted corpora",
+    "app_cancellation_and_responsiveness": "NOT COMPLETE"
+  },
+  "files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "8dae697e8e1e0b33780446af4ec3c024e6888d64e424e9b4360ca16cc5c9bc65",
+      "git_blob": "2ed82fbb3e96c864e5e69ae273eccb9d14e1b757"
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "37424afe59ac656c8d53874a509c3eb027a4c3fa96342105dcbfe364175a3cef",
+      "git_blob": "9352e00e546a83ddf3ca269abe4143c238f38a9c"
+    },
+    {
+      "path": "src/helper_process.rs",
+      "sha256": "27ef252f663c098a4839ff5e3d18213d5f97dfeddc79568b19f79e4d15d85909",
+      "git_blob": "31318fdf8f05a9cfead1016565d5d0872b527ed0"
+    },
+    {
+      "path": "src/helper_process_windows.rs",
+      "sha256": "bca1bb9b2a8aa11509574a9c868f944677f4b7cfbf7054ea7a56bce1cbfcae24",
+      "git_blob": "50e480d915b7773bdc4cedad0cdc96881c206f0f"
+    },
+    {
+      "path": "src/encrypted.rs",
+      "sha256": "a30c4010c520e9325a984cdbaa0b128ad2ba75f0fe49a9b6f4445f3da0c45cd0",
+      "git_blob": "c695eaee3a9d71d58d81d6b8fefb1ae3d3b13cd6"
+    },
+    {
+      "path": "src/assembly.rs",
+      "sha256": "f265931216a8dcd0c120637bce35907600364efaa6d36b80d9dcf93799f5df07",
+      "git_blob": "3081319cfb53aacae7cbf5b5b80dd59be1edeba7"
+    },
+    {
+      "path": "src/review.rs",
+      "sha256": "57053992e9b3d67c7c0d86eeaa375112b4b3f0af7f02dad24c87ec50847f6165",
+      "git_blob": "223e90c619c502f1dc943799a998c06747f69b65"
+    },
+    {
+      "path": "src/platform.rs",
+      "sha256": "45cd04c64339710243e68550ffec86c51d326a4c034e535d08b3797560f03da5",
+      "git_blob": "b7d1d362cebc1f6c07fd7d6e48991eb62cb72753"
+    },
+    {
+      "path": "packaging/licenses/rust/inventory-linux.json",
+      "sha256": "0cb8ff8bea03962c7a4ec605246b4b9f57e11931b5ecfab2027b3c357a805091",
+      "git_blob": "0ae5e7d85c7f49aa50761f15f42e0ad38b2711b6"
+    },
+    {
+      "path": "packaging/licenses/rust/inventory-windows.json",
+      "sha256": "59ac57d92cab24fbf5402e59d3b20e4b71aae763e2124c50d2d1e5732f424862",
+      "git_blob": "807c774a7cf421a814992399c8b5e8dcbb1e9e15"
+    },
+    {
+      "path": "packaging/licenses/rust/texts/de556eb1415648cc1bba68d1e602d8a54e3e5b3592770df34d863449e8f0303c.txt",
+      "sha256": "de556eb1415648cc1bba68d1e602d8a54e3e5b3592770df34d863449e8f0303c",
+      "git_blob": "abd540fd6942248915c74dcc8e1b0da0257e55b5"
+    }
+  ]
+}

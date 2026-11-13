@@ -1,10 +1,11 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: recovery candidate 2d75b74b passed all jobs in run 43506767494 and
-native replay; see progress/T03-recovery-2026-11-13.md. The current increment
-also defers early protected print/export decryption. Its compiled/runtime
-qualification is pending. Experienced lifecycle review remains required before
-merge. This does not qualify all helper callers or production baking.
+Status: protected preparation candidate 8a26ab45 passed every job in run
+43514021130, all six helper regressions and the original native Ctrl+P/page-25
+replay. The current overlay preflight/staged-publication increment is unqualified
+until its own hosted/runtime gates pass. Experienced lifecycle review remains
+required before merging PR #10. This does not qualify every helper caller or
+production baking.
 
 ## Reproduced problem
 
@@ -65,8 +66,8 @@ to finish shutdown. The candidate must remain a draft until that gate is satisfi
 
 This does not promise cleanup after SIGKILL, native-engine preemption, cancellation
 of user-owned print dialogs, or supervision of every existing detached export/print
-thread. Overlay/image metadata and detached export/print ownership still require
-subsequent migration. Native user dialogs retain their existing separate policy.
+thread. Image-page metadata and detached page-export/print ownership still require
+subsequent migration. The current overlay migration is specified below. Native user dialogs retain their existing separate policy.
 
 ## Required evidence
 
@@ -169,3 +170,57 @@ print threads and overlay/image metadata are still separate unfinished work.
 The required reviewer must assess this command retention/resumption, shared
 admission bound, completion routing, failure event and close/shutdown policy on
 the actual reviewed head. Prior green CI does not waive that review gate.
+
+
+## Overlay preflight and staged publication increment
+
+A recovered generated mark and native Ctrl+Shift+S through a private GTK portal
+reproduced another reader stall on candidate 2d75b74b: page status advanced to 25
+while content/thumbnail stayed blank until overlay metadata was released. The
+separate output then passed qpdf validation, the source stayed unchanged and the
+helper was reaped. See progress/T03-overlay-stall-reproduction.json.
+
+Overlay export now has three phases under the same two admission leases:
+
+1. Owned immutable metadata inspection runs on the helper worker. Original native
+   documents remain on the PDF worker. Review-only export skips overlay unit
+   inspection and retains its independent validation policy.
+2. The PDF worker converts validated units and native geometry into owned edited
+   page bytes. It reuses the original lease for the final save. No subprocess runs
+   in this phase; native engine creation/destruction stays on its sole owner.
+3. Byte-only serialized-unit verification, assembly, bookmark repair and review
+   export run in the helper pool with cancellation propagated through every helper
+   call. The helper writes only to an owned sibling staging file; it never replaces
+   the user's destination. Mixed review export reads the validated marked snapshot
+   in cancellable chunks, with fallible reservation and a fixed observed file size.
+
+The final completion carries a TempPath, destination, protected input paths and
+page count. The document-owning worker checks the request/document again, rechecks
+output aliases and atomically publishes. Tab close and publication are serialized
+on this worker: if close is processed first, the pending request is removed and
+the late TempPath is deleted without replacing the destination. If publication is
+processed first, its success precedes close. Checking an AtomicBool only before a
+helper-thread rename would leave an unchecked close/publication race; that is why
+publication returns to the owner. Normal shutdown cancels helper work and drops
+unconsumed staged replies. Cancellation does not promise rollback of an atomic
+publication that has already begun.
+
+Admission failure and helper/native preparation errors produce terminal export
+failures. Close cancels both inspected and saving phases and clears UI busy state.
+Old generation replies cannot be routed into another operation or closed tab.
+This replaces detached mark/workspace export threads; image/page assembly and
+print threads remain separate work. Native image/mark object creation still
+occupies the PDF worker and existing image/placement limits remain unchanged.
+The two-lease count is not a measured whole-app RSS budget; T05 remains open.
+
+New generated window cases hold first overlay metadata, non-default serialized
+page-unit validation, final assembly and post-overlay review metadata. They require
+page 25 to render, close/shutdown to reap the child, no published/changed existing
+destination and no sibling staging leftovers. Pure staging tests cover dropped
+replies, an alias swapped in before publication, and successful publication.
+Existing page-unit/overlay/review/alias/password/recovery and native Windows
+hosted gates remain required. Current-source CI and replay are PENDING.
+
+Experienced review must cover lease continuation, native handle ownership,
+publication ordering, alias races, cancellation of every helper, TempPath teardown
+and the intentionally unfinished image/page-export/native-dialog ownership paths.

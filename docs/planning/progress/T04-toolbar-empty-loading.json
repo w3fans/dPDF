@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "task": "T04 empty/loading toolbar geometry",
+  "status": "PASS for listed generated X11 cases",
+  "source_commit": "c9153a54197ac8725c30b662f723378e9323672b",
+  "cases": [
+    {
+      "mode": "empty",
+      "scale": 1,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "explicit_windowfocus_verified": true,
+      "disabled_selector_changed_pixels": 0,
+      "screenshots": {
+        "dark-disabled-selection.png": "66abd9d915747007aed8885f6bb1519aadcb3f8acec6957dff6f494f79158c4c",
+        "dark-more.png": "66abd9d915747007aed8885f6bb1519aadcb3f8acec6957dff6f494f79158c4c",
+        "dark-wide.png": "c4efe1d49c7aa3b6c072f21b19323b78fb0f9ec49effa9408b28c51b41840edb",
+        "light-disabled-selection.png": "97312fa065ed46a63e212b008dd4d32bca0cd3918f9f22b408e8681ebb6ea8c7",
+        "light-more.png": "97312fa065ed46a63e212b008dd4d32bca0cd3918f9f22b408e8681ebb6ea8c7",
+        "light-wide.png": "63d0e3b9b875c3a158790d5b91408b8a5b39e74bc98ec7f6a5e94e375b6665be"
+      }
+    },
+    {
+      "mode": "empty",
+      "scale": 1.5,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "explicit_windowfocus_verified": true,
+      "disabled_selector_changed_pixels": 0,
+      "screenshots": {
+        "dark-disabled-selection.png": "6f0e291823b771ec7ac7f82a9fd2c5ee28d34abc9b85e9f621e465b7b1ae5bf3",
+        "dark-more.png": "6f0e291823b771ec7ac7f82a9fd2c5ee28d34abc9b85e9f621e465b7b1ae5bf3",
+        "dark-wide.png": "9e5eb094818d1c127c67b635affdd0f9933efd1bdd8c1eee02a94f2ed7c3c3a9",
+        "light-disabled-selection.png": "d15ec311c712a77677b9cb48922e8b16a04ff62d2c0132afee63273ef8ee543c",
+        "light-more.png": "d15ec311c712a77677b9cb48922e8b16a04ff62d2c0132afee63273ef8ee543c",
+        "light-wide.png": "d2a4480a4d3accd90161eb6b8db5e6f6a6c51e3a2323f83005d84f5024ee40c4"
+      }
+    },
+    {
+      "mode": "empty",
+      "scale": 2,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "explicit_windowfocus_verified": true,
+      "disabled_selector_changed_pixels": 0,
+      "screenshots": {
+        "dark-disabled-selection.png": "48c11b9158817c42660d16acd3f7a15d47d6604db08469d5e5f97f53fa5f55e7",
+        "dark-more.png": "48c11b9158817c42660d16acd3f7a15d47d6604db08469d5e5f97f53fa5f55e7",
+        "dark-wide.png": "2c674224b1e7d479a9ff359379863af8f8352e7918daa7810d41066d4379d857",
+        "light-disabled-selection.png": "c83e8246a838699898eb660bb129f0f461e6b3dc70e6e333a09627447e4f7354",
+        "light-more.png": "c83e8246a838699898eb660bb129f0f461e6b3dc70e6e333a09627447e4f7354",
+        "light-wide.png": "f344efffe75c23b1e65a64afe313e248034314294f32d77af0910dc659be0a1c"
+      }
+    },
+    {
+      "mode": "loading",
+      "scale": 1,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "explicit_windowfocus_verified": true,
+      "disabled_selector_changed_pixels": 0,
+      "screenshots": {
+        "loaded-more.png": "3cf0bb3aed73e207093cc1ea252c527f21cfa80ecc9a837df8e381d6d495dec8",
+        "dark-disabled-selection.png": "ccb9a0286e04a5305a1e6eb7ebf8b3bf926ec6a1d9ffb88fe0c81b54944fab71",
+        "dark-more.png": "ccb9a0286e04a5305a1e6eb7ebf8b3bf926ec6a1d9ffb88fe0c81b54944fab71",
+        "dark-wide.png": "1c2890b3affb86ddd6ed1582b14308960b9b886510288e7af7fdaa6f93c43cff",
+        "light-disabled-selection.png": "7eee8dbaa9c6e4d3f622086ad3ef0f67fc644b29b1a54bc91233f64e9a32c0cc",
+        "light-more.png": "7eee8dbaa9c6e4d3f622086ad3ef0f67fc644b29b1a54bc91233f64e9a32c0cc",
+        "light-wide.png": "30e87655bc13a19e41638cb5d1e4283b03775ca78c756e8bbd9c27af7db80d01"
+      }
+    },
+    {
+      "mode": "loading",
+      "scale": 1.5,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "explicit_windowfocus_verified": true,
+      "disabled_selector_changed_pixels": 0,
+      "screenshots": {
+        "loaded-more.png": "c95ee6e2e04e6e8fd7a489369e052ad8c05bed7f52f44b09f5dd943ef1b575e6",
+        "dark-disabled-selection.png": "da9cfac04c8306cef74feaf7311ab88f4ed789140541b403e5c3a9ee0456a6ca",
+        "dark-more.png": "da9cfac04c8306cef74feaf7311ab88f4ed789140541b403e5c3a9ee0456a6ca",
+        "dark-wide.png": "78ffb59fbc88dfdfa5a89291de86a11d52f81bbcebfca864b05121168dddf730",
+        "light-disabled-selection.png": "038810ea278bfdf6ee7582eef56f0e200055edffaf5ed45cff72311c4df07e6d",
+        "light-more.png": "038810ea278bfdf6ee7582eef56f0e200055edffaf5ed45cff72311c4df07e6d",
+        "light-wide.png": "1561256c824830432a5b1f766302ec7b130f527b7b106266cdb941e7f2d2a836"
+      }
+    },
+    {
+      "mode": "loading",
+      "scale": 2,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "explicit_windowfocus_verified": true,
+      "disabled_selector_changed_pixels": 0,
+      "screenshots": {
+        "loaded-more.png": "8bc58d1f5162ededa7fe9eb66fd75e8179aaac3eaa9c7bbf96928f1b7ac72f76",
+        "dark-disabled-selection.png": "5c50695f63752ff277c7fcb87937a623746d7362998169ee53e90a942ffa3b43",
+        "dark-more.png": "5c50695f63752ff277c7fcb87937a623746d7362998169ee53e90a942ffa3b43",
+        "dark-wide.png": "b16b2bff6121a09b4d14e2eb488b799351d8ccc9a37e29e94c29e0be56716a20",
+        "light-disabled-selection.png": "970bfae2c6abd843a1fe8c45085f98f295e52cfa085bb85404cca64627aec452",
+        "light-more.png": "970bfae2c6abd843a1fe8c45085f98f295e52cfa085bb85404cca64627aec452",
+        "light-wide.png": "8992125b2b4fd556976dfcc4908b4b465be7797e0921e8fd010f7a05edc9fcaa"
+      }
+    }
+  ],
+  "script": "/tmp/dpdf-t04-toolbar-states.py",
+  "script_sha256": "0d7064ec69d203a8bd16c73ce20ee74ecf40e237ca88f367794731481808be4a",
+  "observed": "Empty/loading revision selectors and Remarks disabled, pointer attempts unchanged, all controls fit; loading selectors become enabled Revision 1 after helper release",
+  "scope": "Private authenticated X11 only; lifecycle review, Wayland/Windows and owner acceptance not supplied"
+}

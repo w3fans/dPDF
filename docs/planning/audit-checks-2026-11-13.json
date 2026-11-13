@@ -1,0 +1,150 @@
+{
+  "date": "2026-11-13",
+  "source_commit": "268b234e4336789922a6b15dd1236963e131d707",
+  "scope": "Local source-only checks; no application build, runtime, remote delivery or hardware qualification",
+  "format_check": "PASS: cargo fmt --check",
+  "release_metadata": "PASS: python3 scripts/release-version.py verify (v0.1.54)",
+  "summary": {
+    "tests": 111,
+    "passed": 101,
+    "skipped": 4,
+    "errors": 6
+  },
+  "checks": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-cargo-notices.py",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.12,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-print-benchmark.py",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.08,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-print-dialog.py",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.09,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-private-display.py",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.12,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-public-export.py",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.61,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-release-version.py",
+      "exit_code": 1,
+      "tests": 6,
+      "skipped": 0,
+      "errors": 6,
+      "seconds": 0.1,
+      "note": "Missing private .agents/bin/release-controller; all six cases fail in setUp"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-rpm-publication.py",
+      "exit_code": 0,
+      "tests": 21,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.22,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-upstream-sync.py",
+      "exit_code": 0,
+      "tests": 6,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.93,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/ci/test_artifact_cache.py",
+      "exit_code": 0,
+      "tests": 10,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.16,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/ci/test_ci.py",
+      "exit_code": 0,
+      "tests": 12,
+      "skipped": 4,
+      "errors": 0,
+      "seconds": 0.71,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/ci/test_delivery_checkpoint.py",
+      "exit_code": 0,
+      "tests": 7,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.1,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/ci/test_local_copr.py",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.13,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/ci/test_pr_policy.py",
+      "exit_code": 0,
+      "tests": 6,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.41,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/ci/test_release_page.py",
+      "exit_code": 0,
+      "tests": 22,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.39,
+      "note": ""
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 scripts/ci/test_resolve_ref.py",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "errors": 0,
+      "seconds": 0.87,
+      "note": ""
+    }
+  ]
+}

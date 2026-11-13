@@ -1,0 +1,12 @@
+{
+  "candidate": "f21a47459d5b9513056c851d53177bb9024a7fc3",
+  "baseline_main": "1cf522aeccc1794e5cbad4af42a7a02fd1b05c75",
+  "sha256": {
+    "src/assembly.rs": "d25cc07c4997cdb883f054e62a62c4f26fd7cf6dc69196d10abd62b9a9a728c0",
+    "src/review.rs": "5e0687b836d1cb8aebbbf788a55b92ba31f60dbc355c14d77e36e629ec938b4e",
+    "src/pdf_units.rs": "32bad869e2da9354d7e0240e682ffc55b51f711621ef46723a16155b22c268c1",
+    "src/page_bookmarks.rs": "8fd850ec99061612858d50bf3b012825e9af3818f50f7ddd2c432b1a766fa80e",
+    "src/native_print/direct_pdf.rs": "11f1848b048e2f8955e22042e18cadc16be7ce93ff4808316b5a38346f5257a4",
+    "src/helper_process.rs": "27ef252f663c098a4839ff5e3d18213d5f97dfeddc79568b19f79e4d15d85909"
+  }
+}

@@ -1,6 +1,14 @@
 # Local Project Knowledge Audit and Handoff
 
-Audit date: 2026-11-04. Repository state audited: `main` = `47ee628` (tag
+Historical audit date: 2026-11-04. This document preserves that snapshot, including
+its historical environment and evidence. For the active public checkout and
+current implementation use the [2026-11-13 audit](planning/CURRENT-STATE-2026-11-13.md),
+[requirements matrix](REQUIREMENTS_MATRIX.md), [delivery record](RELEASE-STATUS.md)
+and [development workflow](DEVELOPMENT_WORKFLOW.md). Development branches/PRs
+now come from the public clone; `/app/dPDF/source` remains the sole release
+authority. Public CI and controlled local build/acceptance lanes coexist.
+
+Historical repository state audited: `main` = `47ee628` (tag
 `v0.1.43`). Purpose: make the product, implementation, decisions, acceptance
 gates and roadmap understandable from GitHub alone, for example for a cloud
 development agent with no access to the owner's machines.
@@ -95,7 +103,8 @@ Already authoritative on GitHub before this audit:
 
 - **Prototype:** `--probe-block` and `scripts/probe-combined-block.py`. On
   generated fixtures, live labels, lines, the date and two assets are removed; one
-  350-DPI image is inserted; untouched pages keep exact streams and pixels; outside
+  350-DPI image is inserted in the historical Python prototype (the current Rust
+  probe constant is 400 DPI); untouched pages keep exact streams and pixels; outside
   pixels are unchanged in PDFium and Poppler; unsafe structures are refused before
   mutation (14 refusal identities as of v0.1.42). A 96-DPI preview showed higher
   pixel error (MAE 8.19) than 350 DPI (2.32) because of rasterizer phase
@@ -119,7 +128,7 @@ Already authoritative on GitHub before this audit:
   handles, margin, anchors), templates and bake warnings. No MuPDF dependency has
   been added.
 
-## 5. Process rules a contributor needs (public summary)
+## 5. Process rules at the historical audit (current rules: DEVELOPMENT_WORKFLOW)
 
 - **Versions:** 0.1.x patch previews. v0.2.0/v0.4.0/v0.6.0 are reserved for
   accepted milestones. Two-digit patch numbers only. Version numbers are
@@ -139,19 +148,19 @@ Already authoritative on GitHub before this audit:
   Never modify the source file. Generated fixtures only in tests: no real
   contracts, signatures or business documents in the repository.
 
-## 6. Discrepancies and corrections
+## 6. Discrepancies and corrections (refreshed 2026-11-13)
 
 | Item | Resolution |
 | --- | --- |
 | MILESTONES described `/UserUnit` mark export as a live defect | Corrected: resolved in v0.1.35–v0.1.41 |
-| Spec places the Remarks toggle and revision selector on the main toolbar | Implemented in the Review panel; recorded in the matrix (R-UI-2) for owner review |
+| Spec places the Remarks toggle and revision selector on the main toolbar | Remarks toggle and shared revision selector now exist in toolbar/More (selector merged in PR #4); T04 implementation/generated checks complete, broader native acceptance remains T06 |
 | Spec asks for "Send via Email" with attachment | Deliberately not built; copy path / open folder fallback per R-SHR-2 |
-| Spec status bar shows remarks/revision state | Needs verification (R-UI-4) |
-| Spec lists Fedora/Windows packaging scripts | Staging and user-level registration exist; qualified installers do not |
+| Spec status bar shows remarks/revision state | Implemented and covered by smoke/review UI tests (R-UI-4); owner visual acceptance remains |
+| Spec lists Fedora/Windows packaging scripts | v0.1.54 Windows MSI/portable and Fedora installed qualification recorded in RELEASE-STATUS; manual install/default-app acceptance remains |
 | Windows test machine runner lane | Never online. Tag jobs expire after 24 h. Last native Windows test machine pass was v0.1.14 |
-| Printing speed on PostScript-slow printers | New requirement R-PRN-6, not started |
+| Printing speed on PostScript-slow printers | R-PRN-6 compact PDF jobs implemented for eligible Linux CUPS queues; Windows optimization and physical-office-printer measurements remain |
 
-## 7. What a cloud agent can and cannot do from GitHub alone
+## 7. Historical cloud-agent environment notes
 
 **Can learn from the repository:** the full product specification, current
 implementation status with evidence, architecture, integrity boundaries, test
@@ -160,11 +169,12 @@ procedures, milestone gates, release history and validation reports.
 **Cannot do or reach:**
 
 - **remote build service build service and release workstation desktop.** `./build` calls an release workstation-only wrapper. In
-  another environment use plain `cargo build --locked`,
+  authorized public hosted environment use plain `cargo build --locked`,
   `cargo test --locked --release` and
   `cargo clippy --locked -- -D warnings` (also with
   `--features check-windows-print`). `.cargo/config.toml` limits jobs to 1, which
-  may be relaxed locally but must not be committed.
+  must be preserved on controlled infrastructure. This development workstation
+  must use the approved remote wrapper, not local compilation.
 - **Runtime helpers.** Most `scripts/check-*.py` need PDFium chromium/7881
   (`pdfium-binaries`, Linux x64 archive SHA-256 recorded in
   [BUILDING.md](BUILDING.md)), qpdf ≥ 11 (12.x tested) and, for real-window

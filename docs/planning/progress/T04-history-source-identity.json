@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "candidate_commit": "baff99e677911353fd263ae604ea8d51ede9fc8d",
+  "tree": "05e99390b22a43e396f4844f286a7ccd0872ad69",
+  "workflow_run": 43479553479,
+  "baseline_runtime_source": "d8c1eb04747c73cfb55bc0958234849def01a355",
+  "fixture_source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "screenshots": [
+    {
+      "path": "/tmp/dpdf-t04-native-undo/recovered.png",
+      "sha256": "d78d8bd8b29f44ba5fb2249395b2de2adc6d8317375a97df3d1a940c7f0e8ee8"
+    },
+    {
+      "path": "/tmp/dpdf-t04-native-undo/fit.png",
+      "sha256": "48b8272f017df2cd518a066f6dbda8a558986d08c2ab6a7b1286791da197fad3"
+    },
+    {
+      "path": "/tmp/dpdf-t04-native-undo/moved.png",
+      "sha256": "f9da0e5384834b2bb0db35d320068a43a0df591614d33ef93bc2a4eadeaa64f4"
+    },
+    {
+      "path": "/tmp/dpdf-t04-native-undo/review-empty-mark-undone.png",
+      "sha256": "bde53fe2621681b80fdf174ea43fe187ed896a956af06cf5669fe14ac58f2a8d"
+    },
+    {
+      "path": "/tmp/dpdf-t04-native-undo/review-empty-mark-redone.png",
+      "sha256": "29f14d0ebb40dbc495fdcf85b4346077319d5830feed7578ab5e795fd1727a2f"
+    }
+  ],
+  "candidate_files": [
+    {
+      "path": "ui/workspace.slint",
+      "sha256": "f8004ee391e574447104fada121ba1f75a4a107847d082e46e404baf69ecfb53"
+    },
+    {
+      "path": "src/app/ui_smoke.rs",
+      "sha256": "7b2b03bed5991b87f6c43e79c94936e648477709257d7b621f0e469a2086c3cb"
+    },
+    {
+      "path": "scripts/check-review-ui.py",
+      "sha256": "3ce39bd8451c29b8323fe8d81d1a04c00a509e45b0ec5d95864c617886f2d277"
+    }
+  ]
+}

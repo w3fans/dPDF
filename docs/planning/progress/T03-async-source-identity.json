@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "task": "T03 async LoadReview increment",
+  "status": "IN_PROGRESS / technical lifecycle review PENDING",
+  "local_base": "30fafd7aba05a0be4765d621c2c0fad99e1a86da",
+  "candidate_commit": "9519b5cd6bc5a88b8f0f665c752894884ed0879e",
+  "tree": "5fda1243c76205ee933acda314fdddf217a939d0",
+  "pull_request": "https://github.com/w3fans/dPDF/pull/10",
+  "previous_candidate": "6ef1e643af70e5cef9eebbaf0963243a0ce23fad",
+  "previous_run": 43485260680,
+  "baseline_stall_evidence": "/tmp/dpdf-t03-reader-stall",
+  "checks": {
+    "format_diff_syntax": "PASS",
+    "notice_checks": "PASS",
+    "previous_windows_units": "72 PASS, one explicit subprocess fixture ignored at outer level",
+    "previous_application_build": "FAIL: Windows LLVM OOM",
+    "previous_clippy": "FAIL: two corrected source warnings",
+    "new_gui_and_full_corpora": "PENDING",
+    "technical_review": "PENDING: user asked to arrange experienced lifecycle review; PR stays draft",
+    "current_linux_compile_and_units": "PASS: full Linux build/PDF/window run43486282919, including controlled-stall close/retry/shutdown",
+    "current_windows_native": "PASS: native hosted job132095498710 for9519b5c; earlier OOM retained",
+    "visible_replay": "PASS: viewport matches baseline released frame while new helper still stalled; separate exact-source JSON receipt"
+  },
+  "files": [
+    {
+      "path": "src/main.rs",
+      "sha256": "24ce4e889092b9d9f36ad3d045387625b503bea0e60b8cea5f349f27cc1f3775",
+      "git_blob": "069a94309d8865127a46105c8895522922517a09"
+    },
+    {
+      "path": "src/background_jobs.rs",
+      "sha256": "2fe6eb60a2c394dd090411e15d89b59475c1db0d24385e12852854e7ab4937df",
+      "git_blob": "1a34543b9e385aeecfb5b65020073db77fcb63ec"
+    },
+    {
+      "path": "src/pdf.rs",
+      "sha256": "cd20a13544b7ccfac607e2eb8b173b04a56af89b93c04b481673eaf3d0057398",
+      "git_blob": "a5f8dfbf4ddaf86a9fd61a91e8c10c4d99f8b7e4"
+    },
+    {
+      "path": "src/app.rs",
+      "sha256": "975ba207bd06846dd7f0049d6e54bfa6d1db73b8b428a3864ee48dcf93005e31",
+      "git_blob": "153fd48b4e1ac6a54f8556e8b940ca6103068675"
+    },
+    {
+      "path": "src/app/ui_smoke.rs",
+      "sha256": "f6bb3c80b32e2aeec2b9bfec3a3f40a840c20f28faf6f776252ce297057b86dc",
+      "git_blob": "f900f9eda4058c841d24e2552d70e67c58c90f9c"
+    },
+    {
+      "path": "src/encrypted.rs",
+      "sha256": "052fc4f908bea8f8c645c6b8c33d29560458b265162f222600fff7d7989e4f7c",
+      "git_blob": "90006d8291e07ebcf54426126ea3e1e373940fa3"
+    },
+    {
+      "path": "src/assembly.rs",
+      "sha256": "469d3dbd4871910b1058613e4bc1a463b7a1ab73cea8e801f3552042bb2a02e1",
+      "git_blob": "5e2f94193765c27c45d4a0a64cead5714df00b4d"
+    },
+    {
+      "path": "src/review.rs",
+      "sha256": "938605ca8e908bd78510b36956c017024b27f7b189a87f0aae5340ad18708660",
+      "git_blob": "807462a4246e4225e9424e2c494ff9fc6185ca3e"
+    },
+    {
+      "path": "scripts/check-helper-responsiveness.py",
+      "sha256": "4ca14db7d5896c6ebb4d75f7bbc97663886b520064b69b38907bc737aaaf6943",
+      "git_blob": "f5b5818d99e88f2652eaf5917079ff08d6218d25"
+    },
+    {
+      "path": "scripts/ci/validate_linux.py",
+      "sha256": "a10672441533168e395780d574322e542e8f214644d84491f92a4d7098bb0585",
+      "git_blob": "2f3deaa24a6291d9b7636f6ce42ca777c6203ac5"
+    },
+    {
+      "path": "docs/planning/HELPER-WORKER-LIFECYCLE.md",
+      "sha256": "9ce8451f7f3e995732e3ab510e0e3e3ee44b0e784e802f310f47aaee193cb651",
+      "git_blob": "ffcc659af38210309f0e925f76510ed9c5ce7d59"
+    }
+  ],
+  "workflow_run": 43486282919
+}
