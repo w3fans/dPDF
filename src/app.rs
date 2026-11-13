@@ -1208,6 +1208,7 @@ impl Application {
     }
 
     fn show_tab(&mut self, ui: &Workspace, index: usize) {
+        ui.invoke_focus_reader();
         self.reveal_active_tab = true;
         ui.set_review_selected(-1);
         ui.set_review_tool(0);
