@@ -413,6 +413,36 @@ impl SmokeCheck {
                     if ui.get_review_tiles().row_count() != 1 {
                         anyhow::bail!("Current revision filter did not select Revision 3");
                     }
+                    // All revision selectors share these controller state and filter updates.
+                    // This exercises state synchronization; native widget interaction is separate.
+                    app.choose_revision(ui, 0);
+                    if ui.get_revision_index() != 0
+                        || !ui.get_review_status().contains("Revision 1")
+                        || ui.get_review_tiles().row_count() != 1
+                        || ui.get_mark_tiles().row_count() != 1
+                    {
+                        anyhow::bail!(
+                            "Revision selection did not synchronize controls/filter independently of marks"
+                        );
+                    }
+                    ui.set_remarks_on(false);
+                    app.filter_reviews(ui, 1);
+                    app.choose_revision(ui, 1);
+                    if ui.get_revision_index() != 1
+                        || ui.get_remarks_on()
+                        || ui.get_review_tiles().row_count() != 0
+                        || ui.get_mark_tiles().row_count() != 1
+                    {
+                        anyhow::bail!(
+                            "Revision selection changed hidden remarks or mark visibility"
+                        );
+                    }
+                    app.choose_revision(ui, 2);
+                    ui.set_remarks_on(true);
+                    app.filter_reviews(ui, 1);
+                    println!(
+                        "review: revision selector state follows current filter and preserves hidden remarks and marks"
+                    );
                     let before = app.tabs[app.active].review.as_ref().unwrap().model.clone();
                     ui.set_remarks_on(false);
                     ui.set_revision_filter_ids("999".into());
