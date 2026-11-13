@@ -1,6 +1,7 @@
 //! Explicit real-window development diagnostics, separate from the reader controller.
 use super::*;
 mod page_helper;
+mod print_helper;
 
 // Explicit diagnostic mode: exercises a real desktop window and exits. It never prints.
 #[derive(Default)]
@@ -45,6 +46,10 @@ pub(super) struct SmokeCheck {
 
 impl SmokeCheck {
     fn helper_advance(&mut self, app: &mut Application, ui: &Workspace, mode: &str) {
+        if mode.starts_with("print-review-") {
+            self.print_helper_advance(app, ui, mode);
+            return;
+        }
         if mode.starts_with("image-") || mode.starts_with("pages-") {
             self.page_helper_advance(app, ui, mode);
             return;

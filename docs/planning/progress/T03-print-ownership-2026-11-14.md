@@ -98,3 +98,12 @@ assertion was accidentally placed in the existing private-diagnostics test, whos
 fixture deliberately exits 1. Moved that assertion to the intended owned nested
 helper-abort test; no product policy or old fixture expectation weakened. Current
 corrected source must repeat all gates before any qualification is claimed.
+
+
+Added two source-bound real-window reviewed-print cases before qualification:
+initial review loads normally, then an armed fake qpdf holds reviewed output
+metadata while page 25 must render. One closes the tab and requires print busy
+state to clear before handoff; the other quits normally and requires cleanup.
+The generated model contains a real note and the fixture permits only GTK's file
+backend. Held preparation prevents native handoff; no submission occurs. This
+extends the existing fifteen helper windows to seventeen for the current source.
