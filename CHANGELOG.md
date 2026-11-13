@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Extend disposable-account MSI validation with exact default-association preservation, generated user-data retention checks, and an optional prior-version upgrade; repair the existing probe loop for current strict Clippy.
+- Strengthen disposable-account MSI upgrade/default/user-data checks, retain source-bound Linux test runtimes, and make the generated CUPS script fixture robust to executable-file write locks without adding production print retries.
+
+- Make release-adapter unit tests portable in public CI, separate installed-controller integration, use the verified tracked policy, and reject three-digit preview results before writing files.
 
 - Record verified public preview delivery and the selected public Actions/local COPR publication roles.
 

@@ -197,7 +197,17 @@ fn submit_cups(
     printer: &str,
     fit: bool,
 ) -> Result<String> {
-    let mut command = Command::new(executable);
+    submit_cups_with_command(&mut Command::new(executable), path, range, printer, fit)
+}
+
+#[cfg(target_os = "linux")]
+fn submit_cups_with_command(
+    command: &mut Command,
+    path: &Path,
+    range: &str,
+    printer: &str,
+    fit: bool,
+) -> Result<String> {
     if !printer.trim().is_empty() {
         command.args(["-d", printer.trim()]);
     }
@@ -370,9 +380,23 @@ mod tests {
         std::fs::write(&source, b"%PDF-1.7 original signed bytes").unwrap();
         std::fs::write(&mock, format!("#!/bin/sh\nprintf '%s\\n' \"$@\" > {}\nfor last do :; done\ncat \"$last\" > {}\nprintf 'request id is mock-7\\n'\n", quote(&capture), quote(&captured_pdf))).unwrap();
         std::fs::set_permissions(&mock, std::fs::Permissions::from_mode(0o700)).unwrap();
+        // Invoke the generated fixture through an existing interpreter. A
+        // concurrent fork can transiently inherit a newly written script's fd
+        // before exec closes it, making direct execution fail with ETXTBSY.
+        // Production submission still executes lp directly, without a retry.
+        let writable = std::fs::OpenOptions::new().write(true).open(&mock).unwrap();
+        let direct_error = Command::new(&mock).spawn().unwrap_err();
+        assert_eq!(direct_error.raw_os_error(), Some(26));
         let printer = "Office$(not-a-command)";
         assert_eq!(
-            submit_cups(&mock, &source, "1-3,7", printer, false).unwrap(),
+            submit_cups_with_command(
+                Command::new("/bin/sh").arg(&mock),
+                &source,
+                "1-3,7",
+                printer,
+                false
+            )
+            .unwrap(),
             "request id is mock-7"
         );
         let arguments = std::fs::read_to_string(&capture).unwrap();
@@ -393,7 +417,8 @@ mod tests {
             std::fs::read(&captured_pdf).unwrap(),
             std::fs::read(&source).unwrap()
         );
-        submit_cups(&mock, &source, "", "", true).unwrap();
+        submit_cups_with_command(Command::new("/bin/sh").arg(&mock), &source, "", "", true)
+            .unwrap();
         assert_eq!(
             std::fs::read_to_string(&capture)
                 .unwrap()
@@ -404,11 +429,12 @@ mod tests {
         );
         std::fs::write(&mock, "#!/bin/sh\necho 'printer offline' >&2\nexit 42\n").unwrap();
         assert!(
-            submit_cups(&mock, &source, "7", "", true)
+            submit_cups_with_command(Command::new("/bin/sh").arg(&mock), &source, "7", "", true)
                 .unwrap_err()
                 .to_string()
                 .contains("printer offline")
         );
+        drop(writable);
     }
 
     #[cfg(target_os = "linux")]

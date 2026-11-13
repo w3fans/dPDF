@@ -58,11 +58,11 @@ def prepare():
             raise ValueError('Pending preview does not match the package version')
         return verify()
     current = version()
-    policy = ROOT / '.agents/release-policy.yaml'
+    policy = ROOT / 'ops/release-policy.json'
     target = subprocess.check_output([str(ROOT / 'release.sh'), 'preflight', 'patch', current,
                                      str(policy), str(ROOT)], text=True).strip()
     subprocess.run([str(ROOT / 'release.sh'), 'validate-result', 'patch', current, target, str(policy)], check=True)
-    if not re.fullmatch(r'v0\.1\.\d+', target):
+    if not re.fullmatch(r'v0\.1\.\d{1,2}', target):
         raise ValueError('The next patch crosses the preview milestone boundary')
     new = target[1:]
     cargo = (ROOT / 'Cargo.toml').read_text(encoding='utf-8')

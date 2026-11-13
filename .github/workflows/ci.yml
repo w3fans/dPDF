@@ -46,6 +46,7 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: |
           set -euo pipefail
+          python3 scripts/test-release-version.py
           python3 scripts/ci/test_pr_policy.py
           python3 scripts/test-upstream-sync.py
           python3 scripts/test-private-display.py
@@ -161,7 +162,6 @@ jobs:
             cd "$stage"
             sha256sum dpdf libpdfium.so > SHA256SUMS.txt
           )
-      - name: Summary
         if: always()
         run: |
           if [ -f "$RUNNER_TEMP/linux-validation/README.md" ]; then
