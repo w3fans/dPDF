@@ -45,6 +45,7 @@ def main():
             for milestone in (
                 'opening twelve PDFs reveals the active tab and complete close control',
                 'dispatched Ctrl+Tab and Ctrl+Shift+Tab wrap and reveal their selected document',
+                'switching from page and zoom text cancels drafts and restores reader focus',
                 'resizing, active/background closure and empty-to-reopen preserve tab visibility and identity',
             ):
                 if milestone not in result.stdout:

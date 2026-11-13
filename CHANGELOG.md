@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Cancel uncommitted page/zoom field values and restore reader focus when switching documents, including Ctrl+Tab.
+
 - Keep unhandled text-field keys within their editing context so a platform-specific Redo shortcut cannot change independent PDF review or mark history.
 
 - Retain observed Windows job committed-memory peaks beside native validation logs and compile generated UI separately from application code under the existing build limits.

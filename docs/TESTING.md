@@ -849,3 +849,9 @@ has native text focus. It dispatches both platform Redo combinations, then nativ
 text Undo/Redo, and checks the review model, complete draft generation and Redo
 availability remain unchanged. Escape must close Search and restore reader focus.
 This guards against an unhandled text shortcut reaching document history.
+
+
+The tabs window suite types uncommitted page and zoom values before Ctrl+Tab and
+Ctrl+Shift+Tab. The new document must show its own page/zoom, retain its view state
+and restore reader focus. Switching document context cancels field drafts;
+ordinary navigation/relayout while editing retains the existing slow-entry rule.

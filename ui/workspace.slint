@@ -122,6 +122,8 @@ export component Workspace inherits Window {
             || ((root.page-operation < 2 || root.page-operation == 4) && root.operation-source-editing)))
         || (root.print-visible && (root.print-range-editing
             || (root.printer-choice == root.printer-choices.length - 1 && root.printer-name-editing)));
+    out property <float> page-field-window-x: page-input.absolute-position.x / 1px;
+    out property <float> page-field-window-y: page-input.absolute-position.y / 1px;
     out property <float> zoom-field-window-x: zoom-input.absolute-position.x / 1px;
     out property <float> zoom-field-window-y: zoom-input.absolute-position.y / 1px;
     in property <string> view-label: "Single page";
@@ -232,6 +234,11 @@ export component Workspace inherits Window {
     }
     changed print-visible => { if (root.print-visible) { root.discover-printers(); } }
     changed dark => { Palette.color-scheme = root.dark ? ColorScheme.dark : ColorScheme.light; }
+    // Switching document context discards uncommitted field input. Password
+    // prompts keep their explicit focus and cancellation policy.
+    public function focus-reader() {
+        if !root.password-required { keys.focus(); }
+    }
     forward-focus: keys;
     keys := FocusScope {
         capture-key-pressed(event) => {
@@ -311,7 +318,7 @@ export component Workspace inherits Window {
                     if !root.compact-toolbar: Button { text: "Marks…"; clicked => { root.open-mark-studio(); } }
                     Rectangle { width: root.compact-toolbar ? 2px : 10px; }
                     Button { text: "‹"; enabled: root.has-document; clicked => { root.navigate(-1); } }
-                    LineEdit {
+                    page-input := LineEdit {
                         changed has-focus => { root.jump-editing = self.has-focus; if !self.has-focus { root.jump-text = root.has-document ? "" + (root.current-page + 1) : ""; } }
                         text <=> root.jump-text; width: 56px; placeholder-text: "Page"; enabled: root.has-document;
                         accepted => { root.jump(self.text); keys.focus(); }

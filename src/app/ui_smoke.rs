@@ -121,6 +121,77 @@ impl SmokeCheck {
                     println!(
                         "tabs: dispatched Ctrl+Tab and Ctrl+Shift+Tab wrap and reveal their selected document"
                     );
+                    self.stage = 20;
+                }
+                20 if ready => {
+                    let _ = ui.window().take_snapshot()?;
+                    let p = slint::LogicalPosition::new(
+                        ui.get_page_field_window_x() + 15.0,
+                        ui.get_page_field_window_y() + 12.0,
+                    );
+                    self.pending_selection = Some((p, p));
+                    self.pending_key = Some((true, "a".into()));
+                    self.stage = 21;
+                }
+                21 => {
+                    if !ui.get_jump_editing() {
+                        anyhow::bail!("Tab focus fixture did not focus the page field");
+                    }
+                    self.pending_key = Some((false, "9".into()));
+                    self.stage = 22;
+                }
+                22 => {
+                    if ui.get_jump_text().as_str() != "9" || app.active != 11 {
+                        anyhow::bail!("Tab focus fixture did not create an uncommitted page value");
+                    }
+                    self.pending_key = Some((true, slint::platform::Key::Tab.into()));
+                    self.stage = 23;
+                }
+                23 if app.active == 0 && ready => {
+                    if ui.get_jump_editing()
+                        || ui.get_text_field_focused()
+                        || ui.get_jump_text().as_str() != (app.tabs[0].view.page + 1).to_string()
+                        || app.tabs[11].view.page != 0
+                    {
+                        anyhow::bail!("Page field draft crossed a document switch");
+                    }
+                    let _ = ui.window().take_snapshot()?;
+                    let p = slint::LogicalPosition::new(
+                        ui.get_zoom_field_window_x() + 15.0,
+                        ui.get_zoom_field_window_y() + 12.0,
+                    );
+                    self.scale_before_input = app.layout.as_ref().unwrap().scale;
+                    self.pending_selection = Some((p, p));
+                    self.pending_key = Some((true, "a".into()));
+                    self.stage = 24;
+                }
+                24 => {
+                    if !ui.get_zoom_editing() {
+                        anyhow::bail!("Tab focus fixture did not focus the zoom field");
+                    }
+                    self.pending_key = Some((false, "250%".into()));
+                    self.stage = 25;
+                }
+                25 => {
+                    if ui.get_zoom_entry().as_str() != "250%" {
+                        anyhow::bail!("Tab focus fixture did not create an uncommitted zoom value");
+                    }
+                    self.pending_shift = true;
+                    self.pending_key = Some((true, slint::platform::Key::Tab.into()));
+                    self.stage = 26;
+                }
+                26 if app.active == 11 && ready => {
+                    if ui.get_zoom_editing()
+                        || ui.get_text_field_focused()
+                        || ui.get_zoom_entry() != ui.get_zoom_label()
+                        || (app.layout.as_ref().unwrap().scale - self.scale_before_input).abs()
+                            > 0.001
+                    {
+                        anyhow::bail!("Zoom field draft crossed a document switch");
+                    }
+                    println!(
+                        "tabs: switching from page and zoom text cancels drafts and restores reader focus"
+                    );
                     self.pending_key = Some((true, "w".into()));
                     self.stage = 6;
                 }
