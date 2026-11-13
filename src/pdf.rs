@@ -169,6 +169,11 @@ pub struct Worker {
     shutdown: Cancellation,
     thread: Option<thread::JoinHandle<()>>,
 }
+impl Worker {
+    pub fn try_send(&self, command: Command) -> Result<(), mpsc::TrySendError<Command>> {
+        self.commands.try_send(command)
+    }
+}
 impl Drop for Worker {
     fn drop(&mut self) {
         self.shutdown.stop();
@@ -1285,6 +1290,61 @@ pub fn probe_search(path: &Path, query: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn admission_worker(shutdown: Cancellation) -> (Worker, Receiver<Command>) {
+        let (commands, requests) = mpsc::sync_channel(1);
+        let (_, events) = mpsc::sync_channel(1);
+        (
+            Worker {
+                commands,
+                events,
+                generation: Arc::new(AtomicU64::new(0)),
+                search_token: Arc::new(AtomicU64::new(0)),
+                shutdown,
+                thread: None,
+            },
+            requests,
+        )
+    }
+
+    fn ready_helper(jobs: &Jobs<(), ()>) -> Reply<()> {
+        let deadline = std::time::Instant::now() + Duration::from_secs(3);
+        loop {
+            if let Some(reply) = jobs.poll() {
+                return reply;
+            }
+            assert!(std::time::Instant::now() < deadline);
+            thread::sleep(Duration::from_millis(1));
+        }
+    }
+
+    #[test]
+    fn accepted_close_cancels_a_ready_reply_before_owner_cleanup() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let request = jobs.submit(7, ()).unwrap();
+        let reply = ready_helper(&jobs);
+        let (worker, _requests) = admission_worker(shutdown);
+        assert!(worker.try_send(Command::Close(7)).is_ok());
+        // The UI removes the tab after successful admission. The PDF owner has
+        // not consumed Close yet and polls helper replies before queued commands.
+        assert!(
+            !request.matches(&reply.ticket),
+            "Accepted tab close still permits a ready helper result to publish"
+        );
+    }
+
+    #[test]
+    fn rejected_close_preserves_the_open_documents_request() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let request = jobs.submit(7, ()).unwrap();
+        let reply = ready_helper(&jobs);
+        let (worker, _requests) = admission_worker(shutdown);
+        assert!(worker.try_send(Command::Snapshot(7)).is_ok());
+        assert!(worker.try_send(Command::Close(7)).is_err());
+        assert!(request.matches(&reply.ticket));
+    }
     #[test]
     fn shared_reader_retains_snapshot_without_copy_and_supports_random_access() {
         use std::io::{Read, Seek, SeekFrom};
