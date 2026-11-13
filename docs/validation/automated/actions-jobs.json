@@ -1,6 +1,6 @@
 {
   "current_jobs": {
-    "total_count": 4,
+    "total_count": 6,
     "jobs": [
       {
         "id": 132071722504,
@@ -81,11 +81,11 @@
         "head_sha": "87560c34b2d05c956d193cccb8a8c26eeec27d3a",
         "url": "https://api.github.com/repos/w3fans/dPDF/actions/jobs/132071788911",
         "html_url": "https://github.com/w3fans/dPDF/actions/runs/43479424354/job/132071788911",
-        "status": "in_progress",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "success",
         "created_at": "2026-11-13T18:07:01Z",
         "started_at": "2026-11-13T18:07:04Z",
-        "completed_at": null,
+        "completed_at": "2026-11-13T18:07:21Z",
         "name": "hosted / announce",
         "steps": [
           {
@@ -106,19 +106,27 @@
           },
           {
             "name": "Publish queued receipt before waiting for Windows",
-            "status": "in_progress",
-            "conclusion": null,
+            "status": "completed",
+            "conclusion": "success",
             "number": 3,
             "started_at": "2026-11-13T18:07:13Z",
-            "completed_at": null
+            "completed_at": "2026-11-13T18:07:18Z"
           },
           {
             "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
-            "status": "pending",
-            "conclusion": null,
+            "status": "completed",
+            "conclusion": "success",
             "number": 6,
-            "started_at": null,
-            "completed_at": null
+            "started_at": "2026-11-13T18:07:18Z",
+            "completed_at": "2026-11-13T18:07:19Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-13T18:07:19Z",
+            "completed_at": "2026-11-13T18:07:19Z"
           }
         ],
         "check_run_url": "https://api.github.com/repos/w3fans/dPDF/check-runs/132071788911",
@@ -179,6 +187,182 @@
         "runner_name": null,
         "runner_group_id": null,
         "runner_group_name": null
+      },
+      {
+        "id": 132071981383,
+        "run_id": 43479424354,
+        "workflow_name": "Native Windows validation",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/w3fans/dPDF/actions/runs/43479424354",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVnGPb88AAAAewBqBRw",
+        "head_sha": "87560c34b2d05c956d193cccb8a8c26eeec27d3a",
+        "url": "https://api.github.com/repos/w3fans/dPDF/actions/jobs/132071981383",
+        "html_url": "https://github.com/w3fans/dPDF/actions/runs/43479424354/job/132071981383",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-11-13T18:07:21Z",
+        "started_at": "2026-11-13T18:07:24Z",
+        "completed_at": "2026-11-13T18:13:30Z",
+        "name": "hosted / validate",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-13T18:07:25Z",
+            "completed_at": "2026-11-13T18:07:26Z"
+          },
+          {
+            "name": "Checkout validation harness",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-13T18:07:26Z",
+            "completed_at": "2026-11-13T18:07:34Z"
+          },
+          {
+            "name": "Checkout exact source commit",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-13T18:07:34Z",
+            "completed_at": "2026-11-13T18:07:38Z"
+          },
+          {
+            "name": "Restore hosted native build cache",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-13T18:07:38Z",
+            "completed_at": "2026-11-13T18:07:49Z"
+          },
+          {
+            "name": "Native bounded Windows checks",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-13T18:07:49Z",
+            "completed_at": "2026-11-13T18:13:17Z"
+          },
+          {
+            "name": "Retain hosted native build cache",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-11-13T18:13:17Z",
+            "completed_at": "2026-11-13T18:13:24Z"
+          },
+          {
+            "name": "Upload report and per-suite logs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-13T18:13:24Z",
+            "completed_at": "2026-11-13T18:13:25Z"
+          },
+          {
+            "name": "Post Checkout exact source commit",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-11-13T18:13:25Z",
+            "completed_at": "2026-11-13T18:13:27Z"
+          },
+          {
+            "name": "Post Checkout validation harness",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-11-13T18:13:27Z",
+            "completed_at": "2026-11-13T18:13:28Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15,
+            "started_at": "2026-11-13T18:13:28Z",
+            "completed_at": "2026-11-13T18:13:28Z"
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/w3fans/dPDF/check-runs/132071981383",
+        "labels": [
+          "windows-latest"
+        ],
+        "runner_id": 1000002700,
+        "runner_name": "GitHub Actions 1000002700",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
+      },
+      {
+        "id": 132075498108,
+        "run_id": 43479424354,
+        "workflow_name": "Native Windows validation",
+        "head_branch": "main",
+        "run_url": "https://api.github.com/repos/w3fans/dPDF/actions/runs/43479424354",
+        "run_attempt": 1,
+        "node_id": "CR_kwDOVnGPb88AAAAewFAqfA",
+        "head_sha": "87560c34b2d05c956d193cccb8a8c26eeec27d3a",
+        "url": "https://api.github.com/repos/w3fans/dPDF/actions/jobs/132075498108",
+        "html_url": "https://github.com/w3fans/dPDF/actions/runs/43479424354/job/132075498108",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-11-13T18:13:30Z",
+        "started_at": "2026-11-13T18:13:33Z",
+        "completed_at": null,
+        "name": "hosted / publish",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-13T18:13:34Z",
+            "completed_at": "2026-11-13T18:13:34Z"
+          },
+          {
+            "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-13T18:13:34Z",
+            "completed_at": "2026-11-13T18:13:36Z"
+          },
+          {
+            "name": "Run actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-13T18:13:36Z",
+            "completed_at": "2026-11-13T18:13:38Z"
+          },
+          {
+            "name": "Attach summary and publish diagnostics branch",
+            "status": "in_progress",
+            "conclusion": null,
+            "number": 4,
+            "started_at": "2026-11-13T18:13:38Z",
+            "completed_at": null
+          },
+          {
+            "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+            "status": "pending",
+            "conclusion": null,
+            "number": 8,
+            "started_at": null,
+            "completed_at": null
+          }
+        ],
+        "check_run_url": "https://api.github.com/repos/w3fans/dPDF/check-runs/132075498108",
+        "labels": [
+          "ubuntu-latest"
+        ],
+        "runner_id": 1000002704,
+        "runner_name": "GitHub Actions 1000002704",
+        "runner_group_id": 0,
+        "runner_group_name": "GitHub Actions"
       }
     ]
   },
@@ -204,7 +388,7 @@
         "html_url": "https://github.com/w3fans/dPDF/actions/runs/43479424354",
         "pull_requests": [],
         "created_at": "2026-11-13T18:06:54Z",
-        "updated_at": "2026-11-13T18:07:05Z",
+        "updated_at": "2026-11-13T18:13:33Z",
         "actor": {
           "login": "w3fans",
           "id": 128293621,
