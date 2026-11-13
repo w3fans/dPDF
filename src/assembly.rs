@@ -291,6 +291,7 @@ pub(crate) fn inspect_snapshot_cancellable(
     inspect_metadata_cancellable(&input, cancel)
 }
 
+#[cfg(target_os = "linux")]
 pub(crate) fn page_count(executable: &Path, path: &Path) -> Result<usize> {
     page_count_cancellable(executable, path, None)
 }
