@@ -46,6 +46,7 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: |
           set -euo pipefail
+          python3 scripts/test-release-version.py
           python3 scripts/ci/test_pr_policy.py
           python3 scripts/test-upstream-sync.py
           python3 scripts/test-private-display.py

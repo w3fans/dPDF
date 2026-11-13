@@ -332,9 +332,41 @@ fn view_bounds(page: &PdfPage<'_>, rect: [f32; 4]) -> Result<NormalizedRect> {
 }
 
 fn checked(command: &mut Command, action: &str) -> Result<()> {
-    let output = command
-        .output()
-        .with_context(|| format!("Start qpdf to {action}"))?;
+    #[cfg(target_os = "linux")]
+    {
+        checked_with_limits(
+            command,
+            action,
+            crate::helper_process::Limits {
+                timeout: std::time::Duration::from_secs(60),
+                stdout: 64 * 1024,
+                stderr: 0,
+            },
+        )
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        let output = command
+            .output()
+            .with_context(|| format!("Start qpdf to {action}"))?;
+        if !output.status.success() {
+            bail!(
+                "qpdf could not {action} (exit {}); previous files preserved",
+                output.status
+            );
+        }
+        Ok(())
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn checked_with_limits(
+    command: &mut Command,
+    action: &str,
+    limits: crate::helper_process::Limits,
+) -> Result<()> {
+    let output = crate::helper_process::run(command, b"", limits, None)
+        .with_context(|| format!("Run qpdf to {action}"))?;
     if !output.status.success() {
         bail!(
             "qpdf could not {action} (exit {}); previous files preserved",
@@ -343,6 +375,7 @@ fn checked(command: &mut Command, action: &str) -> Result<()> {
     }
     Ok(())
 }
+
 fn inspect(path: &Path) -> Result<Value> {
     crate::assembly::inspect_metadata(path)
 }
@@ -832,6 +865,50 @@ pub fn run_cli(mut args: impl Iterator<Item = std::ffi::OsString>) -> Result<()>
 
 #[cfg(test)]
 mod tests {
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn review_helper_errors_and_stalls_are_bounded_and_retryable() {
+        use std::{
+            process::Command,
+            time::{Duration, Instant},
+        };
+        let policy = || crate::helper_process::Limits {
+            timeout: Duration::from_millis(150),
+            stdout: 4096,
+            stderr: 0,
+        };
+        let start = Instant::now();
+        let error = super::checked_with_limits(
+            Command::new("sh").args(["-c", "sleep 30"]),
+            "test review",
+            policy(),
+        )
+        .unwrap_err();
+        assert!(format!("{error:#}").contains("deadline"));
+        assert!(start.elapsed() < Duration::from_secs(3));
+        for command in [
+            "printf 'private helper detail' >&2; exit 3",
+            "cat /dev/zero",
+        ] {
+            let mut limits = policy();
+            limits.timeout = Duration::from_secs(3);
+            let error = super::checked_with_limits(
+                Command::new("sh").args(["-c", command]),
+                "test review",
+                limits,
+            )
+            .unwrap_err();
+            assert!(!format!("{error:#}").contains("private helper detail"));
+        }
+        let mut limits = policy();
+        limits.timeout = Duration::from_secs(3);
+        super::checked_with_limits(
+            Command::new("sh").args(["-c", "exit 0"]),
+            "test review",
+            limits,
+        )
+        .unwrap();
+    }
     use super::*;
     #[test]
     fn undo_restores_content_but_keeps_view_state() {

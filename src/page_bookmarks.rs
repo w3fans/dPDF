@@ -174,18 +174,15 @@ pub(crate) fn restore(targets: &[Target], input: &Path, scratch: &Path) -> Resul
         &patch,
         serde_json::to_vec(&json!({"qpdf":[{"jsonversion":2},changes]}))?,
     )?;
-    let result = Command::new(qpdf_executable())
-        .arg(path_string(input)?.as_ref())
-        .arg(format!("--update-from-json={}", path_string(&patch)?))
-        .arg("--stream-data=preserve")
-        .arg("--object-streams=preserve")
-        .arg(path_string(&output)?.as_ref())
-        .output()
-        .context("Restore replacement bookmarks")?;
-    ensure!(
-        result.status.success(),
-        "qpdf could not restore replacement bookmarks"
-    );
+    crate::assembly::run_qpdf(
+        Command::new(qpdf_executable())
+            .arg(path_string(input)?.as_ref())
+            .arg(format!("--update-from-json={}", path_string(&patch)?))
+            .arg("--stream-data=preserve")
+            .arg("--object-streams=preserve")
+            .arg(path_string(&output)?.as_ref()),
+        "Restore replacement bookmarks",
+    )?;
     let verified = inspect_metadata(&output)?;
     for target in targets {
         let node = node_at(&verified, &target.route)?;

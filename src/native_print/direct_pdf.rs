@@ -7,7 +7,7 @@ use std::{
     fs::File,
     io::{Seek, SeekFrom, Write},
     os::fd::AsRawFd,
-    process::{Command, Stdio},
+    process::Command,
     sync::Mutex,
 };
 
@@ -108,15 +108,10 @@ fn selected_snapshot(bytes: &[u8], selected: &str, count: usize) -> Result<File>
     let executable = crate::assembly::qpdf_executable();
     // A JSON job avoids command-line length limits for a large page selection.
     // No source pathname from the user's filesystem is reopened.
-    let result = Command::new(&executable)
-        .arg(format!("--job-json-file={}", job.path().display()))
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
-        .context("Prepare compact print pages with qpdf")?;
-    if !result.success() {
-        bail!("Cannot prepare compact print pages without qpdf warnings");
-    }
+    crate::assembly::run_qpdf(
+        Command::new(&executable).arg(format!("--job-json-file={}", job.path().display())),
+        "Prepare compact print pages",
+    )?;
     let file = File::open(&output)?;
     file.set_permissions(std::fs::Permissions::from_mode(0o600))?;
     if file.metadata()?.len() > 256 * 1024 * 1024
@@ -201,10 +196,17 @@ pub(super) fn submit(
         let name = CStr::from_ptr((gtk.gtk_printer_get_name)(printer)).to_str()?;
         // Restrict server-side layout to configured CUPS queues. Discovered
         // direct IPP destinations need not implement the same layout options.
-        if !Command::new("lpstat")
-            .args(["-p", name])
-            .output()
-            .is_ok_and(|o| o.status.success())
+        if !crate::helper_process::run(
+            Command::new("lpstat").args(["-p", name]),
+            b"",
+            crate::helper_process::Limits {
+                timeout: std::time::Duration::from_secs(5),
+                stdout: 64 * 1024,
+                stderr: 0,
+            },
+            None,
+        )
+        .is_ok_and(|o| o.status.success())
         {
             return Ok(None);
         }
