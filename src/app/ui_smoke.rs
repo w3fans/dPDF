@@ -691,7 +691,386 @@ impl SmokeCheck {
         }
         self.pending_key = Some((false, slint::platform::Key::Return.into()));
         true
-…4597 tokens truncated…ing()) =>
+    }
+    fn recovery_advance(&mut self, app: &mut Application, ui: &Workspace, mode: &str) {
+        let result = (|| -> anyhow::Result<()> {
+            match self.stage {
+                0 if mode != "clear" && ui.get_has_recovery() && !ui.get_recovery_busy() => {
+                    app.recover_draft(ui, mode == "discard");
+                    self.stage = 1;
+                }
+                0 if mode == "clear" && ui.get_has_recovery() && !ui.get_recovery_busy() => {
+                    let root = crate::recovery::default_root()
+                        .ok_or_else(|| anyhow::anyhow!("Recovery root unavailable"))?;
+                    let drafts = || -> anyhow::Result<usize> {
+                        Ok(std::fs::read_dir(&root)?
+                            .filter_map(Result::ok)
+                            .filter(|e| e.path().extension().is_some_and(|x| x == "dpdf"))
+                            .count())
+                    };
+                    app.set_recovery_enabled(ui, false);
+                    if app.recovery.is_some() || ui.get_has_recovery() || ui.get_recovery_enabled()
+                    {
+                        anyhow::bail!("Disabling recovery left the store active or offered");
+                    }
+                    if drafts()? == 0 {
+                        anyhow::bail!("Disabling recovery deleted existing drafts");
+                    }
+                    app.clear_recovery(ui);
+                    if drafts()? != 0 {
+                        anyhow::bail!("Deleting drafts while recovery is off left files behind");
+                    }
+                    app.set_recovery_enabled(ui, true);
+                    if app.recovery.is_none() || !ui.get_recovery_enabled() {
+                        anyhow::bail!("Recovery could not be re-enabled");
+                    }
+                    app.clear_recovery(ui);
+                    self.stage = 1;
+                }
+                1 if mode == "clear" && !ui.get_recovery_busy() && !ui.get_has_recovery() => {
+                    app.privacy_controls(ui);
+                    ui.set_privacy_visible(true);
+                    self.stage = 2;
+                }
+                2 if mode == "clear" => {
+                    if !ui.get_recovery_enabled()
+                        || !ui.get_recovery_summary().starts_with("0 saved draft")
+                    {
+                        anyhow::bail!("Privacy panel does not report the active, empty store");
+                    }
+                    if let Some(path) = std::env::var_os("DPDF_SMOKE_SNAPSHOT") {
+                        save_snapshot(ui, &PathBuf::from(path))?;
+                    }
+                    println!(
+                        "recovery: disabling kept drafts; delete-all removed them while off and on"
+                    );
+                    let _ = slint::quit_event_loop();
+                    self.stage = 6;
+                }
+                1 if mode == "discard" && !ui.get_has_recovery() && !ui.get_recovery_busy() => {
+                    println!("recovery: explicit discard removed the abandoned draft");
+                    let _ = slint::quit_event_loop();
+                    self.stage = 6;
+                }
+                1 if mode == "read"
+                    && app.tabs.iter().any(|t| !t.marks.items.is_empty())
+                    && app.pages.iter().any(|p| p.ready) =>
+                {
+                    let tab = &app.tabs[app.active];
+                    let mark = &tab.marks.items[0];
+                    if tab.info.pages.len() != 50
+                        || tab.marks.items.len() != 1
+                        || (mark.placement.geometry.width_mm - 35.0).abs() > 0.001
+                        || (mark.placement.geometry.height_mm - 25.0).abs() > 0.001
+                        || (mark.placement.opacity - 0.7).abs() > 0.001
+                        || mark.default_size != (45.0, 22.5)
+                        || mark.aspect_locked
+                    {
+                        anyhow::bail!(
+                            "Recovered snapshot or physical mark controls differ from the checkpoint"
+                        );
+                    }
+                    if tab.recovery.saved_generation == Some(tab.marks.generation) {
+                        println!(
+                            "recovery: opened retained 50-page snapshot and physical marks; replacement checkpoint durable"
+                        );
+                        let output = PathBuf::from(
+                            std::env::var_os("DPDF_SMOKE_RECOVERY_OUTPUT")
+                                .ok_or_else(|| anyhow::anyhow!("Missing recovery output path"))?,
+                        );
+                        app.save_marks_to(ui, output);
+                        self.stage = 2;
+                    }
+                }
+                2 if !app.export_pending
+                    && app.tabs.iter().all(|t| t.marks.items.is_empty())
+                    && app.tabs.len() >= 2 =>
+                {
+                    self.stage = 3;
+                }
+                3 if app
+                    .tabs
+                    .iter()
+                    .all(|t| t.recovery.saved_generation.is_none()) =>
+                {
+                    println!("recovery: saved recovered copy and retired its checkpoint");
+                    let _ = slint::quit_event_loop();
+                    self.stage = 6;
+                }
+                _ => {}
+            }
+            Ok(())
+        })();
+        if let Err(error) = result {
+            self.failure = Some(format!("{error:#}"));
+            let _ = slint::quit_event_loop();
+        }
+    }
+    pub(super) fn advance(&mut self, app: &mut Application, ui: &Workspace) {
+        self.ticks += 1;
+        if self.ticks > 1250 {
+            self.failure = Some(format!(
+                "UI smoke timed out at stage {}: {}",
+                self.stage,
+                ui.get_status()
+            ));
+            let _ = slint::quit_event_loop();
+            return;
+        }
+        if let Some(error) = &app.engine_error {
+            self.failure = Some(error.clone());
+            let _ = slint::quit_event_loop();
+            return;
+        }
+        if std::env::var_os("DPDF_SMOKE_PHYSICAL").is_some() {
+            match self.physical.advance(app, ui) {
+                Ok(true) => {
+                    let _ = slint::quit_event_loop();
+                }
+                Ok(false) => {}
+                Err(error) => {
+                    self.failure = Some(format!("{error:#}"));
+                    let _ = slint::quit_event_loop();
+                }
+            }
+            return;
+        }
+        if std::env::var_os("DPDF_SMOKE_VIEWPORT").is_some() {
+            match self.viewport.advance(app, ui) {
+                Ok(true) => {
+                    let _ = slint::quit_event_loop();
+                }
+                Ok(false) => {}
+                Err(error) => {
+                    self.failure = Some(format!("{error:#}"));
+                    let _ = slint::quit_event_loop();
+                }
+            }
+            self.pending_key = self.viewport.pending_key.take();
+            self.pending_selection = self.viewport.pending_selection.take();
+            return;
+        }
+        if std::env::var_os("DPDF_SMOKE_TABS").is_some() {
+            self.tabs_advance(app, ui);
+            return;
+        }
+        if let Ok(mode) = std::env::var("DPDF_SMOKE_REVIEW") {
+            self.review_advance(app, ui, &mode);
+            return;
+        }
+        if let Ok(mode) = std::env::var("DPDF_SMOKE_PASSWORD")
+            && self.password_advance(app, ui, &mode)
+        {
+            return;
+        }
+        if let Ok(mode) = std::env::var("DPDF_SMOKE_RECOVERY")
+            && (mode == "read" || mode == "discard" || mode == "clear")
+        {
+            self.recovery_advance(app, ui, &mode);
+            return;
+        }
+        let Some(tab) = app.tabs.get(app.active) else {
+            return;
+        };
+        let ready = app.pages.iter().any(|p| p.ready);
+        match self.stage {
+            0 if ready && !app.thumb_frames.is_empty() => {
+                if std::env::var_os("DPDF_SMOKE_PASSWORD").is_some() {
+                    if !tab.info.password_protected || self.password_attempts < 2 {
+                        self.failure =
+                            Some("Password authentication/retry path was not exercised".into());
+                        let _ = slint::quit_event_loop();
+                        return;
+                    }
+                    if let Some(path) = std::env::var_os("DPDF_SMOKE_PASSWORD_COPY") {
+                        app.command(ui, Command::SaveCopy(tab.info.id, PathBuf::from(path)));
+                    }
+                    println!(
+                        "password: incorrect-password retry succeeded; authenticated reading ready"
+                    );
+                }
+                println!(
+                    "smoke: first page and thumbnails ready; pages={} bookmarks={}",
+                    tab.info.pages.len(),
+                    tab.info.bookmarks.len()
+                );
+                let placement = &app.layout.as_ref().unwrap().pages[0];
+                let position = |x: f32, y: f32| {
+                    slint::LogicalPosition::new(
+                        ui.get_viewport_window_x()
+                            + ui.get_scroll_x()
+                            + placement.x
+                            + x * placement.width,
+                        ui.get_viewport_window_y()
+                            + ui.get_scroll_y()
+                            + placement.y
+                            + y * placement.height,
+                    )
+                };
+                self.pending_selection = Some((position(0.06, 0.04), position(0.95, 0.25)));
+                self.stage = 20;
+            }
+            20 if app.selection_ready => {
+                if !app.selected_text.contains("payment")
+                    || app.selected_text.contains("Authorized signature:")
+                {
+                    self.failure = Some(
+                        "Dispatched selection did not extract only the selected region".into(),
+                    );
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                self.pending_key = Some((true, "a".into()));
+                self.stage = 21;
+            }
+            21 if app.selection_ready && app.selected_text.contains("Authorized signature:") => {
+                println!(
+                    "smoke: dispatched text-region drag and Ctrl+A selection extract expected text"
+                );
+                let detail = ui.get_status_detail();
+                let expected = format!(
+                    "Page {} of {}  ·  ",
+                    ui.get_current_page() + 1,
+                    app.tabs[app.active].info.pages.len()
+                );
+                if !detail.starts_with(&expected) || !detail.contains(ui.get_zoom_label().as_str())
+                {
+                    self.failure = Some(format!("Status bar summary is incomplete: {detail}"));
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                if std::env::var_os("DPDF_SMOKE_CLIPBOARD").is_some() {
+                    // Opt-in only: use an isolated display. Ordinary smoke never changes clipboard contents.
+                    self.pending_key = Some((true, "c".into()));
+                    self.stage = 22;
+                    return;
+                }
+                app.clear_selection(ui);
+                ui.set_page_ops_visible(true);
+                ui.set_page_operation(7);
+                self.stage = 23;
+            }
+            22 if ui.get_status().starts_with("Copied ") => {
+                let readback =
+                    arboard::Clipboard::new().and_then(|mut clipboard| clipboard.get_text());
+                if readback.ok().as_deref() != Some(app.selected_text.as_str()) {
+                    self.failure =
+                        Some("Native clipboard did not return the selected fixture text".into());
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                println!(
+                    "smoke: dispatched Ctrl+C copied text; independent native clipboard readback matched"
+                );
+                app.share_file(ui, 1);
+                let expected = platform::saved_file_path(&app.tabs[app.active].info.path).unwrap();
+                let copied =
+                    arboard::Clipboard::new().and_then(|mut clipboard| clipboard.get_text());
+                if copied.ok().as_deref() != Some(expected.as_str()) || !ui.get_share_ready() {
+                    self.failure =
+                        Some("Saved-file sharing did not copy the exact fixture path".into());
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                println!(
+                    "smoke: saved-file sharing copied exact path to the independent native clipboard"
+                );
+                app.clear_selection(ui);
+                ui.set_share_visible(true);
+                self.stage = 60;
+            }
+            60 if ui.get_share_visible() && ready => {
+                let result = if let Some(path) = std::env::var_os("DPDF_SMOKE_SHARE_SNAPSHOT") {
+                    save_snapshot(ui, &PathBuf::from(path))
+                } else {
+                    ui.window()
+                        .take_snapshot()
+                        .map(|_| ())
+                        .map_err(|error| anyhow::anyhow!("{error}"))
+                };
+                if let Err(error) = result {
+                    self.failure = Some(format!("Share panel snapshot failed: {error:#}"));
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                self.pending_key = Some((false, slint::platform::Key::Escape.into()));
+                self.stage = 61;
+            }
+            61 if !ui.get_share_visible() => {
+                println!("smoke: share panel rendered and dispatched Escape closed it");
+                app.clear_selection(ui);
+                ui.set_page_ops_visible(true);
+                ui.set_page_operation(7);
+                self.stage = 23;
+            }
+            23 if app.arrangement.is_some()
+                && app.sidebar.row_count() >= 2
+                && app.thumb_frames.contains(&0)
+                && app.thumb_frames.contains(&1) =>
+            {
+                // The arrangement header changes layout. Render that layout before dispatching
+                // synthetic input, rather than reading geometry from the preceding frame.
+                if let Err(error) = ui.window().take_snapshot() {
+                    self.failure = Some(format!("Cannot settle arrangement layout: {error}"));
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                let y = ui.get_sidebar_window_y();
+                let x = ui.get_sidebar_window_x() + ui.get_sidebar_width() / 2.0;
+                let height = ui.get_thumbnail_height();
+                let stride = height + ui.get_thumbnail_spacing();
+                self.pending_selection = Some((
+                    slint::LogicalPosition::new(x, y + height * 0.25),
+                    slint::LogicalPosition::new(x, y + stride + height * 0.75),
+                ));
+                self.stage = 24;
+            }
+            24 if ui.get_operation_pages().starts_with("2,1")
+                && app.thumb_frames.contains(&0)
+                && app.thumb_frames.contains(&1) =>
+            {
+                if app.sidebar.row_data(0).map(|p| p.page) != Some(1)
+                    || app.sidebar.row_data(1).map(|p| p.page) != Some(0)
+                {
+                    self.failure =
+                        Some("Thumbnail order does not match exported page-order field".into());
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                println!(
+                    "smoke: dispatched thumbnail drag reordered output slots without modifying the open PDF"
+                );
+                if let Some(path) = std::env::var_os("DPDF_SMOKE_ORDER_SNAPSHOT")
+                    && let Err(error) = save_snapshot(ui, &PathBuf::from(path))
+                {
+                    self.failure = Some(format!("Order snapshot failed: {error:#}"));
+                    let _ = slint::quit_event_loop();
+                    return;
+                }
+                self.stage = 70;
+            }
+            70 => {
+                let _ = ui.window().take_snapshot();
+                let x = ui.get_sidebar_window_x() + ui.get_sidebar_width() / 2.0;
+                let y = ui.get_sidebar_window_y();
+                let start = slint::LogicalPosition::new(x, y + ui.get_thumbnail_height() * 0.25);
+                let end = slint::LogicalPosition::new(x, y + ui.get_sidebar_height() - 10.0);
+                use slint::platform::{PointerEventButton, WindowEvent};
+                self.pending_pointer = vec![
+                    WindowEvent::PointerMoved { position: start },
+                    WindowEvent::PointerPressed {
+                        position: start,
+                        button: PointerEventButton::Left,
+                    },
+                    WindowEvent::PointerMoved {
+                        position: slint::LogicalPosition::new(start.x, start.y + 20.0),
+                    },
+                    WindowEvent::PointerMoved { position: end },
+                ];
+                self.stage = 71;
+            }
+            71 if ui.get_sidebar_offset()
+                >= 6.0 * (ui.get_thumbnail_height() + ui.get_thumbnail_spacing()) =>
             {
                 self.order_scroll_before = ui.get_sidebar_offset();
                 self.order_ticks = 0;
