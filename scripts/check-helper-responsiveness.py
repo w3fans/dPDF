@@ -48,7 +48,7 @@ def main():
                 'import json,os,time,sys\nfrom pathlib import Path\n'
                 f'ready=Path({str(ready)!r})\n'
                 'if sys.argv[1:2]==["--json"] and not ready.exists():\n'
-                ' ready.write_text(json.dumps({"pid":os.getpid()}))\n'
+                ' ready.write_text(json.dumps({"pid":os.getpid(),"start":Path(f"/proc/{os.getpid()}/stat").read_text().rsplit(")",1)[1].split()[19]}))\n'
                 ' deadline=time.monotonic()+30\n'
                 ' while time.monotonic()<deadline:time.sleep(.02)\n'
                 f'os.execv({str(args.qpdf.resolve())!r}, [{str(args.qpdf.resolve())!r}, *sys.argv[1:]])\n',
@@ -61,7 +61,14 @@ def main():
             def owned_pid():
                 if not ready.exists():
                     return None
-                pid = json.loads(ready.read_text())['pid']
+                identity = json.loads(ready.read_text())
+                pid = identity['pid']
+                try:
+                    fields = Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()
+                except FileNotFoundError:
+                    return None
+                if fields[19] != identity['start']:
+                    return None
                 command = Path(f'/proc/{pid}/cmdline')
                 try:
                     data = command.read_bytes()
@@ -70,7 +77,7 @@ def main():
                 if str(driver).encode() in data.split(b'\0'):
                     return pid
                 # An unreaped zombie still retains its process identity.
-                if not data and Path(f'/proc/{pid}').exists():
+                if not data and fields[0] == 'Z':
                     return pid
                 return None
 

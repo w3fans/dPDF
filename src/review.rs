@@ -391,9 +391,6 @@ fn checked_with_limits_cancel(
     Ok(())
 }
 
-fn inspect(path: &Path) -> Result<Value> {
-    crate::assembly::inspect_metadata(path)
-}
 fn objects(document: &Value) -> Result<&Map<String, Value>> {
     document["qpdf"][1]
         .as_object()

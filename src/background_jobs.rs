@@ -132,13 +132,21 @@ impl<T: Send + 'static, R: Send + 'static> Jobs<T, R> {
             .generation
             .checked_add(1)
             .context("Helper identity exhausted")?;
-        self.outstanding
-            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |count| {
-                (count < MAX_OUTSTANDING).then_some(count + 1)
-            })
-            .map_err(|_| {
-                anyhow::anyhow!("Metadata preparation busy; retry when a document finishes")
-            })?;
+        // Compare/exchange also supports the declared Rust 1.92 minimum.
+        // Newer toolchains deprecated fetch_update in favour of a newer API.
+        loop {
+            let count = self.outstanding.load(Ordering::Acquire);
+            if count >= MAX_OUTSTANDING {
+                bail!("Metadata preparation busy; retry when a document finishes");
+            }
+            if self
+                .outstanding
+                .compare_exchange_weak(count, count + 1, Ordering::AcqRel, Ordering::Acquire)
+                .is_ok()
+            {
+                break;
+            }
+        }
         let request = Request {
             id,
             generation: self.generation,
