@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update the locked pulldown-cmark parser to 0.13.6 for the nested-wikilink parsing fix, preserving dependency requirements and MIT notice bytes.
+
 - Cancel uncommitted page/zoom field values and restore reader focus when switching documents, including Ctrl+Tab.
 
 - Keep unhandled text-field keys within their editing context so a platform-specific Redo shortcut cannot change independent PDF review or mark history.
