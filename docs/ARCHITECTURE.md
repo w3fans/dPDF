@@ -154,8 +154,10 @@ retention deduplicates assets by master identity. Undo/Redo retain at most 64
 changes, evicting oldest undo states when either image budget is exceeded. A whole
 move/resize gesture commits once; pointer cancellation restores its starting state.
 Cosmetic view changes and selections do not enter document history. New edits
-clear Redo; no-op edits preserve it. Text input receives its native Undo before
-unhandled shortcuts reach the workspace.
+clear Redo; no-op edits preserve it. Focused text input owns its native Undo/Redo and does not forward unhandled
+editing or navigation keys into document history. Global save/open/search/tab
+actions and Escape still run through the capture handler. Linux text Redo uses
+Ctrl+Shift+Z; Windows text Redo uses Ctrl+Y, following the native widget mapping.
 Exports capture a generation; success clears drafts only when that generation is
 still current. Tab/window close confirms discarding drafts, and printing/page
 operations require saving the marked copy first. A matching successful save clears
