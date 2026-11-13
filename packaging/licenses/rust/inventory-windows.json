@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "target": "x86_64-pc-windows-msvc",
-  "config_fingerprint": "4cfadf99f0abbc87f17fd3ce3708c57978f8b08b95eb6d1238c13354b1bb8d00",
+  "config_fingerprint": "292aa89d585da88d92488326296fd504ccf1261a34b36a0cc8ea7fc8d495170d",
   "lock_fingerprint": "84037ecc94e8fd3f809ab0cbd1cd844fc7bcf579588348a6f27b485e87690c74",
-  "scope": "Conservative Windows target dependency tree resolved on Fedora, including host build dependencies; native Windows validator recollects before packaging",
+  "scope": "Cargo target tree: normal/build/proc-macro dependencies",
   "audit_status": "inventory_only",
   "qualified_for_binary_distribution": false,
-  "dependency_fingerprint": "721c8d6f3fd3c7b8279c1c0acfdbb1bddcf2ec725798d7d1d3b47e21f7e36821",
+  "dependency_fingerprint": "84e5d806848c0ad7221a7c75aa3a158f614f0e639c468f9d24f3b4057ddc517e",
   "components": [
     {
       "name": "adler2",
@@ -929,22 +929,6 @@
           "path": "LICENSE-MIT",
           "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
           "text": "texts/23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3.txt",
-          "origin": "crate-archive"
-        }
-      ]
-    },
-    {
-      "name": "dlib",
-      "version": "0.5.3",
-      "license_declaration": "MIT",
-      "repository": "https://github.com/elinorbgr/dlib",
-      "registry_checksum": "ab8ecd87370524b461f8557c119c405552c396ed91fc0a8eec68679eab26f94a",
-      "resolved_features": [],
-      "notices": [
-        {
-          "path": "LICENSE.txt",
-          "sha256": "10e5daea68c3ab7da6468ea51860e9d4ac87ea6a9a2d34127beff17b7193b618",
-          "text": "texts/10e5daea68c3ab7da6468ea51860e9d4ac87ea6a9a2d34127beff17b7193b618.txt",
           "origin": "crate-archive"
         }
       ]
@@ -2321,48 +2305,6 @@
       ]
     },
     {
-      "name": "libc",
-      "version": "0.2.191",
-      "license_declaration": "MIT OR Apache-2.0",
-      "repository": "https://github.com/rust-lang/libc",
-      "registry_checksum": "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a",
-      "resolved_features": [
-        "default",
-        "extra_traits",
-        "std"
-      ],
-      "notices": [
-        {
-          "path": "LICENSE-APACHE",
-          "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
-          "text": "texts/62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a.txt",
-          "origin": "crate-archive"
-        },
-        {
-          "path": "LICENSE-MIT",
-          "sha256": "123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e",
-          "text": "texts/123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e.txt",
-          "origin": "crate-archive"
-        }
-      ]
-    },
-    {
-      "name": "libloading",
-      "version": "0.8.9",
-      "license_declaration": "ISC",
-      "repository": "https://github.com/nagisa/rust_libloading/",
-      "registry_checksum": "d7c4b02199fee7c5d21a5ae7d8cfa79a6ef5bb2fc834d6e9058e89c825efdc55",
-      "resolved_features": [],
-      "notices": [
-        {
-          "path": "LICENSE",
-          "sha256": "b29f8b01452350c20dd1af16ef83b598fea3053578ccc1c7a0ef40e57be2620f",
-          "text": "texts/b29f8b01452350c20dd1af16ef83b598fea3053578ccc1c7a0ef40e57be2620f.txt",
-          "origin": "crate-archive"
-        }
-      ]
-    },
-    {
       "name": "libloading",
       "version": "0.9.0",
       "license_declaration": "ISC",
@@ -3212,28 +3154,6 @@
           "path": "LICENSE",
           "sha256": "97d06daf5f54a5a5e12776d7f30613b30538c6c7ce4d326731084c27233c6b9b",
           "text": "texts/97d06daf5f54a5a5e12776d7f30613b30538c6c7ce4d326731084c27233c6b9b.txt",
-          "origin": "crate-archive"
-        }
-      ]
-    },
-    {
-      "name": "pkg-config",
-      "version": "0.3.34",
-      "license_declaration": "MIT OR Apache-2.0",
-      "repository": "https://github.com/rust-lang/pkg-config-rs",
-      "registry_checksum": "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548",
-      "resolved_features": [],
-      "notices": [
-        {
-          "path": "LICENSE-APACHE",
-          "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
-          "text": "texts/a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2.txt",
-          "origin": "crate-archive"
-        },
-        {
-          "path": "LICENSE-MIT",
-          "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397",
-          "text": "texts/378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397.txt",
           "origin": "crate-archive"
         }
       ]
@@ -5952,7 +5872,9 @@
         "Win32_System_DataExchange",
         "Win32_System_Diagnostics",
         "Win32_System_Diagnostics_Debug",
+        "Win32_System_Diagnostics_ToolHelp",
         "Win32_System_IO",
+        "Win32_System_JobObjects",
         "Win32_System_LibraryLoader",
         "Win32_System_Memory",
         "Win32_System_Ole",
@@ -6080,8 +6002,8 @@
       "notices": [
         {
           "path": "LICENSE",
-          "sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a",
-          "text": "texts/6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a.txt",
+          "sha256": "de556eb1415648cc1bba68d1e602d8a54e3e5b3592770df34d863449e8f0303c",
+          "text": "texts/de556eb1415648cc1bba68d1e602d8a54e3e5b3592770df34d863449e8f0303c.txt",
           "origin": "crate-archive"
         }
       ]
@@ -6163,24 +6085,6 @@
           "path": "LICENSE-MIT",
           "sha256": "df62e3ef3f207c91073fedd78b4156a278681d0dd3f942379242c62c6a71a3ec",
           "text": "texts/df62e3ef3f207c91073fedd78b4156a278681d0dd3f942379242c62c6a71a3ec.txt",
-          "origin": "crate-archive"
-        }
-      ]
-    },
-    {
-      "name": "yeslogic-fontconfig-sys",
-      "version": "6.0.1",
-      "license_declaration": "MIT",
-      "repository": "https://github.com/yeslogic/fontconfig-rs",
-      "registry_checksum": "1d8b8abf912b9a29ff112e1671c97c33636903d13a69712037190e6805af4f76",
-      "resolved_features": [
-        "dlopen"
-      ],
-      "notices": [
-        {
-          "path": "LICENSE",
-          "sha256": "2ae0635fa25509f3a5ac454f76ad21286a65714b460e55a581e457e07441bf14",
-          "text": "texts/2ae0635fa25509f3a5ac454f76ad21286a65714b460e55a581e457e07441bf14.txt",
           "origin": "crate-archive"
         }
       ]

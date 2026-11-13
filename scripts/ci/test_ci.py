@@ -2,6 +2,7 @@
 import importlib.util
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -18,7 +19,45 @@ import windows_job
 import validate_linux
 
 
+def check_ci_step_keys(content):
+    """Guard direct mapping keys in this repository's six-space CI step lists.
+
+    This focused regression check complements actionlint; it is not a YAML parser.
+    Run-block contents and nested env/with keys have deeper indentation.
+    """
+    keys = None
+    for number, line in enumerate(content.splitlines(), 1):
+        first = re.match(r"^      - ([A-Za-z_-]+):", line)
+        if first:
+            keys = {first[1]}
+            continue
+        field = re.match(r"^        ([A-Za-z_-]+):", line)
+        if keys is not None and field:
+            if field[1] in keys:
+                raise ValueError(f"Duplicate CI step key {field[1]} at line {number}")
+            keys.add(field[1])
+        elif line.strip() and not line.startswith("        "):
+            keys = None
+
+
 class Contracts(unittest.TestCase):
+    def test_ci_step_keys_are_unique(self):
+        source = Path(__file__).resolve().parents[2]
+        check_ci_step_keys((source / '.github/workflows/ci.yml').read_text())
+
+    def test_step_key_guard_detects_lost_summary_boundary(self):
+        valid = """      - name: Retain runtime
+        run: |
+          echo staged
+      - name: Summary
+        if: always()
+        run: |
+          echo summary
+"""
+        check_ci_step_keys(valid)
+        with self.assertRaisesRegex(ValueError, 'Duplicate CI step key run'):
+            check_ci_step_keys(valid.replace('      - name: Summary\n', ''))
+
     def test_print_benchmarks_are_artifacts_only_in_desktop_lanes(self):
         report = Path('artifacts') / 'print-benchmark.json'
         linux = validate_linux.plan(Path('source'), Path('binary'), Path('pdfium'), Path('qpdf'),
