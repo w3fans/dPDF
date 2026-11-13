@@ -275,6 +275,18 @@ mod tests {
         }
     }
 
+    #[test]
+    fn output_limits_accept_exactly_the_cap() {
+        for cap in [0, 1, 4096, 8192, 8193] {
+            assert_eq!(
+                collect(io::Cursor::new(vec![b'x'; cap]), cap).unwrap(),
+                vec![b'x'; cap]
+            );
+            let error = collect(io::Cursor::new(vec![b'x'; cap + 1]), cap).unwrap_err();
+            assert!(error.to_string().contains("byte limit"));
+        }
+    }
+
     // Only a generated test subprocess enters this function. This avoids an
     // installed shell, PowerShell startup/profile, or external test binary.
     #[test]
