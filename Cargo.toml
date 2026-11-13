@@ -45,8 +45,8 @@ debug = 1
 # Dependency release profiles stay unchanged.
 [profile.release.package.dpdf]
 opt-level = 1
-# Explicit baseline for a measured codegen-memory experiment; no limit increase.
-codegen-units = 16
+# Smaller application codegen partitions; qualify under the unchanged build cap.
+codegen-units = 256
 
 # Slint 1.18 requires Winit 0.30; retain that ABI with a focused Wayland receive fix.
 [patch.crates-io]

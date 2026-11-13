@@ -278,10 +278,14 @@ A failed query records `status: unavailable` and an error code, never a fictitio
 zero-memory result. These files inherit the enclosing report's source/toolchain
 and command identity; they do not independently qualify a binary.
 
-Application release codegen units are explicitly 16 for the measurement baseline,
-matching Cargo's default release partition count. Dependency profiles, optimization
-level, Cargo concurrency and resource limits are unchanged. Before comparing a
-codegen experiment, verify the application compiler-artifact has `fresh: false`;
+The explicit 16-unit baseline in run 43489953584 (source fe081869) compiled
+fresh and peaked at 2,125,107,200 committed bytes against the 2,147,483,648-byte
+cap, leaving about 21 MiB. The next candidate evaluates 256 application codegen
+units with a proposed build-memory target of at most 1.75 GiB. This is an
+experiment pending native measurements and reader comparisons, not a claimed fix.
+Dependency profiles, optimization level, Cargo concurrency and resource limits
+are unchanged. Before comparing a codegen experiment, verify the application
+compiler-artifact has `fresh: false`;
 a Cargo cache hit does not measure application compilation. Retain the exact
 source, compiler identity, memory log and original failed receipt. Any later
 partition change needs native build checks plus same-machine reader performance
