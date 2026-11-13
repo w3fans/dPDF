@@ -19,6 +19,18 @@ pub(crate) struct Limits {
 unsafe extern "C" {
     fn fcntl(fd: std::ffi::c_int, command: std::ffi::c_int, ...) -> std::ffi::c_int;
     fn kill(pid: std::ffi::c_int, signal: std::ffi::c_int) -> std::ffi::c_int;
+    fn getpgrp() -> std::ffi::c_int;
+}
+
+// Set only by the internal native print CLI after the outer supervisor made
+// this process a group leader. Nested helpers must stay in that owned group.
+static OWNED_PRINT_HOST: AtomicBool = AtomicBool::new(false);
+pub(crate) fn enable_owned_print_host() -> Result<()> {
+    if unsafe { getpgrp() } != i32::try_from(std::process::id())? {
+        bail!("Native print host requires an owned process group");
+    }
+    OWNED_PRINT_HOST.store(true, Ordering::Release);
+    Ok(())
 }
 
 fn nonblocking(pipe: &impl AsRawFd) -> io::Result<()> {
@@ -34,13 +46,19 @@ fn nonblocking(pipe: &impl AsRawFd) -> io::Result<()> {
 struct OwnedProcess {
     child: Child,
     group: i32,
+    inherited: bool,
+    finished: bool,
 }
 impl Drop for OwnedProcess {
     fn drop(&mut self) {
-        // Command::process_group(0) created this separate group before exec.
-        // Kill descendants as well: an exited shell can leave a pipe-owning child.
-        // The negative PID selects only our child's group, never the reader's.
-        unsafe { kill(-self.group, 9) };
+        // The outer owner creates a separate group before exec; native-host
+        // helpers join that group. Never target the reader's process group.
+        if !self.inherited || !self.finished {
+            // Nested helper failure aborts this print host and its entire group.
+            // The external owner reaps the host and removes its private scratch.
+            // Successful nested work must never kill the host that owns it.
+            unsafe { kill(-self.group, 9) };
+        }
         let _ = self.child.kill();
         let _ = self.child.wait();
     }
@@ -79,13 +97,44 @@ pub(crate) fn run(
     limits: Limits,
     cancel: Option<&AtomicBool>,
 ) -> Result<Output> {
+    let timeout = Some(limits.timeout);
+    run_inner(command, input, limits, timeout, cancel)
+}
+
+/// Owned native dialog: no user-interaction deadline; shutdown still cancels.
+pub(crate) fn run_dialog(
+    command: &mut Command,
+    input: &[u8],
+    cancel: &AtomicBool,
+) -> Result<Output> {
+    run_inner(
+        command,
+        input,
+        Limits {
+            timeout: Duration::ZERO,
+            stdout: 64 * 1024,
+            stderr: 64 * 1024,
+        },
+        None,
+        Some(cancel),
+    )
+}
+
+fn run_inner(
+    command: &mut Command,
+    input: &[u8],
+    limits: Limits,
+    timeout: Option<Duration>,
+    cancel: Option<&AtomicBool>,
+) -> Result<Output> {
     let started = Instant::now();
     let cancelled = || cancel.is_some_and(|value| value.load(Ordering::Relaxed));
     if cancelled() {
         bail!("Helper operation cancelled");
     }
+    let inherited = timeout.is_some() && OWNED_PRINT_HOST.load(Ordering::Acquire);
+    command.process_group(if inherited { unsafe { getpgrp() } } else { 0 });
     let child = command
-        .process_group(0)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(if limits.stderr == 0 {
@@ -96,7 +145,11 @@ pub(crate) fn run(
         .spawn()
         .context("Start helper process")?;
     // Linux process identifiers fit in signed pid_t; reject before negating.
-    let group = match i32::try_from(child.id()) {
+    let group = match i32::try_from(if inherited {
+        std::process::id()
+    } else {
+        child.id()
+    }) {
         Ok(id) if id > 0 => id,
         _ => {
             let mut child = child;
@@ -105,7 +158,12 @@ pub(crate) fn run(
             bail!("Invalid helper process identity");
         }
     };
-    let mut process = OwnedProcess { child, group };
+    let mut process = OwnedProcess {
+        child,
+        group,
+        inherited,
+        finished: false,
+    };
     let mut stdin = process.child.stdin.take();
     let mut stdout = process.child.stdout.take();
     let mut stderr = process.child.stderr.take();
@@ -126,7 +184,7 @@ pub(crate) fn run(
         if cancelled() {
             bail!("Helper operation cancelled");
         }
-        if started.elapsed() >= limits.timeout {
+        if timeout.is_some_and(|limit| started.elapsed() >= limit) {
             bail!("Helper operation exceeded its deadline");
         }
         let mut progressed = drain(&mut stdout, &mut output, limits.stdout)?;
@@ -156,6 +214,7 @@ pub(crate) fn run(
             && stderr.is_none()
             && stdin.is_none()
         {
+            process.finished = true;
             return Ok(Output {
                 status,
                 stdout: output,
@@ -273,5 +332,119 @@ mod tests {
         .unwrap();
         assert!(result.stderr.is_empty());
         assert!(!result.status.success());
+        use std::os::unix::process::ExitStatusExt;
+        assert_eq!(result.status.signal(), Some(9));
+    }
+    #[test]
+    fn dialog_has_no_interaction_deadline_but_cancels_blocked_io_and_bounds_output() {
+        let cancel = AtomicBool::new(false);
+        let start = Instant::now();
+        assert!(
+            run_dialog(Command::new("sh").args(["-c", "sleep .3"]), b"", &cancel)
+                .unwrap()
+                .status
+                .success()
+        );
+        assert!(start.elapsed() >= Duration::from_millis(250));
+        thread::scope(|scope| {
+            scope.spawn(|| {
+                thread::sleep(Duration::from_millis(80));
+                cancel.store(true, Ordering::Release);
+            });
+            let start = Instant::now();
+            let error = run_dialog(
+                Command::new("sh").args(["-c", "sleep 30"]),
+                &vec![0; 1024 * 1024],
+                &cancel,
+            )
+            .unwrap_err();
+            assert!(error.to_string().contains("cancelled"));
+            assert!(start.elapsed() < Duration::from_secs(3));
+        });
+        cancel.store(false, Ordering::Release);
+        for stream in ["cat /dev/zero", "cat /dev/zero >&2"] {
+            let error =
+                run_dialog(Command::new("sh").args(["-c", stream]), b"", &cancel).unwrap_err();
+            assert!(error.to_string().contains("byte limit"));
+        }
+    }
+
+    #[test]
+    #[ignore = "owned host subprocess only; never enable group inheritance in the test runner"]
+    fn owned_print_host_fixture() {
+        enable_owned_print_host().unwrap();
+        let mut policy = limits();
+        policy.timeout = Duration::from_millis(200);
+        if std::env::var("DPDF_TEST_PRINT_HOST_MODE").as_deref() == Ok("success") {
+            policy.timeout = Duration::from_secs(3);
+            let output = run(
+                Command::new("sh").args(["-c", "printf nested-ready"]),
+                b"",
+                policy,
+                None,
+            )
+            .unwrap();
+            assert_eq!(output.stdout, b"nested-ready");
+            println!("host survived successful nested work");
+        } else {
+            let pid = std::env::var_os("DPDF_TEST_PRINT_DESCENDANT").unwrap();
+            let _ = run(
+                Command::new("sh")
+                    .args(["-c", "sleep 30 & echo $! > \"$1\"; wait", "fixture"])
+                    .arg(pid),
+                b"",
+                policy,
+                None,
+            );
+            panic!("A failed nested helper must abort its externally owned host group");
+        }
+    }
+
+    #[test]
+    fn successful_nested_helper_keeps_host_alive_and_failed_nested_helper_cannot_escape() {
+        let fixture = |mode: &str| {
+            let mut command = Command::new(std::env::current_exe().unwrap());
+            command
+                .args([
+                    "--exact",
+                    "helper_process::tests::owned_print_host_fixture",
+                    "--ignored",
+                    "--nocapture",
+                ])
+                .env("DPDF_TEST_PRINT_HOST_MODE", mode);
+            command
+        };
+        let cancel = AtomicBool::new(false);
+        let result = run_dialog(&mut fixture("success"), b"", &cancel).unwrap();
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        assert!(String::from_utf8_lossy(&result.stdout).contains("host survived"));
+        let folder = tempfile::tempdir().unwrap();
+        let path = folder.path().join("descendant.pid");
+        let start = Instant::now();
+        let result = run_dialog(
+            fixture("stall").env("DPDF_TEST_PRINT_DESCENDANT", &path),
+            b"",
+            &cancel,
+        )
+        .unwrap();
+        assert!(!result.status.success());
+        assert!(start.elapsed() < Duration::from_secs(3));
+        let pid = std::fs::read_to_string(path).unwrap();
+        let stat = std::fs::read_to_string(format!("/proc/{}/stat", pid.trim()));
+        assert!(
+            stat.is_err()
+                || stat
+                    .unwrap()
+                    .rsplit(')')
+                    .next()
+                    .unwrap()
+                    .split_whitespace()
+                    .next()
+                    == Some("Z")
+        );
     }
 }

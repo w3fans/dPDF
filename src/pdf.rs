@@ -1,6 +1,7 @@
 //! PDFium lives on one worker thread. No PDFium handles or borrowed objects enter the UI.
 mod overlay_jobs;
 mod page_jobs;
+mod print_jobs;
 use crate::background_jobs::{Cancellation, Jobs, Reply, Request};
 use crate::{cache::ByteCache, document::*};
 use anyhow::{Context, Result, bail, ensure};
@@ -474,6 +475,7 @@ struct SearchJob {
 }
 
 enum ReviewWork {
+    Print(Box<print_jobs::Preparation>),
     Pages(Box<page_jobs::Work>),
     SaveOverlay(Box<overlay_jobs::Save>),
     Decrypt {
@@ -490,6 +492,7 @@ enum ReviewWork {
     },
 }
 enum ReviewData {
+    Print(Box<print_jobs::Ready>),
     PageImage(Box<page_jobs::Image>),
     Exported(crate::assembly::StagedExport),
     Decrypted(Arc<Vec<u8>>),
@@ -614,7 +617,8 @@ fn recovery_completed(
                 ReviewData::Cleaned(_)
                 | ReviewData::Decrypted(_)
                 | ReviewData::Exported(_)
-                | ReviewData::PageImage(_),
+                | ReviewData::PageImage(_)
+                | ReviewData::Print(_),
             ) => {
                 bail!("Unexpected recovery metadata result")
             }
@@ -633,6 +637,7 @@ fn recovery_completed(
 
 fn review_work(work: ReviewWork, cancel: &std::sync::atomic::AtomicBool) -> Result<ReviewData> {
     let data = match work {
+        ReviewWork::Print(prepared) => ReviewData::Print(Box::new(prepared.run(cancel)?)),
         ReviewWork::Pages(work) => work.run(cancel)?,
         ReviewWork::SaveOverlay(save) => ReviewData::Exported(save.run(cancel)?),
         ReviewWork::Decrypt { bytes, password } => ReviewData::Decrypted(
@@ -803,15 +808,18 @@ fn review_completed<'a>(
                 Err(error) => review_finished(responses, id, generation, Some(units), Err(error)),
             }
         }
-        Ok(ReviewData::Decrypted(_) | ReviewData::Exported(_) | ReviewData::PageImage(_)) => {
-            review_finished(
-                responses,
-                id,
-                generation,
-                None,
-                Err("Unexpected review preparation phase".into()),
-            )
-        }
+        Ok(
+            ReviewData::Decrypted(_)
+            | ReviewData::Exported(_)
+            | ReviewData::PageImage(_)
+            | ReviewData::Print(_),
+        ) => review_finished(
+            responses,
+            id,
+            generation,
+            None,
+            Err("Unexpected review preparation phase".into()),
+        ),
     }
 }
 
@@ -831,6 +839,8 @@ pub fn start() -> Worker {
         };
         let _ = responses.send(Event::Ready);
         let mut background = Jobs::new(stopping.clone(), review_work);
+        let mut printing = print_jobs::Actor::new(stopping.clone());
+        let mut print_pending: HashMap<u64, print_jobs::Pending> = HashMap::new();
         let mut review_pending: HashMap<DocumentId, ReviewPending> = HashMap::new();
         let mut recovery_pending: HashMap<DocumentId, RecoveryPending> = HashMap::new();
         let mut working_pending: HashMap<u64, WorkingPending> = HashMap::new();
@@ -843,10 +853,13 @@ pub fn start() -> Worker {
         let mut search: Option<SearchJob> = None;
         loop {
             if stopping.stopped() { break; }
+            if let Ok(actor) = &mut printing { actor.poll(&responses); }
             if let Ok(jobs) = &background {
                 while let Some(completion) = jobs.poll() {
                     let generation = completion.ticket.request.generation;
-                    if page_pending.contains_key(&generation) {
+                    if let Some(pending) = print_pending.remove(&generation) {
+                        print_jobs::completed(&documents, pending, &mut printing, &responses, completion);
+                    } else if page_pending.contains_key(&generation) {
                         page_jobs::completed(&pdfium, &documents, &mut page_pending, jobs, &responses, completion);
                     } else if overlay_pending.contains_key(&generation) {
                         overlay_jobs::completed(&pdfium, &documents, &mut overlay_pending, jobs, &responses, completion);
@@ -929,23 +942,16 @@ pub fn start() -> Worker {
                     let event=result.unwrap_or_else(|error|Some(Event::OpenFailed(id,format!("{error:#}"))));
                     if let Some(event)=event && responses.send(event).is_err(){break;}
                 }
-                Some(Command::PrintReviewed{id,review,current,range,printer,fit,native})=>{
-                    let prepared=(||->Result<_>{let document=documents.get(&id).context("Document was closed")?;let source=crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?};let path=source.path.clone();Ok((crate::review::prepare(source,&document.pdf,&review,crate::review::ExportMode::Current)?,path))})();
-                    match prepared {
-                        Ok((prepared,path))=>{let reply=responses.clone();thread::spawn(move || {
-                            let result=(||->Result<String>{
-                                let folder=tempfile::tempdir()?;let snapshot=folder.path().join("review-print.pdf");prepared.save(&snapshot)?;
-                                if native {
-                                    #[cfg(any(target_os="linux",target_os="windows"))]
-                                    {return crate::platform::native_print(&std::fs::read(snapshot)?,&path,current,&range,&printer,fit);}
-                                    #[cfg(not(any(target_os="linux",target_os="windows")))]
-                                    {let _=(path,current);bail!("Native printing is unavailable on this platform");}
-                                }
-                                let _=(path,current);
-                                crate::platform::print_pdf(&snapshot,&range,&printer,fit)
-                            })().map_err(|e|format!("{e:#}"));let _=reply.send(Event::PrintFinished(result));
-                        });},
-                        Err(e)=>{let _=responses.send(Event::PrintFinished(Err(format!("{e:#}"))));}
+                Some(command @ (Command::PrintReviewed { .. } | Command::Print { .. })) => {
+                    let result = (|| -> Result<_> {
+                        let actor = printing.as_ref().map_err(|error| anyhow::anyhow!("{error:#}"))?;
+                        ensure!(!actor.busy() && print_pending.is_empty(), "A print action is already active");
+                        let jobs = background.as_mut().map_err(|error| anyhow::anyhow!("{error:#}"))?;
+                        print_jobs::start(&documents, jobs, command)
+                    })();
+                    match result {
+                        Ok(pending) => { print_pending.insert(pending.request.generation, pending); }
+                        Err(error) => { let _ = responses.send(Event::PrintFinished(Err(format!("{error:#}")))); }
                     }
                 }
                 Some(Command::LoadReview(id, generation))=>{
@@ -975,6 +981,13 @@ pub fn start() -> Worker {
                     if let Some(document)=documents.get(&id) {let _=responses.send(Event::Snapshot(id,document.original.clone()));}
                 }
                 Some(Command::Close(id)) => {
+                    let cancelled: Vec<_> = print_pending.iter()
+                        .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
+                    for generation in cancelled {
+                        let state = print_pending.remove(&generation).unwrap();
+                        state.request.cancel();
+                        let _ = responses.send(Event::PrintFinished(Err("Print preparation cancelled: document was closed".into())));
+                    }
                     let cancelled: Vec<_> = page_pending.iter()
                         .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
                     for generation in cancelled {
@@ -1036,29 +1049,17 @@ pub fn start() -> Worker {
                     }
                 }
                 #[cfg(any(target_os="linux",target_os="windows"))]
-                Some(Command::PrintNative { id,current,range,printer,fit }) => {
-                    let Some(document)=documents.get(&id) else{let _=responses.send(Event::PrintFinished(Err("Document was closed".into())));continue;};
-                    let original=match document.working_bytes(){Ok(bytes)=>bytes,Err(e)=>{let _=responses.send(Event::PrintFinished(Err(format!("{e:#}"))));continue;}};
-                    let path=document.path.clone();
-                    let reply=responses.clone();
-                    thread::spawn(move || {let _=reply.send(Event::PrintFinished(crate::platform::native_print(&original,&path,current,&range,&printer,fit).map_err(|e|format!("{e:#}"))));});
-                }
-                Some(Command::Print { id, range, printer, fit }) => {
-                    let original=match documents.get(&id).context("Document was closed").and_then(OpenDocument::working_bytes) {
-                        Ok(bytes)=>bytes,Err(e)=>{let _=responses.send(Event::PrintFinished(Err(format!("{e:#}"))));continue;}
-                    };
-                    let reply = responses.clone();
-                    // Spooler/print-helper latency must not block PDF rendering or searching.
-                    thread::spawn(move || {
-                        let result = (|| -> Result<String> {
-                            use std::io::Write;
-                            let mut snapshot = tempfile::Builder::new().prefix("dpdf-print-").suffix(".pdf").tempfile()?;
-                            snapshot.write_all(&original)?;
-                            snapshot.flush()?;
-                            crate::platform::print_pdf(snapshot.path(), &range, &printer, fit)
-                        })().map_err(|error| format!("{error:#}"));
-                        let _ = reply.send(Event::PrintFinished(result));
-                    });
+                Some(command @ Command::PrintNative { .. }) => {
+                    let result = (|| -> Result<_> {
+                        let actor = printing.as_ref().map_err(|error| anyhow::anyhow!("{error:#}"))?;
+                        ensure!(!actor.busy() && print_pending.is_empty(), "A print action is already active");
+                        let jobs = background.as_mut().map_err(|error| anyhow::anyhow!("{error:#}"))?;
+                        print_jobs::start(&documents, jobs, command)
+                    })();
+                    match result {
+                        Ok(pending) => { print_pending.insert(pending.request.generation, pending); }
+                        Err(error) => { let _ = responses.send(Event::PrintFinished(Err(format!("{error:#}")))); }
+                    }
                 }
                 Some(Command::SaveCopy(id, path)) => {
                     let result = documents.get(&id).context("Document was closed").and_then(|d| save_original(&d.original, &path));
@@ -1093,6 +1094,8 @@ pub fn start() -> Worker {
             }
         }
         stopping.stop();
+        if let Ok(actor) = &printing { actor.stop(); }
+        // Actor and metadata pool drops join their workers before this owner exits.
     }).expect("start PDF worker");
     Worker {
         commands,

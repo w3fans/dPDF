@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Own print preparation and immutable print actions through shutdown, supervise native dialog pipes without an interaction deadline, and cancel/reap nested helpers without retrying ambiguous submissions.
+
 - Prepare page-input snapshots and image pixels off the reader, retaining one decoded image per operation and staging cancellable unit/assembly exports for document-owner publication.
 - Cancel helper requests when tab close is accepted and atomically order staged publication against cancellation, preserving rejected-close retry and lease cleanup.
 

@@ -301,3 +301,18 @@ hosted/runtime gates are PENDING. This dependent page/image implementation integ
 publication policy; its cancelled ready replies also send a terminal error. Experienced review must assess
 both orderings, delayed registration, lease release, marker reclamation and no
 mutex held across work that needs a UI callback or native owner to complete.
+
+
+## Owned print follow-up (unqualified draft)
+
+Print preparation uses document identity until an atomic handoff claim. A separate
+single-action byte-only actor owns dialog/submission latency and normal-shutdown
+join. Closing a tab after handoff retains its immutable print action; shutdown
+cancellation is immediate through the shared application stop flag. Actor Drop
+sets that flag before joining. Native dialogs have byte limits and cancellation,
+with no qpdf-style interaction deadline. Parent-owned private scratch outlives
+child/group/job termination. Linux inherited-group nested failures deliberately
+abort the host; Windows retains nested jobs without breakaway or relaxed limits.
+See progress/T03-print-ownership-2026-11-14.md for the reproduced defect, exact
+source, containment tradeoff, tests and pending qualification/review. This changes
+the earlier unfinished-print description but does not close its review gate.
