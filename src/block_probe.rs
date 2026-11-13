@@ -844,8 +844,8 @@ pub fn run_cli(mut args: impl Iterator<Item = std::ffi::OsString>) -> Result<()>
             write_new(output.join("raw.pdf"), &baked)?;
             let clean = Document::open(engine.api.as_ref(), &baked)?;
             let mut removal_geometry = clean.geometry()?;
-            for index in 0..4 {
-                removal_geometry.bounds[index] += if index < 2 { -0.02 } else { 0.02 };
+            for (index, bound) in removal_geometry.bounds.iter_mut().enumerate() {
+                *bound += if index < 2 { -0.02 } else { 0.02 };
             }
             write_new(
                 output.join("removed.pdf"),
