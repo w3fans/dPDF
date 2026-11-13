@@ -170,8 +170,13 @@ pub struct Worker {
     thread: Option<thread::JoinHandle<()>>,
 }
 impl Worker {
-    pub fn try_send(&self, command: Command) -> Result<(), mpsc::TrySendError<Command>> {
-        self.commands.try_send(command)
+    pub fn try_send(&self, command: Command) -> Result<(), &'static str> {
+        self.commands
+            .try_send(command)
+            .map_err(|error| match error {
+                mpsc::TrySendError::Full(_) => "request queue is full",
+                mpsc::TrySendError::Disconnected(_) => "worker is disconnected",
+            })
     }
 }
 impl Drop for Worker {
