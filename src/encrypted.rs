@@ -17,9 +17,6 @@ pub fn validate_password(password: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn decrypt(bytes: &[u8], password: &str) -> Result<Arc<Vec<u8>>> {
-    decrypt_cancellable(bytes, password, None)
-}
 pub(crate) fn decrypt_cancellable(
     bytes: &[u8],
     password: &str,

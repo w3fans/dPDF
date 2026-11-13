@@ -4,7 +4,7 @@ use crate::{cache::ByteCache, document::*};
 use anyhow::{Context, Result, bail, ensure};
 use pdfium_render::prelude::*;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     path::{Path, PathBuf},
     sync::{
         Arc,
@@ -95,6 +95,30 @@ pub enum Command {
         printer: String,
         fit: bool,
     },
+}
+
+impl Command {
+    fn working_document(&self) -> Option<DocumentId> {
+        match self {
+            Self::PrintReviewed { id, .. }
+            | Self::ExportWorkspace { id, .. }
+            | Self::ExportPages { id, .. }
+            | Self::ExportMarks { id, .. }
+            | Self::Print { id, .. } => Some(*id),
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
+            Self::PrintNative { id, .. } => Some(*id),
+            _ => None,
+        }
+    }
+
+    fn preparation_failed(self, message: String) -> Event {
+        match self {
+            Self::PrintReviewed { .. } | Self::Print { .. } => Event::PrintFinished(Err(message)),
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
+            Self::PrintNative { .. } => Event::PrintFinished(Err(message)),
+            _ => Event::ExportFinished(Err(message)),
+        }
+    }
 }
 
 pub enum Event {
@@ -335,15 +359,15 @@ struct OpenDocument<'a> {
 }
 impl OpenDocument<'_> {
     fn working_bytes(&self) -> Result<Arc<Vec<u8>>> {
-        let Some(password) = &self.password else {
+        if self.password.is_none() {
             return Ok(self.original.clone());
-        };
-        if let Some(bytes) = self.unlocked.get() {
-            return Ok(bytes.clone());
         }
-        let bytes = crate::encrypted::decrypt(&self.original, password)?;
-        let _ = self.unlocked.set(bytes.clone());
-        Ok(bytes)
+        // Operation admission below prepares missing bytes off this worker.
+        // Never fall back to synchronous decryption while the reader is live.
+        self.unlocked
+            .get()
+            .cloned()
+            .context("Protected PDF preparation has not completed")
     }
 }
 struct PendingDocument {
@@ -428,6 +452,10 @@ struct SearchJob {
 }
 
 enum ReviewWork {
+    Decrypt {
+        bytes: Arc<Vec<u8>>,
+        password: String,
+    },
     Inspect {
         bytes: Arc<Vec<u8>>,
         password: Option<String>,
@@ -438,6 +466,7 @@ enum ReviewWork {
     },
 }
 enum ReviewData {
+    Decrypted(Arc<Vec<u8>>),
     Inspected {
         bytes: Arc<Vec<u8>>,
         metadata: serde_json::Value,
@@ -453,6 +482,43 @@ struct ReviewPending {
 struct RecoveryPending {
     request: Request,
     info: DocumentInfo,
+}
+
+struct WorkingPending {
+    request: Request,
+    command: Command,
+}
+
+fn working_completed(
+    documents: &HashMap<DocumentId, OpenDocument<'_>>,
+    responses: &SyncSender<Event>,
+    state: WorkingPending,
+    completion: Reply<ReviewData>,
+) -> Option<Command> {
+    let result = (|| -> Result<()> {
+        ensure!(
+            state.request.matches(&completion.ticket),
+            "Protected preparation cancelled"
+        );
+        let document = documents
+            .get(&state.request.id)
+            .context("Document was closed")?;
+        let bytes = match completion.result {
+            Ok(ReviewData::Decrypted(bytes)) => bytes,
+            Err(message) => bail!(message),
+            _ => bail!("Unexpected protected preparation result"),
+        };
+        // A review completion can have populated the same immutable snapshot.
+        let _ = document.unlocked.set(bytes);
+        Ok(())
+    })();
+    match result {
+        Ok(()) => Some(state.command),
+        Err(error) => {
+            let _ = responses.send(state.command.preparation_failed(format!("{error:#}")));
+            None
+        }
+    }
 }
 
 // Native documents stay on this PDF worker. Recovery metadata validation uses
@@ -534,6 +600,9 @@ fn recovery_completed(
 
 fn review_work(work: ReviewWork, cancel: &std::sync::atomic::AtomicBool) -> Result<ReviewData> {
     let data = match work {
+        ReviewWork::Decrypt { bytes, password } => ReviewData::Decrypted(
+            crate::encrypted::decrypt_cancellable(&bytes, &password, Some(cancel))?,
+        ),
         ReviewWork::Inspect { bytes, password } => {
             let bytes = match password {
                 Some(password) => {
@@ -699,6 +768,13 @@ fn review_completed<'a>(
                 Err(error) => review_finished(responses, id, generation, Some(units), Err(error)),
             }
         }
+        Ok(ReviewData::Decrypted(_)) => review_finished(
+            responses,
+            id,
+            generation,
+            None,
+            Err("Unexpected review preparation phase".into()),
+        ),
     }
 }
 
@@ -720,6 +796,8 @@ pub fn start() -> Worker {
         let mut background = Jobs::new(stopping.clone(), review_work);
         let mut review_pending: HashMap<DocumentId, ReviewPending> = HashMap::new();
         let mut recovery_pending: HashMap<DocumentId, RecoveryPending> = HashMap::new();
+        let mut working_pending: HashMap<u64, WorkingPending> = HashMap::new();
+        let mut prepared_commands = VecDeque::new();
         let mut documents: HashMap<DocumentId, OpenDocument<'_>> = HashMap::new();
         let mut passwords:HashMap<DocumentId,PendingDocument>=HashMap::new();
         let mut cache = ByteCache::new(64 * 1024 * 1024);
@@ -728,20 +806,41 @@ pub fn start() -> Worker {
             if stopping.stopped() { break; }
             if let Ok(jobs) = &background {
                 while let Some(completion) = jobs.poll() {
-                    if recovery_pending.contains_key(&completion.ticket.request.id) {
+                    let generation = completion.ticket.request.generation;
+                    if let Some(state) = working_pending.remove(&generation) {
+                        if let Some(command) = working_completed(&documents, &responses, state, completion) {
+                            prepared_commands.push_back(command);
+                        }
+                    } else if recovery_pending.contains_key(&completion.ticket.request.id) {
                         recovery_completed(&mut documents, &mut recovery_pending, &responses, completion);
                     } else {
                         review_completed(&pdfium, &mut documents, &mut cache, &mut review_pending, jobs, &responses, completion);
                     }
                 }
             }
-            let command = if search.is_some() { requests.try_recv().ok() } else {
+            let command = if let Some(command) = prepared_commands.pop_front() { Some(command) } else if search.is_some() { requests.try_recv().ok() } else {
                 match requests.recv_timeout(Duration::from_millis(20)) {
                     Ok(command) => Some(command),
                     Err(mpsc::RecvTimeoutError::Timeout) => None,
                     Err(mpsc::RecvTimeoutError::Disconnected) => break,
                 }
             };
+            if let Some(id) = command.as_ref().and_then(Command::working_document)
+                && let Some(document) = documents.get(&id)
+                && let Some(password) = &document.password
+                && document.unlocked.get().is_none()
+            {
+                let command = command.unwrap();
+                let request = background.as_mut().map_err(|error| anyhow::anyhow!("{error:#}"))
+                    .and_then(|jobs| jobs.submit(id, ReviewWork::Decrypt {
+                        bytes: document.original.clone(), password: password.clone(),
+                    }));
+                match request {
+                    Ok(request) => { working_pending.insert(request.generation, WorkingPending { request, command }); }
+                    Err(error) => { let _ = responses.send(command.preparation_failed(format!("{error:#}"))); }
+                }
+                continue;
+            }
             match command {
                 Some(request @ (Command::Open(..) | Command::OpenSnapshot(..))) => {
                     let (id,path,snapshot)=match request {
@@ -844,6 +943,13 @@ pub fn start() -> Worker {
                     if let Some(document)=documents.get(&id) {let _=responses.send(Event::Snapshot(id,document.original.clone()));}
                 }
                 Some(Command::Close(id)) => {
+                    let cancelled: Vec<_> = working_pending.iter()
+                        .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
+                    for generation in cancelled {
+                        let state = working_pending.remove(&generation).unwrap();
+                        state.request.cancel();
+                        let _ = responses.send(state.command.preparation_failed("Protected preparation cancelled: document was closed".into()));
+                    }
                     if let Some(pending) = review_pending.remove(&id) { pending.request.cancel(); }
                     if let Some(pending) = recovery_pending.remove(&id) { pending.request.cancel(); }
                     passwords.remove(&id);

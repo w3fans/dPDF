@@ -34,22 +34,43 @@ def main():
     private = module('helper_display', 'private-display.py')
     with tempfile.TemporaryDirectory(prefix='dpdf-helper-window-') as directory:
         root = Path(directory)
-        for mode in ('close', 'retry', 'shutdown', 'recovery'):
+        for mode in ('close', 'retry', 'shutdown', 'recovery', 'protected-print', 'protected-export'):
             folder = root / mode
             folder.mkdir()
             source = folder / 'generated50.pdf'
             source.write_bytes(sample.make_pdf(50))
+            if mode.startswith('protected-'):
+                encrypted = folder / 'protected50.pdf'
+                job = folder / 'generated-encryption.json'
+                job.write_text(json.dumps({'inputFile': str(source), 'outputFile': str(encrypted),
+                    'encrypt': {'userPassword': 'generated-only helper test',
+                                'ownerPassword': 'generated-owner', '256bit': {}}}))
+                job.chmod(0o600)
+                try:
+                    subprocess.run([str(args.qpdf.resolve()), '--job-json-file=' + str(job)],
+                                   check=True, capture_output=True, timeout=10)
+                finally:
+                    job.unlink()
+                source = encrypted
+            destination = folder / 'existing-output.pdf'
+            destination.write_bytes(b'pre-existing generated destination must survive cancellation')
+            destination_before = destination.read_bytes()
             original = hashlib.sha256(source.read_bytes()).hexdigest()
             ready = folder / 'ready.json'
             arm = folder / 'armed'
             driver = folder / 'helper.py'
-            # One owned process, no shell children. Only the first metadata call
-            # stalls; cancellation/retry must allow a subsequent real qpdf call.
+            # Helpers exec directly without shell children. Metadata modes stall
+            # the first inspection; protected modes stall every decryption.
+            condition = ('"--decrypt" in sys.argv' if mode.startswith('protected-') else
+                         'sys.argv[1:2]==["--json"] and not ready.exists()' +
+                         (' and arm.exists()' if mode == 'recovery' else ''))
             driver.write_text(
                 'import json,os,time,sys\nfrom pathlib import Path\n'
                 f'ready=Path({str(ready)!r});arm=Path({str(arm)!r})\n'
-                f'if sys.argv[1:2]==["--json"] and not ready.exists(){" and arm.exists()" if mode == "recovery" else ""}:\n'
-                ' ready.write_text(json.dumps({"pid":os.getpid(),"start":Path(f"/proc/{os.getpid()}/stat").read_text().rsplit(")",1)[1].split()[19]}))\n'
+                f'if {condition}:\n'
+                ' identity=json.dumps({"pid":os.getpid(),"start":Path(f"/proc/{os.getpid()}/stat").read_text().rsplit(")",1)[1].split()[19]})\n'
+                ' (ready.parent/f"helper-{os.getpid()}.json").write_text(identity)\n'
+                ' ready.write_text(identity)\n'
                 ' deadline=time.monotonic()+30\n'
                 ' while time.monotonic()<deadline:time.sleep(.02)\n'
                 f'os.execv({str(args.qpdf.resolve())!r}, [{str(args.qpdf.resolve())!r}, *sys.argv[1:]])\n',
@@ -59,28 +80,21 @@ def main():
                               shlex.quote(str(driver)) + ' "$@"\n', encoding='utf-8')
             helper.chmod(0o700)
 
-            def owned_pid():
-                if not ready.exists():
-                    return None
-                identity = json.loads(ready.read_text())
-                pid = identity['pid']
-                try:
-                    fields = Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()
-                except FileNotFoundError:
-                    return None
-                if fields[19] != identity['start']:
-                    return None
-                command = Path(f'/proc/{pid}/cmdline')
-                try:
-                    data = command.read_bytes()
-                except FileNotFoundError:
-                    return None
-                if str(driver).encode() in data.split(b'\0'):
-                    return pid
-                # An unreaped zombie still retains its process identity.
-                if not data and fields[0] == 'Z':
-                    return pid
-                return None
+            def owned_pids():
+                result = []
+                for record in folder.glob('helper-*.json'):
+                    identity = json.loads(record.read_text())
+                    pid = identity['pid']
+                    try:
+                        fields = Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()
+                        data = Path(f'/proc/{pid}/cmdline').read_bytes()
+                    except FileNotFoundError:
+                        continue
+                    if fields[19] == identity['start'] and (
+                            str(driver).encode() in data.split(b'\0') or
+                            (not data and fields[0] == 'Z')):
+                        result.append(pid)
+                return result
 
             try:
                 with private.display(folder, args.xvfb) as env:
@@ -96,7 +110,10 @@ def main():
                         assert 'durable checkpoint written' in prepared.stdout
                         assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1
                         env['DPDF_SMOKE_RECOVERY'] = 'read'
-                    env.update(DPDF_SMOKE_HELPER=mode, DPDF_SMOKE_HELPER_READY=str(ready),
+                    env.update(DPDF_SMOKE_PASSWORD_VALUE='generated-only helper test',
+                               DPDF_SMOKE_HELPER_DESTINATION=str(destination),
+                               GTK_PRINT_BACKENDS='file', GTK_USE_PORTAL='0',
+                               DPDF_SMOKE_HELPER=mode, DPDF_SMOKE_HELPER_READY=str(ready),
                                DPDF_SMOKE_HELPER_ARM=str(arm),
                                DPDF_PDFIUM_LIBRARY=str(args.pdfium.resolve()), DPDF_QPDF_BINARY=str(helper),
                                SLINT_SCALE_FACTOR='1')
@@ -112,14 +129,19 @@ def main():
                     expected = {'close': 'closed stalled document and reopened without a stale completion',
                                 'retry': 'retry replaced stalled metadata without accepting its cancelled completion',
                                 'shutdown': 'quitting with a live metadata helper',
-                                'recovery': 'recovery metadata stayed pending until normal shutdown'}[mode]
+                                'recovery': 'recovery metadata stayed pending until normal shutdown',
+                                'protected-print': 'protected print preparation stayed pending until normal shutdown',
+                                'protected-export': 'tab close cancelled protected export without publishing a late result'}[mode]
                     assert expected in result.stdout, expected
                     deadline = time.monotonic() + 1
-                    while owned_pid() is not None and time.monotonic() < deadline:
+                    while owned_pids() and time.monotonic() < deadline:
                         time.sleep(.01)
-                    assert owned_pid() is None, 'Owned helper remained live/unreaped after completion'
+                    assert not owned_pids(), 'Owned helper remained live/unreaped after completion'
                     if mode == 'recovery':
                         assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1, 'Cancelled recovery lost its durable checkpoint'
+                    if mode.startswith('protected-'):
+                        assert len(list(folder.glob('helper-*.json'))) == 1, 'Cancelled queued decryption was started'
+                    assert destination.read_bytes() == destination_before, 'Cancelled operation changed its existing destination'
                     assert hashlib.sha256(source.read_bytes()).hexdigest() == original
                     print(f'PASS: helper {mode}, reader responsive, child reaped, source unchanged '
                           f'({time.monotonic() - started:.2f}s)', flush=True)
@@ -127,8 +149,7 @@ def main():
                 print(error.stdout or '', error.stderr or '', flush=True)
                 raise
             finally:
-                pid = owned_pid()
-                if pid is not None:
+                for pid in owned_pids():
                     # Failure cleanup only for this generated fixture identity.
                     try:
                         if os.getpgid(pid) == pid:

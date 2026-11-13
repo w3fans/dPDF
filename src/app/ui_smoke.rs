@@ -45,8 +45,21 @@ pub(super) struct SmokeCheck {
 impl SmokeCheck {
     fn helper_advance(&mut self, app: &mut Application, ui: &Workspace, mode: &str) {
         let result = (|| -> anyhow::Result<()> {
-            if !matches!(mode, "close" | "retry" | "shutdown" | "recovery") {
+            if !matches!(
+                mode,
+                "close"
+                    | "retry"
+                    | "shutdown"
+                    | "recovery"
+                    | "protected-print"
+                    | "protected-export"
+            ) {
                 anyhow::bail!("Unknown helper diagnostic mode");
+            }
+            if mode.starts_with("protected-") && ui.get_password_required() {
+                ui.set_password_text(std::env::var("DPDF_SMOKE_PASSWORD_VALUE")?.into());
+                self.pending_key = Some((false, slint::platform::Key::Return.into()));
+                return Ok(());
             }
             let marker = PathBuf::from(
                 std::env::var_os("DPDF_SMOKE_HELPER_READY")
@@ -94,6 +107,35 @@ impl SmokeCheck {
                     }
                     self.tab_identity = Some(app.tabs[app.active].info.id);
                     self.tab_reopen = Some(app.tabs[app.active].info.path.clone());
+                    if mode == "protected-print" {
+                        app.request_native_print(ui, false);
+                        if !app.print_pending {
+                            anyhow::bail!("Protected print was not admitted");
+                        }
+                    } else if mode == "protected-export" {
+                        let destination = PathBuf::from(
+                            std::env::var_os("DPDF_SMOKE_HELPER_DESTINATION").ok_or_else(|| {
+                                anyhow::anyhow!("Missing protected export destination")
+                            })?,
+                        );
+                        if !app.command(
+                            ui,
+                            Command::ExportPages {
+                                id: app.tabs[app.active].info.id,
+                                operation: crate::assembly::PageOperation {
+                                    kind: crate::assembly::OperationKind::Extract,
+                                    pages: "1".into(),
+                                    source_pages: String::new(),
+                                },
+                                additional: vec![],
+                                destination,
+                            },
+                        ) {
+                            anyhow::bail!("Protected export was not admitted");
+                        }
+                        app.export_pending = true;
+                        ui.set_export_busy(true);
+                    }
                     app.go_to(ui, 24);
                     self.stage = 1;
                 }
@@ -103,6 +145,23 @@ impl SmokeCheck {
                     }
                     println!("helper: rendered page 25 while metadata remained stalled");
                     match mode {
+                        "protected-print" => {
+                            if !app.print_pending {
+                                anyhow::bail!("Protected print completed before decryption");
+                            }
+                            println!(
+                                "helper: protected print preparation stayed pending until normal shutdown"
+                            );
+                            self.stage = 99;
+                            let _ = slint::quit_event_loop();
+                        }
+                        "protected-export" => {
+                            if !app.export_pending {
+                                anyhow::bail!("Protected export completed before decryption");
+                            }
+                            app.close(ui, app.active);
+                            self.stage = 7;
+                        }
                         "close" => {
                             app.close(ui, app.active);
                             self.stage = 2;
@@ -119,6 +178,13 @@ impl SmokeCheck {
                             let _ = slint::quit_event_loop();
                         }
                     }
+                }
+                7 if app.tabs.is_empty() && !app.export_pending && !ui.get_export_busy() => {
+                    println!(
+                        "helper: tab close cancelled protected export without publishing a late result"
+                    );
+                    self.stage = 99;
+                    let _ = slint::quit_event_loop();
                 }
                 2 if app.tabs.is_empty() => {
                     app.open(ui, self.tab_reopen.clone().unwrap());

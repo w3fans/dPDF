@@ -1,11 +1,10 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: prior draft PR #10 candidate 9519b5c passed hosted CI and the generated
-responsive-reader replay (see progress/T03-reader-responsive-replay.json). The
-current increment adds asynchronous recovery validation on main de7a53d; new
-compiled/runtime evidence is pending.
-Experienced lifecycle review remains required before merge; broader native
-acceptance is pending. This does not qualify all helper callers or production baking.
+Status: recovery candidate 2d75b74b passed all jobs in run 43506767494 and
+native replay; see progress/T03-recovery-2026-11-13.md. The current increment
+also defers early protected print/export decryption. Its compiled/runtime
+qualification is pending. Experienced lifecycle review remains required before
+merge. This does not qualify all helper callers or production baking.
 
 ## Reproduced problem
 
@@ -66,8 +65,8 @@ to finish shutdown. The candidate must remain a draft until that gate is satisfi
 
 This does not promise cleanup after SIGKILL, native-engine preemption, cancellation
 of user-owned print dialogs, or supervision of every existing detached export/print
-thread. Other preparation paths still using `working_bytes`/metadata on the PDF
-worker require subsequent migration; this is the `LoadReview` increment.
+thread. Overlay/image metadata and detached export/print ownership still require
+subsequent migration. Native user dialogs retain their existing separate policy.
 
 ## Required evidence
 
@@ -120,11 +119,53 @@ metadata stall only after ordinary reading is ready, begins recovery, renders
 page 25 in the still-open original tab, then exits normally with recovery pending.
 It requires the owned helper reaped, source unchanged and checkpoint retained.
 Existing changed/missing/protected recovery, geometry, passwords and review suites
-remain required. New build, this regression and native replay are PENDING until
-actual exact-source evidence is recorded.
+remain required. Recovery candidate 2d75b74b passed the full build, this regression and native
+replay in run 43506767494. That evidence is scoped to that candidate; subsequent
+increments require their own gates.
 
 Experienced lifecycle review must include this unpublished-to-opened transition,
 pending document cleanup, pool admission failure and shutdown ordering on the
 reviewed head. The prior review request remains outstanding; green CI alone does
 not satisfy it. Production baking and unrelated detached export/print ownership
 are outside this increment and remain unqualified.
+
+
+## Early protected print/export preparation increment
+
+A generated encrypted 50-page PDF and two controlled decryption helpers reproduced
+a remaining stall on recovery candidate 2d75b74b (Linux merge b067f63f). Ctrl+P
+before initial review inspection finishes invokes another synchronous decrypt
+through working_bytes. Page status advances to 25 while the viewport/thumbnail
+remain blank until release. Both children were released/reaped and the source
+remained unchanged; see progress/T03-protected-preparation-stall.json.
+
+All six print/export command variants now defer missing protected working bytes
+through the existing two-lease helper pool. A pending record owns the command
+and its document/request identity; no native handle enters it. Commands resume
+on the PDF worker only after a matching completion caches immutable decrypted
+bytes. The reader-side working_bytes accessor now refuses a missing cache; it
+has no synchronous decryption fallback. Passwords remain private process memory
+and child stdin, never command arguments, logs or durable drafts.
+
+Multiple operations are keyed by pool generation, so print and export requests
+cannot overwrite one another. Admission failure produces the appropriate terminal
+print/export event. Tab close cancels all pending commands for that document and
+produces terminal failures that clear UI busy state. Late replies cannot restart
+a closed operation. Normal shutdown cancels active/queued work and joins the
+existing pool; cancelled queued decryptions never start a child. Prepared commands
+are drained before accepting more operations, keeping their queue within the
+same two-result admission bound. A concurrently completed review may have already
+populated the identical immutable decrypted snapshot.
+
+Two new generated window cases keep initial decryption stalled, queue an early
+native print or page export, then navigate to page 25. Print quits normally while
+preparation is pending; export closes its tab and requires busy state cleared.
+Both require source/existing destination preservation, child reaping, and exactly
+one child launch (queued decryption must not start after cancellation). GTK is
+limited to the file backend; no print is submitted. Full current-source gates and
+native replay remain PENDING for this increment. Existing detached final export/
+print threads and overlay/image metadata are still separate unfinished work.
+
+The required reviewer must assess this command retention/resumption, shared
+admission bound, completion routing, failure event and close/shutdown policy on
+the actual reviewed head. Prior green CI does not waive that review gate.

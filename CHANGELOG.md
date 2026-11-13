@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Defer missing protected print/export working bytes through the bounded helper queue, preserving reader navigation and cancelling queued preparation when its tab closes.
+
 - Prepare cancellable background review and recovery metadata jobs so stalled helpers can leave reader navigation responsive; validate recovery dimensions before publishing the document, reject stale completions and join helper cleanup on normal shutdown.
 
 - Cancel uncommitted page/zoom field values and restore reader focus when switching documents, including Ctrl+Tab.
