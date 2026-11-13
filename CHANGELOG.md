@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep Linux staging and summary in separate workflow steps and guard duplicate step keys with a source-only regression test.
+
 - Strengthen disposable-account MSI upgrade/default/user-data checks, retain source-bound Linux test runtimes, and make the generated CUPS script fixture robust to executable-file write locks without adding production print retries.
 
 - Make release-adapter unit tests portable in public CI, separate installed-controller integration, use the verified tracked policy, and reject three-digit preview results before writing files.
