@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add a generated controlled-stall characterization test for qpdf decryption before changing helper supervision.
+
 - Record verified public preview delivery and the selected public Actions/local COPR publication roles.
 
 - Run bounded Windows installer packaging under the current PowerShell host so required hashing commands resolve consistently.

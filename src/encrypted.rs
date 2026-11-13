@@ -111,6 +111,59 @@ mod tests {
             .to_string();
         assert!(!error.contains(password));
     }
+    // Characterize the baseline stall before changing process supervision. The
+    // fixture releases cooperatively and has its own finite fallback lifetime.
+    #[cfg(unix)]
+    #[test]
+    fn stalled_helper_holds_decryption_until_fixture_release() {
+        use std::{
+            os::unix::fs::PermissionsExt,
+            sync::mpsc,
+            thread,
+            time::{Duration, Instant},
+        };
+        let folder = tempfile::tempdir().unwrap();
+        let helper = folder.path().join("qpdf-stall-fixture");
+        let ready = folder.path().join("ready");
+        let release = folder.path().join("release");
+        let script = format!(
+            "#!/bin/sh\ncat >/dev/null\nprintf ready > '{}'\ni=0\nwhile [ ! -e '{}' ] && [ \"$i\" -lt 100 ]; do sleep 0.05; i=$((i+1)); done\ncat \"$4\"\n",
+            ready.display(),
+            release.display()
+        );
+        std::fs::write(&helper, script).unwrap();
+        std::fs::set_permissions(&helper, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let original = b"%PDF generated stalled-helper snapshot";
+        let (tx, rx) = mpsc::channel();
+        let worker = thread::spawn(move || {
+            let result = decrypt_with(original, "generated password", &helper)
+                .map_err(|error| error.to_string());
+            let _ = tx.send(result);
+        });
+        let startup = Instant::now();
+        while !ready.exists() && startup.elapsed() < Duration::from_secs(5) {
+            thread::sleep(Duration::from_millis(10));
+        }
+        let started = ready.exists();
+        let stalled = matches!(
+            rx.recv_timeout(Duration::from_millis(250)),
+            Err(mpsc::RecvTimeoutError::Timeout)
+        );
+        // Release before assertions so a failed observation still cleans up.
+        std::fs::write(&release, b"release").unwrap();
+        let result = rx.recv_timeout(Duration::from_secs(10));
+        worker.join().unwrap();
+        assert!(
+            started,
+            "Generated helper did not reach its controlled stall"
+        );
+        assert!(
+            stalled,
+            "Decryption unexpectedly completed before fixture release"
+        );
+        assert_eq!(result.unwrap().unwrap().as_slice(), original);
+    }
+
     #[test]
     fn password_validation_preserves_spaces_and_unicode_without_echoing_rejected_input() {
         assert!(validate_password("  Žig čšž \"$`  ").is_ok());
