@@ -9,6 +9,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import publish_report
@@ -41,6 +42,36 @@ def check_ci_step_keys(content):
 
 
 class Contracts(unittest.TestCase):
+    def test_job_memory_metrics_preserve_committed_peak_and_limit(self):
+        class Kernel:
+            def QueryInformationJobObject(self, job, info, pointer, length, returned):
+                self_outer.assertEqual((job, info, length, returned),
+                                       (123, 9, windows_job.C.sizeof(windows_job.EXTENDED_LIMITS), None))
+                usage = windows_job.C.cast(pointer, windows_job.C.POINTER(windows_job.EXTENDED_LIMITS)).contents
+                usage.JobMemoryLimit = 2 * 1024 ** 3
+                usage.PeakJobMemoryUsed = 1900000000
+                usage.PeakProcessMemoryUsed = 1700000000
+                usage.BasicLimitInformation.LimitFlags = 0x2200
+                return 1
+        self_outer = self
+        data = windows_job.memory_metrics(Kernel(), 123)
+        self.assertEqual(data['status'], 'observed')
+        self.assertEqual(data['job_memory_limit_bytes'], 2 * 1024 ** 3)
+        self.assertEqual(data['peak_job_memory_bytes'], 1900000000)
+        self.assertEqual(data['peak_process_memory_bytes'], 1700000000)
+        self.assertEqual(data['limit_flags'], 0x2200)
+        self.assertIn('not RSS', data['measurement'])
+
+    def test_unavailable_job_memory_is_not_reported_as_zero_usage(self):
+        class Kernel:
+            def QueryInformationJobObject(self, *args):
+                return 0
+        with patch.object(windows_job.C, 'get_last_error', return_value=5, create=True):
+            data = windows_job.memory_metrics(Kernel(), 123)
+        self.assertEqual(data['status'], 'unavailable')
+        self.assertEqual(data['windows_error'], 5)
+        self.assertNotIn('peak_job_memory_bytes', data)
+
     def test_ci_step_keys_are_unique(self):
         source = Path(__file__).resolve().parents[2]
         check_ci_step_keys((source / '.github/workflows/ci.yml').read_text())

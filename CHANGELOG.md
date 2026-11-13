@@ -4,6 +4,8 @@
 
 - Keep unhandled text-field keys within their editing context so a platform-specific Redo shortcut cannot change independent PDF review or mark history.
 
+- Retain observed Windows job committed-memory peaks beside native validation logs and compile generated UI separately from application code under the existing build limits.
+
 - Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
 
 - Refresh Windows notices from the native target graph, retaining exact notice bytes and excluding Linux build-host packages.
