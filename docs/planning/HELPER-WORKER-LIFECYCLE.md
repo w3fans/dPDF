@@ -1,11 +1,9 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: protected preparation candidate 8a26ab45 passed every job in run
-43514021130, all six helper regressions and the original native Ctrl+P/page-25
-replay. The current overlay preflight/staged-publication increment is unqualified
-until its own hosted/runtime gates pass. Experienced lifecycle review remains
-required before merging PR #10. This does not qualify every helper caller or
-production baking.
+Status: draft stacked image/page-preparation increment. Its own compiled/runtime
+qualification and experienced lifecycle review are PENDING. Parent overlay and
+protected qualification retain their exact source scope in PR #10; no prior pass
+is transferred to these changes. Production baking remains disabled.
 
 ## Reproduced problem
 
@@ -224,3 +222,50 @@ hosted gates remain required. Current-source CI and replay are PENDING.
 Experienced review must cover lease continuation, native handle ownership,
 publication ordering, alias races, cancellation of every helper, TempPath teardown
 and the intentionally unfinished image/page-export/native-dialog ownership paths.
+
+
+## Sequential page-input and image preparation increment
+
+Native replacement of page 1 from a fixture photo in a generated 50-page,
+UserUnit=2 document reproduced a blank page 25 until target-unit metadata returned.
+The native file/save dialogs used a private GTK portal, the separate output then
+validated, the source stayed unchanged and the helper was reaped. See
+progress/T03-image-stall-reproduction.json. This is separate from overlay export.
+
+The page operation retains one admission lease across all inputs and phases.
+The PDF worker first reduces target page geometry to scalar values. The helper
+worker reads one immutable input snapshot, lazily validates replacement units,
+and decodes/orients/resizes/encodes one image. A byte/pixel-only completion returns
+to the PDF worker for native image-object construction and serialization. Those
+native documents are destroyed there before returning raw bytes to the helper.
+The helper finalizes UserUnit and continues with the next input using the same
+lease. It never accumulates decoded RGBA for every selected image. PDF input
+snapshots and generated PDF bytes accumulate as in the existing page workflow;
+this is not a complete measured aggregate RSS bound (T05 remains open).
+
+Existing PNG/JPEG compressed/decoded/resize limits and original JPEG preservation
+are retained. Input snapshots use cancellable chunks and fallible reservation;
+regular files are required and size changes during reading are refused. OS file
+I/O and image-codec calls are not preempted inside a call; cancellation is checked
+between chunks/phases. No filesystem-latency guarantee is inferred from qpdf's
+process deadlines. Source paths stay attached for source/output alias checks.
+Selected protected secondary sources still need T07's separate prompt queue.
+
+All page operations, including no-image extraction, finish in the owned pool with
+cancellable assembly, metadata/bookmark checks and private sibling staging.
+Close cancels preparation/finalization and removes pending identity; late pixel
+or staged replies are discarded. Only a live matching document owner can publish.
+The existing detached page-export thread is removed. Standalone CLI and GUI use
+the same image preparation/native construction/unit APIs; CLI coordinates them in
+its own process before UI creation. No PDFium initialization/handle crosses into
+the helper pool.
+
+Five additional generated window cases hold target-unit inspection, image unit
+rewrite, image assembly and no-image assembly; another cancels a mixed JPEG/PNG/PDF
+merge and retries after reopening. They require reader page 25 while stalled,
+normal shutdown/close cleanup, unchanged sources/existing destination, no staging
+leftovers, and a validated 55-page retry output. Original native reproduction must
+also be replayed on the built candidate. Full debug/release/Clippy, page/alias/unit/
+password/recovery and native Windows gates remain required. Print preparation,
+quick-print and native-dialog ownership/cancellation remain separate unfinished
+T03 work. The established experienced lifecycle review gate still applies.

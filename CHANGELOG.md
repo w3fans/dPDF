@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Prepare page-input snapshots and image pixels off the reader, retaining one decoded image per operation and staging cancellable unit/assembly exports for document-owner publication.
+
 - Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
 
 - Keep overlay preflight and final exports in the owned helper queue, staging validated bytes for publication by the document owner and discarding late results after tab close.

@@ -496,6 +496,21 @@ pub fn export_plan(
     export_plan_cancellable(sources, destination, preserve_catalog, create_plan, None)
 }
 
+pub(crate) fn export_cancellable(
+    sources: &[SourceSnapshot],
+    operation: &PageOperation,
+    destination: &Path,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<ExportResult> {
+    export_plan_cancellable(
+        sources,
+        destination,
+        operation.kind != OperationKind::Extract,
+        |counts| build_plan(counts, operation),
+        cancel,
+    )
+}
+
 pub(crate) fn export_plan_cancellable(
     sources: &[SourceSnapshot],
     destination: &Path,

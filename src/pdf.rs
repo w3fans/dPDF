@@ -1,5 +1,6 @@
 //! PDFium lives on one worker thread. No PDFium handles or borrowed objects enter the UI.
 mod overlay_jobs;
+mod page_jobs;
 use crate::background_jobs::{Cancellation, Jobs, Reply, Request};
 use crate::{cache::ByteCache, document::*};
 use anyhow::{Context, Result, bail, ensure};
@@ -453,6 +454,7 @@ struct SearchJob {
 }
 
 enum ReviewWork {
+    Pages(Box<page_jobs::Work>),
     SaveOverlay(Box<overlay_jobs::Save>),
     Decrypt {
         bytes: Arc<Vec<u8>>,
@@ -468,6 +470,7 @@ enum ReviewWork {
     },
 }
 enum ReviewData {
+    PageImage(Box<page_jobs::Image>),
     Exported(crate::assembly::StagedExport),
     Decrypted(Arc<Vec<u8>>),
     Inspected {
@@ -587,7 +590,12 @@ fn recovery_completed(
                 }
                 Ok(info)
             }
-            Ok(ReviewData::Cleaned(_) | ReviewData::Decrypted(_) | ReviewData::Exported(_)) => {
+            Ok(
+                ReviewData::Cleaned(_)
+                | ReviewData::Decrypted(_)
+                | ReviewData::Exported(_)
+                | ReviewData::PageImage(_),
+            ) => {
                 bail!("Unexpected recovery metadata result")
             }
             Err(error) => bail!("{error}"),
@@ -605,6 +613,7 @@ fn recovery_completed(
 
 fn review_work(work: ReviewWork, cancel: &std::sync::atomic::AtomicBool) -> Result<ReviewData> {
     let data = match work {
+        ReviewWork::Pages(work) => work.run(cancel)?,
         ReviewWork::SaveOverlay(save) => ReviewData::Exported(save.run(cancel)?),
         ReviewWork::Decrypt { bytes, password } => ReviewData::Decrypted(
             crate::encrypted::decrypt_cancellable(&bytes, &password, Some(cancel))?,
@@ -774,13 +783,15 @@ fn review_completed<'a>(
                 Err(error) => review_finished(responses, id, generation, Some(units), Err(error)),
             }
         }
-        Ok(ReviewData::Decrypted(_) | ReviewData::Exported(_)) => review_finished(
-            responses,
-            id,
-            generation,
-            None,
-            Err("Unexpected review preparation phase".into()),
-        ),
+        Ok(ReviewData::Decrypted(_) | ReviewData::Exported(_) | ReviewData::PageImage(_)) => {
+            review_finished(
+                responses,
+                id,
+                generation,
+                None,
+                Err("Unexpected review preparation phase".into()),
+            )
+        }
     }
 }
 
@@ -804,6 +815,7 @@ pub fn start() -> Worker {
         let mut recovery_pending: HashMap<DocumentId, RecoveryPending> = HashMap::new();
         let mut working_pending: HashMap<u64, WorkingPending> = HashMap::new();
         let mut overlay_pending: HashMap<u64, overlay_jobs::Pending> = HashMap::new();
+        let mut page_pending: HashMap<u64, page_jobs::Pending> = HashMap::new();
         let mut prepared_commands = VecDeque::new();
         let mut documents: HashMap<DocumentId, OpenDocument<'_>> = HashMap::new();
         let mut passwords:HashMap<DocumentId,PendingDocument>=HashMap::new();
@@ -814,7 +826,9 @@ pub fn start() -> Worker {
             if let Ok(jobs) = &background {
                 while let Some(completion) = jobs.poll() {
                     let generation = completion.ticket.request.generation;
-                    if overlay_pending.contains_key(&generation) {
+                    if page_pending.contains_key(&generation) {
+                        page_jobs::completed(&pdfium, &documents, &mut page_pending, jobs, &responses, completion);
+                    } else if overlay_pending.contains_key(&generation) {
                         overlay_jobs::completed(&pdfium, &documents, &mut overlay_pending, jobs, &responses, completion);
                     } else if let Some(state) = working_pending.remove(&generation) {
                         if let Some(command) = working_completed(&documents, &responses, state, completion) {
@@ -941,6 +955,13 @@ pub fn start() -> Worker {
                     if let Some(document)=documents.get(&id) {let _=responses.send(Event::Snapshot(id,document.original.clone()));}
                 }
                 Some(Command::Close(id)) => {
+                    let cancelled: Vec<_> = page_pending.iter()
+                        .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
+                    for generation in cancelled {
+                        let state = page_pending.remove(&generation).unwrap();
+                        state.request.cancel();
+                        let _ = responses.send(Event::ExportFinished(Err("Page export cancelled: document was closed".into())));
+                    }
                     let cancelled: Vec<_> = overlay_pending.iter()
                         .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
                     for generation in cancelled {
@@ -986,26 +1007,12 @@ pub fn start() -> Worker {
                     let _ = responses.send(Event::SelectedText { id, token, text: result });
                 }
                 Some(Command::ExportPages { id, operation, additional, destination }) => {
-                    let original=match documents.get(&id).context("Document was closed").and_then(|d|Ok(crate::assembly::SourceSnapshot{path:d.path.clone(),bytes:d.working_bytes()?})) {
-                        Ok(source)=>source,Err(e)=>{let _=responses.send(Event::ExportFinished(Err(format!("{e:#}"))));continue;}
-                    };
-                    // Image creation shares this worker's PDFium instance. Never initialize or
-                    // destroy another PDFium library while the reader has live documents.
-                    let prepared = crate::image_pages::prepare(&pdfium, &documents[&id].pdf, &original, &operation, &additional);
-                    let mut sources = vec![original];
-                    match prepared {
-                        Ok(additional) => sources.extend(additional),
-                        Err(error) => {
-                            let _ = responses.send(Event::ExportFinished(Err(format!("{error:#}"))));
-                            continue;
-                        }
+                    let result = background.as_mut().map_err(|error| anyhow::anyhow!("{error:#}"))
+                        .and_then(|jobs| page_jobs::start(&documents, jobs, id, operation, additional, destination));
+                    match result {
+                        Ok(state) => { page_pending.insert(state.request.generation, state); }
+                        Err(error) => { let _ = responses.send(Event::ExportFinished(Err(format!("{error:#}")))); }
                     }
-                    let reply = responses.clone();
-                    thread::spawn(move || {
-                        let result = crate::assembly::export(&sources, &operation, &destination)
-                            .map_err(|error| format!("{error:#}"));
-                        let _ = reply.send(Event::ExportFinished(result));
-                    });
                 }
                 #[cfg(any(target_os="linux",target_os="windows"))]
                 Some(Command::PrintNative { id,current,range,printer,fit }) => {
