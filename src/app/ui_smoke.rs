@@ -25,6 +25,8 @@ pub(super) struct SmokeCheck {
     password_queue_started: bool,
     review_source: Option<usize>,
     review_marks: usize,
+    history_review: Option<crate::review::Review>,
+    history_generation: u64,
     usage_fixture: Option<crate::marks::AssetUse>,
     pub(super) pending_pointer: Vec<slint::platform::WindowEvent>,
     tab_reopen: Option<PathBuf>,
@@ -43,7 +45,7 @@ pub(super) struct SmokeCheck {
 impl SmokeCheck {
     fn helper_advance(&mut self, app: &mut Application, ui: &Workspace, mode: &str) {
         let result = (|| -> anyhow::Result<()> {
-            if !matches!(mode, "close" | "retry" | "shutdown") {
+            if !matches!(mode, "close" | "retry" | "shutdown" | "recovery") {
                 anyhow::bail!("Unknown helper diagnostic mode");
             }
             let marker = PathBuf::from(
@@ -51,6 +53,38 @@ impl SmokeCheck {
                     .ok_or_else(|| anyhow::anyhow!("Missing helper readiness path"))?,
             );
             match self.stage {
+                0 if mode == "recovery"
+                    && ui.get_review_ready()
+                    && !app.recovery_candidates.is_empty()
+                    && app.pages.iter().any(|p| p.ready) =>
+                {
+                    let arm = PathBuf::from(
+                        std::env::var_os("DPDF_SMOKE_HELPER_ARM")
+                            .ok_or_else(|| anyhow::anyhow!("Missing recovery helper arm path"))?,
+                    );
+                    std::fs::write(arm, b"armed")?;
+                    self.tab_identity = Some(app.tabs[app.active].info.id);
+                    app.recover_draft(ui, false);
+                    self.stage = 5;
+                }
+                5 if marker.exists() && app.recovering.is_some() => {
+                    app.go_to(ui, 24);
+                    self.stage = 6;
+                }
+                6 if app.pages.iter().any(|p| p.page == 24 && p.ready) => {
+                    if app.recovering.is_none()
+                        || Some(app.tabs[app.active].info.id) != self.tab_identity
+                        || !ui.get_recovery_busy()
+                    {
+                        anyhow::bail!("Recovery published a document before metadata validation");
+                    }
+                    println!("helper: rendered page 25 while metadata remained stalled");
+                    println!("helper: recovery metadata stayed pending until normal shutdown");
+                    use std::io::Write;
+                    std::io::stdout().flush()?;
+                    self.stage = 99;
+                    let _ = slint::quit_event_loop();
+                }
                 0 if marker.exists()
                     && app.tabs.len() == 1
                     && app.pages.iter().any(|p| p.ready) =>
@@ -198,6 +232,77 @@ impl SmokeCheck {
                     visible(app)?;
                     println!(
                         "tabs: dispatched Ctrl+Tab and Ctrl+Shift+Tab wrap and reveal their selected document"
+                    );
+                    self.stage = 20;
+                }
+                20 if ready => {
+                    let _ = ui.window().take_snapshot()?;
+                    let p = slint::LogicalPosition::new(
+                        ui.get_page_field_window_x() + 15.0,
+                        ui.get_page_field_window_y() + 12.0,
+                    );
+                    self.pending_selection = Some((p, p));
+                    self.pending_key = Some((true, "a".into()));
+                    self.stage = 21;
+                }
+                21 => {
+                    if !ui.get_jump_editing() {
+                        anyhow::bail!("Tab focus fixture did not focus the page field");
+                    }
+                    self.pending_key = Some((false, "9".into()));
+                    self.stage = 22;
+                }
+                22 => {
+                    if ui.get_jump_text().as_str() != "9" || app.active != 11 {
+                        anyhow::bail!("Tab focus fixture did not create an uncommitted page value");
+                    }
+                    self.pending_key = Some((true, slint::platform::Key::Tab.into()));
+                    self.stage = 23;
+                }
+                23 if app.active == 0 && ready => {
+                    if ui.get_jump_editing()
+                        || ui.get_text_field_focused()
+                        || ui.get_jump_text().as_str() != (app.tabs[0].view.page + 1).to_string()
+                        || app.tabs[11].view.page != 0
+                    {
+                        anyhow::bail!("Page field draft crossed a document switch");
+                    }
+                    let _ = ui.window().take_snapshot()?;
+                    let p = slint::LogicalPosition::new(
+                        ui.get_zoom_field_window_x() + 15.0,
+                        ui.get_zoom_field_window_y() + 12.0,
+                    );
+                    self.scale_before_input = app.layout.as_ref().unwrap().scale;
+                    self.pending_selection = Some((p, p));
+                    self.pending_key = Some((true, "a".into()));
+                    self.stage = 24;
+                }
+                24 => {
+                    if !ui.get_zoom_editing() {
+                        anyhow::bail!("Tab focus fixture did not focus the zoom field");
+                    }
+                    self.pending_key = Some((false, "250%".into()));
+                    self.stage = 25;
+                }
+                25 => {
+                    if ui.get_zoom_entry().as_str() != "250%" {
+                        anyhow::bail!("Tab focus fixture did not create an uncommitted zoom value");
+                    }
+                    self.pending_shift = true;
+                    self.pending_key = Some((true, slint::platform::Key::Tab.into()));
+                    self.stage = 26;
+                }
+                26 if app.active == 11 && ready => {
+                    if ui.get_zoom_editing()
+                        || ui.get_text_field_focused()
+                        || ui.get_zoom_entry() != ui.get_zoom_label()
+                        || (app.layout.as_ref().unwrap().scale - self.scale_before_input).abs()
+                            > 0.001
+                    {
+                        anyhow::bail!("Zoom field draft crossed a document switch");
+                    }
+                    println!(
+                        "tabs: switching from page and zoom text cancels drafts and restores reader focus"
                     );
                     self.pending_key = Some((true, "w".into()));
                     self.stage = 6;
@@ -555,6 +660,83 @@ impl SmokeCheck {
                     self.stage = 30;
                 }
                 30 if ready => {
+                    app.step_review(ui, true);
+                    if !ui.get_can_redo_remark() {
+                        anyhow::bail!("Text focus fixture lacks independent review Redo");
+                    }
+                    self.history_review =
+                        Some(app.tabs[app.active].review.as_ref().unwrap().model.clone());
+                    self.history_generation = app.tabs[app.active].draft_generation();
+                    ui.set_query("".into());
+                    self.pending_key = Some((true, "f".into()));
+                    self.stage = 36;
+                }
+                36 => {
+                    if !ui.get_search_visible() || !ui.get_text_field_focused() {
+                        anyhow::bail!("Search did not acquire native text focus");
+                    }
+                    self.pending_key = Some((false, "n".into()));
+                    self.stage = 37;
+                }
+                37..=41 => {
+                    let tab = &app.tabs[app.active];
+                    if Some(&tab.review.as_ref().unwrap().model) != self.history_review.as_ref()
+                        || tab.draft_generation() != self.history_generation
+                        || !ui.get_can_redo_remark()
+                    {
+                        anyhow::bail!(
+                            "Focused search shortcut changed independent document history"
+                        );
+                    }
+                    match self.stage {
+                        37 => {
+                            if ui.get_query().as_str() != "n" {
+                                anyhow::bail!("Focused search did not receive text");
+                            }
+                            self.pending_key = Some((true, "y".into()));
+                        }
+                        38 => {
+                            self.pending_shift = true;
+                            self.pending_key = Some((true, "z".into()));
+                        }
+                        39 => self.pending_key = Some((true, "z".into())),
+                        40 => {
+                            if !ui.get_query().is_empty() {
+                                anyhow::bail!("Native text Undo did not remove search input");
+                            }
+                            self.pending_shift = !cfg!(target_os = "windows");
+                            self.pending_key = Some((
+                                true,
+                                if cfg!(target_os = "windows") {
+                                    "y"
+                                } else {
+                                    "z"
+                                }
+                                .into(),
+                            ));
+                        }
+                        41 => {
+                            if ui.get_query().as_str() != "n" {
+                                anyhow::bail!("Native text Redo did not restore search input");
+                            }
+                            self.pending_key = Some((false, slint::platform::Key::Escape.into()));
+                        }
+                        _ => unreachable!(),
+                    }
+                    self.stage += 1;
+                }
+                42 => {
+                    if ui.get_search_visible() || ui.get_text_field_focused() {
+                        anyhow::bail!("Escape did not return input focus to the reader");
+                    }
+                    app.step_review(ui, false);
+                    self.history_review = None;
+                    println!(
+                        "review: focused text owns Undo/Redo without changing document history"
+                    );
+                    self.stage = 43;
+                }
+                43 if ready => {
                     // A recovered review can have empty history while mark edits
                     // remain undoable. Exercise real key dispatch at that boundary.
                     app.tabs[app.active]

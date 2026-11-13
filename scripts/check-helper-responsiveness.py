@@ -34,20 +34,21 @@ def main():
     private = module('helper_display', 'private-display.py')
     with tempfile.TemporaryDirectory(prefix='dpdf-helper-window-') as directory:
         root = Path(directory)
-        for mode in ('close', 'retry', 'shutdown'):
+        for mode in ('close', 'retry', 'shutdown', 'recovery'):
             folder = root / mode
             folder.mkdir()
             source = folder / 'generated50.pdf'
             source.write_bytes(sample.make_pdf(50))
             original = hashlib.sha256(source.read_bytes()).hexdigest()
             ready = folder / 'ready.json'
+            arm = folder / 'armed'
             driver = folder / 'helper.py'
             # One owned process, no shell children. Only the first metadata call
             # stalls; cancellation/retry must allow a subsequent real qpdf call.
             driver.write_text(
                 'import json,os,time,sys\nfrom pathlib import Path\n'
-                f'ready=Path({str(ready)!r})\n'
-                'if sys.argv[1:2]==["--json"] and not ready.exists():\n'
+                f'ready=Path({str(ready)!r});arm=Path({str(arm)!r})\n'
+                f'if sys.argv[1:2]==["--json"] and not ready.exists(){" and arm.exists()" if mode == "recovery" else ""}:\n'
                 ' ready.write_text(json.dumps({"pid":os.getpid(),"start":Path(f"/proc/{os.getpid()}/stat").read_text().rsplit(")",1)[1].split()[19]}))\n'
                 ' deadline=time.monotonic()+30\n'
                 ' while time.monotonic()<deadline:time.sleep(.02)\n'
@@ -83,7 +84,20 @@ def main():
 
             try:
                 with private.display(folder, args.xvfb) as env:
+                    if mode == 'recovery':
+                        prepared_env = dict(env, DPDF_PDFIUM_LIBRARY=str(args.pdfium.resolve()),
+                            DPDF_QPDF_BINARY=str(args.qpdf.resolve()), DPDF_SMOKE_RECOVERY='write',
+                            DPDF_SMOKE_PLACEMENT_IMAGE=str(Path(__file__).with_name('fixtures').joinpath('page-photo.jpg').resolve()),
+                            SLINT_SCALE_FACTOR='1')
+                        prepared = subprocess.run([str(args.binary.resolve()), '--smoke-ui', str(source)],
+                            env=prepared_env, capture_output=True, text=True, timeout=45)
+                        if prepared.returncode:
+                            raise RuntimeError(prepared.stdout + prepared.stderr)
+                        assert 'durable checkpoint written' in prepared.stdout
+                        assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1
+                        env['DPDF_SMOKE_RECOVERY'] = 'read'
                     env.update(DPDF_SMOKE_HELPER=mode, DPDF_SMOKE_HELPER_READY=str(ready),
+                               DPDF_SMOKE_HELPER_ARM=str(arm),
                                DPDF_PDFIUM_LIBRARY=str(args.pdfium.resolve()), DPDF_QPDF_BINARY=str(helper),
                                SLINT_SCALE_FACTOR='1')
                     started = time.monotonic()
@@ -97,12 +111,15 @@ def main():
                     assert 'rendered page 25 while metadata remained stalled' in result.stdout
                     expected = {'close': 'closed stalled document and reopened without a stale completion',
                                 'retry': 'retry replaced stalled metadata without accepting its cancelled completion',
-                                'shutdown': 'quitting with a live metadata helper'}[mode]
+                                'shutdown': 'quitting with a live metadata helper',
+                                'recovery': 'recovery metadata stayed pending until normal shutdown'}[mode]
                     assert expected in result.stdout, expected
                     deadline = time.monotonic() + 1
                     while owned_pid() is not None and time.monotonic() < deadline:
                         time.sleep(.01)
                     assert owned_pid() is None, 'Owned helper remained live/unreaped after completion'
+                    if mode == 'recovery':
+                        assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1, 'Cancelled recovery lost its durable checkpoint'
                     assert hashlib.sha256(source.read_bytes()).hexdigest() == original
                     print(f'PASS: helper {mode}, reader responsive, child reaped, source unchanged '
                           f'({time.monotonic() - started:.2f}s)', flush=True)

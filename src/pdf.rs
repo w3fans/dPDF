@@ -390,26 +390,13 @@ fn describe(
         signatures: pdf.signatures().len() as usize,
     })
 }
-fn describe_open(
-    id: DocumentId,
-    document: &OpenDocument<'_>,
-    recovery: bool,
-) -> Result<DocumentInfo> {
-    let mut info = describe(
+fn describe_open(id: DocumentId, document: &OpenDocument<'_>) -> Result<DocumentInfo> {
+    describe(
         id,
         document.path.clone(),
         &document.pdf,
         document.password.is_some(),
-    )?;
-    if recovery {
-        let bytes = document.working_bytes()?;
-        let units = crate::pdf_units::load(bytes.as_slice())?;
-        info.physical_pages = Some(
-            physical_page_sizes(&info.pages, &units)
-                .context("Cannot verify recovered physical page dimensions")?,
-        );
-    }
-    Ok(info)
+    )
 }
 
 fn password_error(error: &PdfiumError) -> bool {
@@ -461,6 +448,88 @@ struct ReviewPending {
     request: Request,
     load_generation: u64,
     clean: Option<(Result<Vec<f64>, String>, crate::review::Review)>,
+}
+
+struct RecoveryPending {
+    request: Request,
+    info: DocumentInfo,
+}
+
+// Native documents stay on this PDF worker. Recovery metadata validation uses
+// the same bounded byte-only pool as review preparation, before publishing Opened.
+fn finish_open<'a>(
+    id: DocumentId,
+    document: OpenDocument<'a>,
+    recovery: bool,
+    documents: &mut HashMap<DocumentId, OpenDocument<'a>>,
+    pending: &mut HashMap<DocumentId, RecoveryPending>,
+    background: &mut Result<Jobs<ReviewWork, ReviewData>>,
+) -> Result<Option<Event>> {
+    let info = describe_open(id, &document)?;
+    if recovery {
+        let request = background
+            .as_mut()
+            .map_err(|error| anyhow::anyhow!("{error:#}"))?
+            .submit(
+                id,
+                ReviewWork::Inspect {
+                    bytes: document.original.clone(),
+                    password: document.password.clone(),
+                },
+            )?;
+        pending.insert(id, RecoveryPending { request, info });
+        documents.insert(id, document);
+        Ok(None)
+    } else {
+        documents.insert(id, document);
+        Ok(Some(Event::Opened(info)))
+    }
+}
+
+fn recovery_completed(
+    documents: &mut HashMap<DocumentId, OpenDocument<'_>>,
+    pending: &mut HashMap<DocumentId, RecoveryPending>,
+    responses: &SyncSender<Event>,
+    completion: Reply<ReviewData>,
+) {
+    let id = completion.ticket.request.id;
+    if !pending
+        .get(&id)
+        .is_some_and(|state| state.request.matches(&completion.ticket))
+    {
+        return;
+    }
+    let state = pending.remove(&id).unwrap();
+    if !documents.contains_key(&id) {
+        return;
+    }
+    let result = (|| -> Result<DocumentInfo> {
+        let document = &documents[&id];
+        match completion.result {
+            Ok(ReviewData::Inspected { bytes, metadata }) => {
+                let mut info = state.info;
+                let units = crate::pdf_units::from_metadata(&metadata, info.pages.len())?;
+                info.physical_pages = Some(
+                    physical_page_sizes(&info.pages, &units)
+                        .context("Cannot verify recovered physical page dimensions")?,
+                );
+                if document.password.is_some() {
+                    let _ = document.unlocked.set(bytes);
+                }
+                Ok(info)
+            }
+            Ok(ReviewData::Cleaned(_)) => bail!("Unexpected recovery metadata result"),
+            Err(error) => bail!("{error}"),
+        }
+    })();
+    let event = match result {
+        Ok(info) => Event::Opened(info),
+        Err(error) => {
+            documents.remove(&id);
+            Event::OpenFailed(id, format!("{error:#}"))
+        }
+    };
+    let _ = responses.send(event);
 }
 
 fn review_work(work: ReviewWork, cancel: &std::sync::atomic::AtomicBool) -> Result<ReviewData> {
@@ -650,6 +719,7 @@ pub fn start() -> Worker {
         let _ = responses.send(Event::Ready);
         let mut background = Jobs::new(stopping.clone(), review_work);
         let mut review_pending: HashMap<DocumentId, ReviewPending> = HashMap::new();
+        let mut recovery_pending: HashMap<DocumentId, RecoveryPending> = HashMap::new();
         let mut documents: HashMap<DocumentId, OpenDocument<'_>> = HashMap::new();
         let mut passwords:HashMap<DocumentId,PendingDocument>=HashMap::new();
         let mut cache = ByteCache::new(64 * 1024 * 1024);
@@ -658,7 +728,11 @@ pub fn start() -> Worker {
             if stopping.stopped() { break; }
             if let Ok(jobs) = &background {
                 while let Some(completion) = jobs.poll() {
-                    review_completed(&pdfium, &mut documents, &mut cache, &mut review_pending, jobs, &responses, completion);
+                    if recovery_pending.contains_key(&completion.ticket.request.id) {
+                        recovery_completed(&mut documents, &mut recovery_pending, &responses, completion);
+                    } else {
+                        review_completed(&pdfium, &mut documents, &mut cache, &mut review_pending, jobs, &responses, completion);
+                    }
                 }
             }
             let command = if search.is_some() { requests.try_recv().ok() } else {
@@ -676,46 +750,42 @@ pub fn start() -> Worker {
                         _=>unreachable!(),
                     };
                     let recovery=snapshot.is_some();
-                    let result = (|| -> Result<Event> {
+                    let result = (|| -> Result<Option<Event>> {
                         let original=match snapshot {Some(bytes)=>bytes,None=>Arc::new(std::fs::read(&path).with_context(||format!("Read {}",path.display()))?)};
                         match load_shared_pdf(&pdfium,original.clone(),None) {
                             Ok(pdf)=>{
                                 let document=OpenDocument{pdf,original,path,password:None,unlocked:Default::default()};
-                                let info=describe_open(id,&document,recovery)?;
-                                documents.insert(id,document);
-                                Ok(Event::Opened(info))
+                                finish_open(id, document, recovery, &mut documents, &mut recovery_pending, &mut background)
                             }
                             Err(error) if password_error(&error)=>{
                                 if passwords.len()>=16 || original.len().saturating_add(passwords.values().map(|p|p.original.len()).sum::<usize>())>256*1024*1024 {bail!("Pending protected PDFs exceed 16 files / 256 MiB; finish or cancel their prompts first");}
                                 passwords.insert(id,PendingDocument{recovery,path:path.clone(),original});
-                                Ok(Event::PasswordRequired(id,path,false))
+                                Ok(Some(Event::PasswordRequired(id,path,false)))
                             }
                             Err(error)=>Err(open_pdf_error(error)),
                         }
                     })();
-                    let event=result.unwrap_or_else(|error|Event::OpenFailed(id,format!("{error:#}")));
-                    if responses.send(event).is_err(){break;}
+                    let event=result.unwrap_or_else(|error|Some(Event::OpenFailed(id,format!("{error:#}"))));
+                    if let Some(event)=event && responses.send(event).is_err(){break;}
                 }
                 Some(Command::Unlock(id,password))=>{
                     let Some(pending)=passwords.remove(&id) else{continue;};
                     let path=pending.path.clone();
-                    let result=(||->Result<Event>{
+                    let result=(||->Result<Option<Event>>{
                         crate::encrypted::validate_password(&password)?;
                         match load_shared_pdf(&pdfium,pending.original.clone(),Some(&password)) {
                             Ok(pdf)=>{
                                 let document=OpenDocument{pdf,original:pending.original,path,password:Some(password),unlocked:Default::default()};
-                                let info=describe_open(id,&document,pending.recovery)?;
-                                documents.insert(id,document);
-                                Ok(Event::Opened(info))
+                                finish_open(id, document, pending.recovery, &mut documents, &mut recovery_pending, &mut background)
                             }
                             Err(error) if password_error(&error)=>{
-                                passwords.insert(id,pending);Ok(Event::PasswordRequired(id,path,true))
+                                passwords.insert(id,pending);Ok(Some(Event::PasswordRequired(id,path,true)))
                             }
                             Err(error)=>Err(open_pdf_error(error)),
                         }
                     })();
-                    let event=result.unwrap_or_else(|error|Event::OpenFailed(id,format!("{error:#}")));
-                    if responses.send(event).is_err(){break;}
+                    let event=result.unwrap_or_else(|error|Some(Event::OpenFailed(id,format!("{error:#}"))));
+                    if let Some(event)=event && responses.send(event).is_err(){break;}
                 }
                 Some(Command::PrintReviewed{id,review,current,range,printer,fit,native})=>{
                     let prepared=(||->Result<_>{let document=documents.get(&id).context("Document was closed")?;let source=crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?};let path=source.path.clone();Ok((crate::review::prepare(source,&document.pdf,&review,crate::review::ExportMode::Current)?,path))})();
@@ -775,6 +845,7 @@ pub fn start() -> Worker {
                 }
                 Some(Command::Close(id)) => {
                     if let Some(pending) = review_pending.remove(&id) { pending.request.cancel(); }
+                    if let Some(pending) = recovery_pending.remove(&id) { pending.request.cancel(); }
                     passwords.remove(&id);
                     documents.remove(&id);
                     cache.retain(|k: &RenderKey| k.document != id);

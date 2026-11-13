@@ -911,6 +911,7 @@ version = "0.1.54"
 dependencies = [
  "anyhow",
  "arboard",
+ "dpdf-ui",
  "image",
  "libloading 0.8.9",
  "pdfium-render",
@@ -920,10 +921,17 @@ dependencies = [
  "serde",
  "serde_json",
  "slint",
- "slint-build",
  "tempfile",
  "uuid",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "dpdf-ui"
+version = "0.0.0"
+dependencies = [
+ "slint",
+ "slint-build",
 ]
 
 [[package]]

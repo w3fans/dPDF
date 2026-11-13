@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "run": 43486282919,
+  "artifact": 14068251548,
+  "source_commit": "c9153a54197ac8725c30b662f723378e9323672b",
+  "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+  "host": "Fedora45 private authenticated X11; scale1; 1180x800 window",
+  "viewport": "948x640+216+132",
+  "baseline_released_vs_new_stalled_changed_pixels": 0,
+  "new_stalled_vs_released_changed_pixels": 0,
+  "source_unchanged": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "snapshots": [
+    {
+      "path": "/tmp/dpdf-t03-reader-responsive/helper-released.png",
+      "sha256": "d98e252eaf50b26edff45b20b730553865c598328097685d69c9b9817af2291d"
+    },
+    {
+      "path": "/tmp/dpdf-t03-reader-responsive/helper-stalled.png",
+      "sha256": "f9b7c0760e36db8fbda15fdf1bc6eb0e2aad38c2403023f7fa33f5bc2bf603e3"
+    },
+    {
+      "path": "/tmp/dpdf-t03-reader-responsive/initial.png",
+      "sha256": "567aadd692bc011b8e61af9de0ae496f3c48110890e367be9ec979b2a6c74b72"
+    }
+  ]
+}

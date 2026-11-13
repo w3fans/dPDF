@@ -1,7 +1,11 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: implementation candidate; compilation, lifecycle review and exact-source
-acceptance pending. This does not qualify all helper callers or production baking.
+Status: prior draft PR #10 candidate 9519b5c passed hosted CI and the generated
+responsive-reader replay (see progress/T03-reader-responsive-replay.json). The
+current increment adds asynchronous recovery validation on main de7a53d; new
+compiled/runtime evidence is pending.
+Experienced lifecycle review remains required before merge; broader native
+acceptance is pending. This does not qualify all helper callers or production baking.
 
 ## Reproduced problem
 
@@ -86,3 +90,41 @@ python3 scripts/check-helper-responsiveness.py --binary /path/to/dpdf \
 ```
 
 Reviewer decision: **PENDING** (GO / REVISE / NO-GO, reviewer/date/source required).
+
+
+## Recovery snapshot validation increment
+
+The prior LoadReview candidate still used synchronous metadata inside
+`describe_open(..., recovery=true)`. A generated durable checkpoint, controlled
+helper and native XTest page jump reproduced a blank page 25 until helper release
+on c9153a54, executable 79731920. Source and checkpoint were generated; the helper
+was reaped after release. See progress/T03-recovery-stall-reproduction.json.
+
+The current increment describes native geometry on the PDF worker, then submits
+owned snapshot bytes/private password to the same two-lease helper pool. Native
+PDF documents stay in the worker's map while recovery is pending; they are never
+passed to the helper thread. A pending record holds the request identity and
+owned DocumentInfo only. Recovery's Opened event is withheld until returned
+metadata validates the physical page sizes, preserving the existing mark-size
+safety check. Protected input caches validated decrypted bytes for later use.
+
+On failure, the pending native document is removed on its owner thread and an
+OpenFailed event leaves the durable checkpoint available. Busy admission also
+fails visibly before publication; it never restores at guessed units. Close
+cancels pending recovery by document/request identity. Normal shutdown uses the
+existing shared cancellation/join path. Late results cannot publish a closed or
+replaced request. No new native engine, helper thread or admission capacity.
+
+The added generated window regression prepares a real durable checkpoint, arms a
+metadata stall only after ordinary reading is ready, begins recovery, renders
+page 25 in the still-open original tab, then exits normally with recovery pending.
+It requires the owned helper reaped, source unchanged and checkpoint retained.
+Existing changed/missing/protected recovery, geometry, passwords and review suites
+remain required. New build, this regression and native replay are PENDING until
+actual exact-source evidence is recorded.
+
+Experienced lifecycle review must include this unpublished-to-opened transition,
+pending document cleanup, pool admission failure and shutdown ordering on the
+reviewed head. The prior review request remains outstanding; green CI alone does
+not satisfy it. Production baking and unrelated detached export/print ownership
+are outside this increment and remain unqualified.

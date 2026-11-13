@@ -263,3 +263,66 @@ Normal patch releases remain independent of stable milestone acceptance. Missing
 API authorization is `PENDING_API_AUTH`; missing packages are `PENDING_COPR`;
 missing native Windows outputs are `PENDING_WINDOWS_ARTIFACTS`. Full delivery
 must not be inferred from a successful service exit or source tag alone.
+
+## Bounded Windows compiler memory measurements
+
+Repeated native application builds have hit LLVM out-of-memory under the existing
+2 GiB Job Object cap (for example runs 43476228011 and 43485260680). Other builds
+passed; an isolated later pass does not establish a deterministic memory fix.
+Keep the one-logical-CPU-equivalent and aggregate 2 GiB limits unchanged.
+
+The native job wrapper now queries `JobObjectExtendedLimitInformation` before
+closing each owned job and retains `<suite>.log.memory.json` beside its log.
+`peak_job_memory_bytes` is aggregate Windows committed memory, **not peak RSS**.
+A failed query records `status: unavailable` and an error code, never a fictitious
+zero-memory result. These files inherit the enclosing report's source/toolchain
+and command identity; they do not independently qualify a binary.
+
+The explicit 16-unit baseline in run 43489953584 (source fe081869) compiled
+fresh and peaked at 2,125,107,200 committed bytes against the 2,147,483,648-byte
+cap, leaving about 21 MiB. The 256-unit candidate (source bd71a8f5,
+run 43492468459) failed in application LLVM code generation with out-of-memory;
+its job recorded 2,153,193,472 committed bytes. Retain this failed measurement,
+including the original logs; it supplies no usable application binary.
+
+The single-unit candidate (source 21df7bdf, run 43493985255) also failed in LLVM
+with out-of-memory, recording 2,147,762,176 committed bytes. Avoiding local
+ThinLTO with one unit did not establish a memory improvement.
+
+The level-0 candidate (source 8849548f, run 43495457705) passed all CI jobs,
+but its fresh application compile peaked at 2,137,460,736 committed bytes, leaving
+only 10,022,912 bytes below the cap. Lower optimization did not meet the target
+and is not accepted as a memory fix.
+
+The next candidate restores application optimization level 1 and the default
+codegen partition count. Generated Slint types move unchanged into the internal
+`dpdf-ui` path crate, allowing UI and application compilation to finish separately.
+Its release optimization and dev/test debug levels match their previous settings
+inside the application. There is no new external crate version, license selection,
+engine ownership or runtime worker. The internal crate retains the project's
+existing LICENSE and NOTICE; native notice readback must confirm the inventories.
+
+The first separated build (source 87fadf2b, run 43497797523) passed every CI
+job. Both UI and application compiled fresh at optimization level 1. The native
+Windows build peaked at 1,779,228,672 committed bytes, below the proposed
+1.75-GiB target, leaving 368,254,976 bytes (~351 MiB) under the unchanged cap.
+This single measured run is not a universal bound. Same-machine generated reader
+medians (five repeats per fixture) showed no >10% median first-page/render/RSS
+regression on the 50-page office, 1000-page text and 50-page vector fixtures;
+32 geometry cases and full Linux/Windows PDF regressions passed. GUI latency and
+representative-office/native acceptance remain separate performance work.
+
+Native Windows inventory readback matched all prior external components but
+found CRLF conversions in the new internal crate's LICENSE/NOTICE. The final
+candidate preserves those copies verbatim through Git attributes and requires
+fresh Linux target collection to equal the retained Linux inventory as well.
+Windows native readback must be compared again after that correction. No license
+selection changes; the unsuccessful original measurements remain retained.
+
+The final combined candidate also includes the merged focused-text fix. Repeat
+its full gates, check fresh UI/application identities and native job peaks, and
+compare exact native notice inventories before merge. Cargo concurrency,
+dependency optimization and the CPU/memory caps remain unchanged.
+
+References: [Cargo profiles](https://doc.rust-lang.org/cargo/reference/profiles.html#codegen-units)
+and [QueryInformationJobObject](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-queryinformationjobobject).

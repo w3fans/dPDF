@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "target": "x86_64-pc-windows-msvc",
-  "config_fingerprint": "292aa89d585da88d92488326296fd504ccf1261a34b36a0cc8ea7fc8d495170d",
-  "lock_fingerprint": "84037ecc94e8fd3f809ab0cbd1cd844fc7bcf579588348a6f27b485e87690c74",
+  "config_fingerprint": "6340cdac1f8bf1ca3966afa0de2b69b15d8d4e1ee732e2b31abc4f4d4eead8da",
+  "lock_fingerprint": "1ca796afa60d58416aea8360788bf5e478d69a80c188203eb529b134da0afc22",
   "scope": "Cargo target tree: normal/build/proc-macro dependencies",
   "audit_status": "inventory_only",
   "qualified_for_binary_distribution": false,
-  "dependency_fingerprint": "84e5d806848c0ad7221a7c75aa3a158f614f0e639c468f9d24f3b4057ddc517e",
+  "dependency_fingerprint": "deaefd9346642d0f51589de37629b8bfc6a3ddd18699e9c6d7d4c9c9fda78f86",
   "components": [
     {
       "name": "adler2",
@@ -929,6 +929,28 @@
           "path": "LICENSE-MIT",
           "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
           "text": "texts/23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3.txt",
+          "origin": "crate-archive"
+        }
+      ]
+    },
+    {
+      "name": "dpdf-ui",
+      "version": "0.0.0",
+      "license_declaration": "Apache-2.0",
+      "repository": null,
+      "registry_checksum": null,
+      "resolved_features": [],
+      "notices": [
+        {
+          "path": "LICENSE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "text": "texts/cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30.txt",
+          "origin": "crate-archive"
+        },
+        {
+          "path": "NOTICE",
+          "sha256": "127279c5f7c1ce4bc2287a9609cd880bd692ebfe1ec0b3fcbb151a97065fb399",
+          "text": "texts/127279c5f7c1ce4bc2287a9609cd880bd692ebfe1ec0b3fcbb151a97065fb399.txt",
           "origin": "crate-archive"
         }
       ]

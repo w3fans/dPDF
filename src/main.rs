@@ -38,7 +38,7 @@ mod storage;
 #[cfg(any(target_os = "windows", feature = "check-windows-print"))]
 mod windows_print;
 
-slint::include_modules!();
+pub use dpdf_ui::*;
 
 fn main() -> anyhow::Result<()> {
     let mut args = std::env::args_os().skip(1);

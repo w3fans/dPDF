@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-- Prepare cancellable background review metadata and annotation-cleaning jobs so stalled helpers can leave reader navigation responsive; reject stale document/request completions and join helper cleanup on normal shutdown.
+- Prepare cancellable background review and recovery metadata jobs so stalled helpers can leave reader navigation responsive; validate recovery dimensions before publishing the document, reject stale completions and join helper cleanup on normal shutdown.
+
+- Cancel uncommitted page/zoom field values and restore reader focus when switching documents, including Ctrl+Tab.
+
+- Keep unhandled text-field keys within their editing context so a platform-specific Redo shortcut cannot change independent PDF review or mark history.
+
+- Retain observed Windows job committed-memory peaks beside native validation logs and compile generated UI separately from application code under the existing build limits.
 
 - Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
 

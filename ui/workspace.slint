@@ -101,6 +101,29 @@ export component Workspace inherits Window {
     in-out property <string> zoom-entry: "100%";
     in-out property <bool> zoom-editing: false;
     in-out property <bool> jump-editing: false;
+    property <bool> search-editing: false;
+    property <bool> revision-name-editing: false;
+    property <bool> revision-filter-editing: false;
+    property <bool> remark-editing: false;
+    property <bool> mark-width-editing: false;
+    property <bool> mark-height-editing: false;
+    property <bool> mark-opacity-editing: false;
+    property <bool> operation-pages-editing: false;
+    property <bool> operation-source-editing: false;
+    property <bool> print-range-editing: false;
+    property <bool> printer-name-editing: false;
+    out property <bool> text-field-focused: root.jump-editing || root.zoom-editing
+        || (root.search-visible && root.search-editing)
+        || (root.review-visible && (root.revision-name-editing || root.remark-editing
+            || (root.review-filter == 2 && root.revision-filter-editing)))
+        || ((root.mark-pending || root.has-marks || root.can-undo-mark || root.can-redo-mark)
+            && (root.mark-width-editing || root.mark-height-editing || root.mark-opacity-editing))
+        || (root.page-ops-visible && ((root.page-operation != 4 && root.operation-pages-editing)
+            || ((root.page-operation < 2 || root.page-operation == 4) && root.operation-source-editing)))
+        || (root.print-visible && (root.print-range-editing
+            || (root.printer-choice == root.printer-choices.length - 1 && root.printer-name-editing)));
+    out property <float> page-field-window-x: page-input.absolute-position.x / 1px;
+    out property <float> page-field-window-y: page-input.absolute-position.y / 1px;
     out property <float> zoom-field-window-x: zoom-input.absolute-position.x / 1px;
     out property <float> zoom-field-window-y: zoom-input.absolute-position.y / 1px;
     in property <string> view-label: "Single page";
@@ -211,6 +234,11 @@ export component Workspace inherits Window {
     }
     changed print-visible => { if (root.print-visible) { root.discover-printers(); } }
     changed dark => { Palette.color-scheme = root.dark ? ColorScheme.dark : ColorScheme.light; }
+    // Switching document context discards uncommitted field input. Password
+    // prompts keep their explicit focus and cancellation policy.
+    public function focus-reader() {
+        if !root.password-required { keys.focus(); }
+    }
     forward-focus: keys;
     keys := FocusScope {
         capture-key-pressed(event) => {
@@ -237,6 +265,9 @@ export component Workspace inherits Window {
         }
         key-pressed(event) => {
             if root.password-required {return reject;}
+            // Text inputs handle native shortcuts first. The other platform's
+            // Redo and other unhandled keys must not change an independent draft.
+            if root.text-field-focused {return reject;}
             if (event.modifiers.control && (event.text == "z" || event.text == "Z")) {
                 if root.review-visible {
                     if event.modifiers.shift {
@@ -287,7 +318,7 @@ export component Workspace inherits Window {
                     if !root.compact-toolbar: Button { text: "Marks…"; clicked => { root.open-mark-studio(); } }
                     Rectangle { width: root.compact-toolbar ? 2px : 10px; }
                     Button { text: "‹"; enabled: root.has-document; clicked => { root.navigate(-1); } }
-                    LineEdit {
+                    page-input := LineEdit {
                         changed has-focus => { root.jump-editing = self.has-focus; if !self.has-focus { root.jump-text = root.has-document ? "" + (root.current-page + 1) : ""; } }
                         text <=> root.jump-text; width: 56px; placeholder-text: "Page"; enabled: root.has-document;
                         accepted => { root.jump(self.text); keys.focus(); }
@@ -389,7 +420,7 @@ export component Workspace inherits Window {
                 height: root.search-visible ? 40px : 0px; background: Palette.alternate-background;
                 HorizontalLayout {
                     padding: 5px; spacing: 5px;
-                    search-input := LineEdit { text <=> root.query; placeholder-text: "Find text in this document"; accepted => { root.search(self.text); } }
+                    search-input := LineEdit { changed has-focus => { root.search-editing = self.has-focus; } text <=> root.query; placeholder-text: "Find text in this document"; accepted => { root.search(self.text); } }
                     Button { text: "Search"; clicked => { root.search(root.query); } }
                     Button { text: "Previous"; clicked => { root.next-result(-1); } }
                     Button { text: "Next"; clicked => { root.next-result(1); } }
@@ -454,15 +485,15 @@ export component Workspace inherits Window {
                         spacing:5px;
                         Text {text:"Revision";color:Palette.foreground;vertical-alignment:center;}
                         ComboBox {model:root.revision-labels;current-index <=> root.revision-index;width:160px;enabled:root.review-ready;selected=>{root.choose-revision(self.current-index);}}
-                        LineEdit {text <=> root.revision-name;placeholder-text:"New revision label";horizontal-stretch:1;enabled:root.review-ready;}
+                        LineEdit {changed has-focus => { root.revision-name-editing = self.has-focus; } text <=> root.revision-name;placeholder-text:"New revision label";horizontal-stretch:1;enabled:root.review-ready;}
                         Button {text:"New revision";enabled:root.review-ready;clicked=>{root.new-revision();}}
                         ComboBox {model:["All revisions","Current revision","Selected revisions"];current-index <=> root.review-filter;width:170px;enabled:root.review-ready;selected=>{root.filter-reviews(self.current-index);}}
-                        if root.review-filter==2: LineEdit {text <=> root.revision-filter-ids;width:65px;accepted=>{root.filter-reviews(2);}}
+                        if root.review-filter==2: LineEdit {changed has-focus => { root.revision-filter-editing = self.has-focus; } text <=> root.revision-filter-ids;width:65px;accepted=>{root.filter-reviews(2);}}
                     }
                     HorizontalLayout {
                         spacing:5px;
                         ComboBox {model:["Select text","Place note","Highlight area","Underline area"];current-index <=> root.review-tool;width:170px;enabled:root.review-ready;selected=>{root.cancel-mark();}}
-                        LineEdit {text <=> root.review-text;placeholder-text:"Remark text — required for a note";horizontal-stretch:1;enabled:root.review-ready;}
+                        LineEdit {changed has-focus => { root.remark-editing = self.has-focus; } text <=> root.review-text;placeholder-text:"Remark text — required for a note";horizontal-stretch:1;enabled:root.review-ready;}
                         Button {text:"Update text";enabled:root.review-selected>=0;clicked=>{root.update-remark();}}
                         ComboBox {model:["All remarks visible","Current visibility","Without dPDF remarks"];current-index <=> root.review-export;width:190px;enabled:root.review-ready;}
                         Button {text:"Export copy…";enabled:root.review-ready && !root.export-busy;clicked=>{root.export-review();}}
@@ -504,12 +535,12 @@ export component Workspace inherits Window {
                             property <length> window-y: self.absolute-position.y;
                             changed window-x => { root.mark-width-window-x = self.window-x / 1px; }
                             changed window-y => { root.mark-width-window-y = self.window-y / 1px; }
-                            text <=> root.mark-width; enabled: root.mark-selected; width: 65px; accepted => { root.apply-mark-size(false); } }
+                            changed has-focus => { root.mark-width-editing = self.has-focus; } text <=> root.mark-width; enabled: root.mark-selected; width: 65px; accepted => { root.apply-mark-size(false); } }
                         Text { text: "Height mm"; color: Palette.foreground; vertical-alignment: center; }
-                        LineEdit { text <=> root.mark-height; enabled: root.mark-selected; width: 65px; accepted => { root.apply-mark-size(false); } }
+                        LineEdit { changed has-focus => { root.mark-height-editing = self.has-focus; } text <=> root.mark-height; enabled: root.mark-selected; width: 65px; accepted => { root.apply-mark-size(false); } }
                         CheckBox { text: "Lock ratio"; checked <=> root.mark-lock; enabled: root.mark-selected; }
                         Text { text: "Opacity %"; color: Palette.foreground; vertical-alignment: center; }
-                        LineEdit { text <=> root.mark-opacity; enabled: root.mark-selected; width: 55px; }
+                        LineEdit { changed has-focus => { root.mark-opacity-editing = self.has-focus; } text <=> root.mark-opacity; enabled: root.mark-selected; width: 55px; }
                         Button { text: "Apply"; enabled: root.mark-selected; clicked => { root.apply-mark-size(false); } }
                         Button { text: "Reset size"; enabled: root.mark-selected; clicked => { root.apply-mark-size(true); } }
                         Button { text: "Remove"; enabled: root.mark-selected; clicked => { root.remove-mark(); } }
@@ -526,8 +557,8 @@ export component Workspace inherits Window {
                     HorizontalLayout {
                         spacing: 5px;
                         ComboBox { model: ["Replace page", "Insert pages", "Remove pages", "Extract pages", "Merge files", "Rotate clockwise", "Rotate counterclockwise", "Reorder pages"]; current-index <=> root.page-operation; width: 220px; }
-                        if root.page-operation != 4: LineEdit { text <=> root.operation-pages; placeholder-text: root.page-operation < 2 ? "Target page" : "Pages: 1-3,7"; accepted => { if (root.arranging) { root.apply-page-order(); } } }
-                        if root.page-operation < 2 || root.page-operation == 4: LineEdit { text <=> root.operation-source-pages; placeholder-text: "Source pages (blank = all)"; }
+                        if root.page-operation != 4: LineEdit { changed has-focus => { root.operation-pages-editing = self.has-focus; } text <=> root.operation-pages; placeholder-text: root.page-operation < 2 ? "Target page" : "Pages: 1-3,7"; accepted => { if (root.arranging) { root.apply-page-order(); } } }
+                        if root.page-operation < 2 || root.page-operation == 4: LineEdit { changed has-focus => { root.operation-source-editing = self.has-focus; } text <=> root.operation-source-pages; placeholder-text: "Source pages (blank = all)"; }
                         Button { text: root.export-busy ? "Saving…" : "Save edited copy…"; enabled: !root.export-busy; clicked => { root.export-pages(); } }
                         Button { text: "Close"; clicked => { root.page-ops-visible = false; } }
                     }
@@ -541,14 +572,14 @@ export component Workspace inherits Window {
                     Text { text: root.printer-loading ? "Finding printers…" : root.printer-note; color: Palette.foreground; overflow: elide; }
                     HorizontalLayout {
                         spacing: 5px;
-                        LineEdit { text <=> root.print-range; placeholder-text: "All pages, or a range such as 1-3,7"; }
+                        LineEdit { changed has-focus => { root.print-range-editing = self.has-focus; } text <=> root.print-range; placeholder-text: "All pages, or a range such as 1-3,7"; }
                         ComboBox { model: ["Fit to paper", "Actual size"]; current-index <=> root.print-scaling; }
                         Button { text: "Current page"; clicked => { root.print-range = "" + (root.current-page + 1); } }
                     }
                     HorizontalLayout {
                         spacing: 5px;
                         ComboBox { model: root.printer-choices; current-index <=> root.printer-choice; selected(value) => { root.choose-printer(self.current-index); } }
-                        if root.printer-choice == root.printer-choices.length - 1: LineEdit { text <=> root.printer-name; placeholder-text: "Printer name"; }
+                        if root.printer-choice == root.printer-choices.length - 1: LineEdit { changed has-focus => { root.printer-name-editing = self.has-focus; } text <=> root.printer-name; placeholder-text: "Printer name"; }
                         Button { text: "Refresh"; enabled: !root.printer-loading; clicked => { root.discover-printers(); } }
                         if root.native-printing: Button { text: "System dialog…"; enabled: !root.print-busy; clicked => { root.native-print-document(); } }
                         Button { text: root.print-busy ? "Submitting…" : root.native-printing ? "Quick Print" : "Print"; enabled: !root.print-busy; clicked => { root.print-document(); } }

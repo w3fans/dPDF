@@ -130,6 +130,9 @@ jobs:
         run: |
           python3 scripts/check-cargo-notices.py --target linux
           python3 scripts/check-cargo-notices.py --target windows
+          python3 scripts/ci/collect_notices.py --source . --cargo "$(command -v cargo)" \
+            --target x86_64-unknown-linux-gnu --retained packaging/licenses/rust/inventory-linux.json \
+            --output "$RUNNER_TEMP/linux-validation/notices"
       - name: Pinned PDFium 7881
         run: |
           set -euo pipefail
