@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Expose active-review revision selection in the reader toolbar and narrow More menu, sharing existing review state; check revision/filter synchronization independently of remark and mark visibility.
+
 - Record verified public preview delivery and the selected public Actions/local COPR publication roles.
 
 - Run bounded Windows installer packaging under the current PowerShell host so required hashing commands resolve consistently.

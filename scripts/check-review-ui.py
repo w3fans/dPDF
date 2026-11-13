@@ -22,6 +22,8 @@ def main():
     parser.add_argument('--pdfium', type=Path, required=True)
     parser.add_argument('--qpdf', type=Path, required=True)
     parser.add_argument('--xvfb', default='Xvfb')
+    parser.add_argument('--scale', type=float, choices=[1, 1.5, 2],
+                        help='Override fixture scale; otherwise retain the validation lane setting')
     args = parser.parse_args()
     sample, private = module('sample', 'make-sample.py'), module('display', 'private-display.py')
     binary, qpdf = str(args.binary.resolve()), str(args.qpdf.resolve())
@@ -39,6 +41,8 @@ def main():
                            DPDF_DATA_DIR=str(case / 'data'), DPDF_SMOKE_RECOVERY='review',
                            DPDF_SMOKE_REVIEW_OUTPUT=str(output),
                            DPDF_SMOKE_PLACEMENT_IMAGE=str(Path(__file__).with_name('fixtures').joinpath('page-photo.jpg').resolve()))
+                if args.scale is not None:
+                    env['SLINT_SCALE_FACTOR'] = str(args.scale)
                 for key in ('DPDF_SMOKE_PASSWORD', 'DPDF_SMOKE_CLIPBOARD', 'DPDF_SMOKE_PREFERENCES', 'DPDF_SMOKE_ASSEMBLY_SOURCE'):
                     env.pop(key, None)
 
@@ -68,6 +72,7 @@ def main():
                 assert 'clean copy, failed retry, older-export guard, mixed save/reopen' in report
                 if case_name == 'edit':
                     assert 'remark Undo/Redo restored remarks and revisions' in report
+                    assert 'revision selector state follows current filter and preserves hidden remarks and marks' in report
                 subprocess.run([qpdf, '--check', str(output)], capture_output=True, check=True)
                 result = subprocess.run([binary, '--review', 'inspect', str(output)], env=env,
                                         capture_output=True, text=True, check=True)

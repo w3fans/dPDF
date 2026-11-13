@@ -297,7 +297,7 @@ export component Workspace inherits Window {
                 overflow-menu := PopupWindow {
                     x: parent.width - self.width - 6px;
                     y: parent.height;
-                    width: 220px; height: 284px;
+                    width: 220px; height: 320px;
                     close-policy: PopupClosePolicy.close-on-click-outside;
                     Rectangle {
                         background: Palette.background;
@@ -309,6 +309,12 @@ export component Workspace inherits Window {
                             Button { text: "Marks…"; clicked => { overflow-menu.close(); root.open-mark-studio(); } }
                             Button { text: "Review…"; enabled: root.has-document; clicked => { overflow-menu.close(); root.review-visible = !root.review-visible; } }
                             CheckBox { text: "Remarks"; checked <=> root.remarks-on; enabled: root.review-ready; toggled => { root.filter-reviews(root.review-filter); } }
+                            ComboBox {
+                                model: root.revision-labels;
+                                current-index <=> root.revision-index;
+                                enabled: root.has-document && root.review-ready;
+                                selected => { root.choose-revision(self.current-index); overflow-menu.close(); keys.focus(); }
+                            }
                             Button { text: "Privacy…"; clicked => { overflow-menu.close(); root.confirm-clear-recovery = false; root.show-privacy(); root.privacy-visible = !root.privacy-visible; } }
                             Button { text: "About"; clicked => { overflow-menu.close(); root.show-about(); } }
                         }
@@ -339,6 +345,13 @@ export component Workspace inherits Window {
                     Button { text: "Rotate ↻"; enabled: root.has-document; clicked => { root.rotate(); } }
                     if !root.compact-toolbar: Button {text:"Review…";enabled:root.has-document;clicked=>{root.review-visible=!root.review-visible;}}
                     if !root.compact-toolbar: CheckBox {text:"Remarks";checked <=> root.remarks-on;enabled:root.review-ready; toggled=>{root.filter-reviews(root.review-filter);}}
+                    if !root.compact-toolbar: ComboBox {
+                        model: root.revision-labels;
+                        current-index <=> root.revision-index;
+                        width: 140px;
+                        enabled: root.has-document && root.review-ready;
+                        selected => { root.choose-revision(self.current-index); keys.focus(); }
+                    }
 
                     if root.native-printing: Button { text: root.compact-toolbar ? "Print…" : "Print options…"; enabled: root.has-document; clicked => { root.print-visible = true; } }
                     Rectangle { horizontal-stretch: 1; }
