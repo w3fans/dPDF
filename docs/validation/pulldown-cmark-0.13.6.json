@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "status": "PREPARED; compiled/native qualification pending",
+  "baseline": "de7a53d1c9c23f8389984a6d17df79f669c510d7",
+  "recorded_at": "2026-11-13T21:07:12.970782+00:00",
+  "package": "pulldown-cmark",
+  "old_version": "0.13.5",
+  "new_version": "0.13.6",
+  "old_registry_checksum": "278e9268c93b9e498a2da46c34d90ba93a3255eb99009646398f34bc73ab36eb",
+  "new_registry_checksum": "3db2be46835f013dd3f4fa7f5f7402c537787b54ebb6fe2b94bbdd7e2669bb7b",
+  "registry_index": "https://index.crates.io/pu/ll/pulldown-cmark",
+  "index_snapshot_sha256": "eff738c742b1a0b848a03427ea1432924ae5717c1cbf154d609ff208d564fab7",
+  "source_revision": "014b61d38d235f382935bb676bab872b7680afa2",
+  "archive_differences": [
+    ".cargo_vcs_info.json",
+    "Cargo.lock",
+    "Cargo.toml",
+    "Cargo.toml.orig",
+    "src/parse.rs",
+    "tests/suite/wikilinks.rs"
+  ],
+  "dependency_requirements_unchanged": true,
+  "features_unchanged": true,
+  "license_declaration": "MIT",
+  "license_text_unchanged": true,
+  "license_sha256": "c4f10f55904bdb9f27d3fbf94c354926d6cfe8b982276e556238c258941b243b",
+  "minimum_rust_version": "1.71.1",
+  "prior_lock_sha256": "6c20efc6d2c3430d3d7ebb970e9fb61ae4eff8bddb89893043b7663f13d76b5d",
+  "candidate_lock_sha256": "77a95cf43b58375595620d6793a1771530cce2552e3d6c58e632bc3b298dd505",
+  "patched_version_osv_matches": [],
+  "scope": "One known advisory version match. No release-wide security clearance, pin migration or manual platform qualification.",
+  "prior_slint_parser_observation": {
+    "caller": "i-slint-common 1.18.1 styled_text.rs",
+    "crate_sha256": "68a578f3e4b681b2b9cbd326d3be19716e2fac51d00a8a5b00c0ef4ae923b5e6",
+    "file_sha256": "0e95e5b8cdeaf8d801614c7206392c9305bc855e1515bfe00cef2670bb081f89",
+    "options": "ENABLE_STRIKETHROUGH only; no ENABLE_WIKILINKS or Options::all in observed parser call",
+    "assessment": "Advisory version matches, but required option absent in inspected transitive caller; upgrade to patched version remains recommended as separate qualified work"
+  },
+  "only_one_locked_package_identity_changed": true
+}
