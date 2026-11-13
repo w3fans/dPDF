@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "task": "T04 focused text histories",
+  "source_commit": "43d3dc5bce9835dc1c28e27596373e114ca3cda8",
+  "cases": [
+    {
+      "scale": 1,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "a85939aa202d149a315e8b1f81295b86d0b6625e02223a4b39ff01d1b0b52995",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "search_and_revision_field_document_changes": 0,
+      "screenshots": {
+        "reader-redo.png": "338f4038cb50406863b38a1f0e55e41582fffd374ce8510f98a366d1f7ecaf68",
+        "revision-field-redo.png": "7e25430e026fab21ce459a6153c252436730253b20bb7738a30d36ef7a0b1267",
+        "revision-field-undo.png": "d0edeb1b66fbbd8c40ae736c0a00449d1b55577afc3dbad00c2f46e43b3deb3a",
+        "revision-field-after-ctrl-y.png": "d26839cc1888f6d83d5d1070868c34362a95e199018e065877f3ae366c36a558",
+        "revision-field-before.png": "7e25430e026fab21ce459a6153c252436730253b20bb7738a30d36ef7a0b1267",
+        "focused-text-redo.png": "fa17f01fd4c24fa330080326f2f5b71d48f1bb6d990dbfd8cf6feb59afc1ad2d",
+        "focused-text-undo.png": "5446658c453baa0c4d6c5f386e5f5544c963728694f6f536ab4a616b6e5eb7e3",
+        "focused-after-ctrl-y.png": "486156c649de943ee1973562e9b604351389a29f4ec2376015529294ae2cda55",
+        "focused-before-redo.png": "fa17f01fd4c24fa330080326f2f5b71d48f1bb6d990dbfd8cf6feb59afc1ad2d",
+        "document-undo.png": "d5593041ba7ab7be1e441f97c2a139694039898b3a6189657684bbf844cd677f",
+        "created-revision.png": "867322a105512907026c925ab1be1a507d18c93afb3b3fa9a6a0d7fb03acd754"
+      }
+    },
+    {
+      "scale": 1.5,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "a85939aa202d149a315e8b1f81295b86d0b6625e02223a4b39ff01d1b0b52995",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "search_and_revision_field_document_changes": 0,
+      "screenshots": {
+        "reader-redo.png": "c08c161070811506e7a260d433e4f03ea4ece7e42f55cc320a5c7857a1cad73b",
+        "revision-field-redo.png": "ebcaf115ed4de2e85a1b7cc3bbf708678884a55ab79d078afd13f0f655e5b188",
+        "revision-field-undo.png": "2fed827816230f3a7f5a66bbaa9ad491f9492df1808a3c664e2fbe4a676f4728",
+        "revision-field-after-ctrl-y.png": "572f4536fd9b38451818842191729412d6657dec20777a25e1d4fb19d73f1f83",
+        "revision-field-before.png": "8d334a3e9ac68d3d7c62c21c1ea1e1054d13d059fc5ab25f163bfce7160557c9",
+        "focused-text-redo.png": "b47dba4b96e3fa657cd8ab14e145a88a320d177b3a67c6b90c88fcfd9ec23e61",
+        "focused-text-undo.png": "5c9f992a840276f0114bf8c09efd357d0ac4a99c2be69f9ef94f7786a9b6f7e9",
+        "focused-after-ctrl-y.png": "05aa3b3d513f7aa0497f8a68faff086ce826b44526742821ad3be8b64a6ea327",
+        "focused-before-redo.png": "0b8d533e82f39f4c0727005e5b13b85081a259cbaa9f364aaf04420442e6f43a",
+        "document-undo.png": "7b6f609eaab26a462e44aeed54a4a2dc6517388e044789434e319c8a17871dcb",
+        "created-revision.png": "ebdba15eabe5973e958c71e7f19037a3865ed4bfe85ba847b0fe6ec942545b1b"
+      }
+    },
+    {
+      "scale": 2,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "a85939aa202d149a315e8b1f81295b86d0b6625e02223a4b39ff01d1b0b52995",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "search_and_revision_field_document_changes": 0,
+      "screenshots": {
+        "reader-redo.png": "0423a7969562df7ae371b882f24244fdfe8b18ab36de0e3b134de5d6fc40b6bf",
+        "revision-field-redo.png": "e17e52d2fe48a04fd86a5ffc7966eda269b94d11878474462cc40c7941bca094",
+        "revision-field-undo.png": "6300f8d54f138b6e78d2a58bac5865800c11376b72ff4ca6b8a2e71d21d415be",
+        "revision-field-after-ctrl-y.png": "00fed47dbfb9b1768a418d09014bd6de82ff6a592e2ad2d34afd3ceb23df6f8f",
+        "revision-field-before.png": "d5ac8e7fa1c5e7e5c71091431cbe4f5a030e947b38c623c1fe4c24ba1d479ebc",
+        "focused-text-redo.png": "aeae176f747d0870d5330b2265780d575a871d79fdc64c44111470b7702f3c19",
+        "focused-text-undo.png": "472ca163d55d4f3da586c245d114878a25e27a1c87a40cf2b0ea35c1def76ca7",
+        "focused-after-ctrl-y.png": "61cd630f2387e3da87da71aab26523ade1f8b694e8e503e916aa2cd58564692f",
+        "focused-before-redo.png": "8eac346a0eebb52f92cea6ad95434bb978132277ddd360f036e3b6607e08fc6d",
+        "document-undo.png": "f21380f13cf053daf1ac90df5765b768128f71a62837de31b1ab8b9418738fc3",
+        "created-revision.png": "68e7031af3cb380fe0b6a5c82fa5fcfe6309cb30beeaf9b12c176492a53734f1"
+      }
+    }
+  ],
+  "status": "PASS for listed generated native X11 search/revision histories and reader restoration at scales 1/1.5/2"
+}

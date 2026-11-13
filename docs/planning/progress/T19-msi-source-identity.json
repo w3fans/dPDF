@@ -1,0 +1,8 @@
+{
+  "baseline": "268b234e4336789922a6b15dd1236963e131d707",
+  "sha256": {
+    "packaging/windows/test-msi.ps1": "31424e2f62eae474d884ceabdef4fbd1b58906972869ae15e7accf43ad6870aa",
+    "scripts/build-pdfium-source.sh": "8b38b21b012aa7a13aceeb321313f19439f367d884de8d5a7e932a476901b089",
+    "docs/DEPENDENCY-MAINTENANCE.md": "64aab794ccc2642d4819df312abc9cb2e27ed50686777ec6caa54eaf47c15137"
+  }
+}

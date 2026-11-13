@@ -1,0 +1,118 @@
+{
+  "schema": 1,
+  "task": "T19 separated generated UI compilation",
+  "candidate": "87fadf2b0a71985b5249d8635c2e6c45e5a73208",
+  "run": 43497797523,
+  "status": "All jobs passed; measured memory target PASS; final notice-byte correction and combined candidate checks pending",
+  "artifact": 14071784831,
+  "archive_sha256": "71fe6973fd178c3d04cb32f873196301d95fb9a91375b298faddd1b7a4d1ae41",
+  "windows_binary_sha256": "f9ad4dcb538dd4255c2fe807bae2da39f1e1a0a1b818b95f4e01f45df84eef0a",
+  "fresh_compiler_artifacts": [
+    "dpdf_ui",
+    "dpdf"
+  ],
+  "optimization_levels": {
+    "dpdf_ui": 1,
+    "dpdf": 1
+  },
+  "measurement": {
+    "schema": 1,
+    "status": "observed",
+    "measurement": "Windows job committed memory; not RSS",
+    "job_memory_limit_bytes": 2147483648,
+    "peak_job_memory_bytes": 1779228672,
+    "peak_process_memory_bytes": 1398833152,
+    "limit_flags": 8704
+  },
+  "headroom_bytes": 368254976,
+  "proposed_target_bytes": 1879048192,
+  "baseline_peak_bytes": 2125107200,
+  "peak_reduction_percent": 16.275815544740524,
+  "reader_scope": "Same-machine generated headless reader; five repeats, 32 geometry cases; not GUI/Windows/representative-office latency acceptance",
+  "reader_comparisons": [
+    {
+      "name": "50-office",
+      "before": {
+        "first_page_ready_ms": 16.792628,
+        "metadata_ms": 0.637765,
+        "first_render_ms": 15.047742,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 0.228841,
+        "eager_page_sizes_ms": 1.1832749999999999,
+        "process_peak_kib": 97400
+      },
+      "after": {
+        "first_page_ready_ms": 16.149873,
+        "metadata_ms": 0.583051,
+        "first_render_ms": 14.593503,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 0.24438100000000001,
+        "eager_page_sizes_ms": 1.28649,
+        "process_peak_kib": 96864
+      },
+      "change_percent": {
+        "first_page_ready_ms": -3.8276022073495675,
+        "first_render_ms": -3.018652233670671,
+        "process_peak_kib": -0.5503080082135514
+      }
+    },
+    {
+      "name": "1000-text",
+      "before": {
+        "first_page_ready_ms": 32.893698,
+        "metadata_ms": 12.446097,
+        "first_render_ms": 17.086482,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 4.750152,
+        "eager_page_sizes_ms": 16.678372,
+        "process_peak_kib": 101280
+      },
+      "after": {
+        "first_page_ready_ms": 30.358592,
+        "metadata_ms": 12.466376,
+        "first_render_ms": 15.761931,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 4.84386,
+        "eager_page_sizes_ms": 17.765135,
+        "process_peak_kib": 100804
+      },
+      "change_percent": {
+        "first_page_ready_ms": -7.7069656321402285,
+        "first_render_ms": -7.752040472696486,
+        "process_peak_kib": -0.4699842022116929
+      }
+    },
+    {
+      "name": "50-vector",
+      "before": {
+        "first_page_ready_ms": 21.949838,
+        "metadata_ms": 0.347497,
+        "first_render_ms": 19.064158000000003,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 0.237939,
+        "eager_page_sizes_ms": 34.792815999999995,
+        "process_peak_kib": 93436
+      },
+      "after": {
+        "first_page_ready_ms": 21.950981000000002,
+        "metadata_ms": 0.34859799999999996,
+        "first_render_ms": 19.987102,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 0.253819,
+        "eager_page_sizes_ms": 35.681633999999995,
+        "process_peak_kib": 93072
+      },
+      "change_percent": {
+        "first_page_ready_ms": 0.00520732772606447,
+        "first_render_ms": 4.841252364777904,
+        "process_peak_kib": -0.38957147138147796
+      }
+    }
+  ],
+  "notice_comparison": "All external records identical; internal crate LICENSE/NOTICE converted to CRLF on Windows. Pin exact bytes via Git attributes and repeat native comparison before merge.",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "toolchain": "cargo 1.99.1 (5f94df478 2026-08-27)\nrelease: 1.99.1\ncommit-hash: 5f94df4789f005f9a352888e8355ffc645b7ed0e\ncommit-date: 2026-08-27\nhost: x86_64-pc-windows-msvc\nlibgit2: 1.9.6 (sys:0.21.0 vendored)\nlibcurl: 8.21.0-DEV (sys:0.4.90+curl-8.21.0 vendored ssl:Schannel)\nos: Windows 10.0.26100 (Windows 11 ServerDatacenter) [64-bit]\n",
+  "compiler_toolchain_matches_baseline": true,
+  "next_candidate": "fa02b37ea6cbde26ed89276ab49e738f3e1345a8",
+  "next_run": 43500377264
+}

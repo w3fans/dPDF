@@ -1,0 +1,23 @@
+{
+  "binary_sha256": "da8d01e41fd9b1af87f955704df2251d89236403e4a813074a5ed36731b5283f",
+  "source_commit": "df8a27b4abe4115114dbdde9f6950db2b0699701",
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "page": 25,
+  "observed_stall_seconds": 2.33,
+  "helper_policy": "controlled readiness/release with finite20s fallback",
+  "screenshots": [
+    {
+      "path": "/tmp/dpdf-t03-reader-stall/helper-released.png",
+      "sha256": "a187ed42c458450f981d02e0565747597ac029ecf4f09c288d564e7ac004166d"
+    },
+    {
+      "path": "/tmp/dpdf-t03-reader-stall/helper-stalled.png",
+      "sha256": "50baa2a62c4694f57c858b82496a58edf16c12ccc01d3c9c5dd82aa461dbad42"
+    },
+    {
+      "path": "/tmp/dpdf-t03-reader-stall/initial.png",
+      "sha256": "567aadd692bc011b8e61af9de0ae496f3c48110890e367be9ec979b2a6c74b72"
+    }
+  ],
+  "scope": "Baseline blocked sole-worker navigation while a generated metadata helper stalled; not a test of the new async candidate"
+}

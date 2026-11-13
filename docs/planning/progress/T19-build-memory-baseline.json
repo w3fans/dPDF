@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "task": "T19 bounded compiler memory investigation",
+  "status": "IN_PROGRESS",
+  "baseline_candidate": "fe081869f89b66035f6a44dbe20bdcb0a8aee140",
+  "run": 43489953584,
+  "windows_artifact": 14070285357,
+  "archive_sha256": "b0ec0a06893007a6a9f09ce8bfa692a2c7c66ac176dc0d59ecad17d93c287959",
+  "native_binary_sha256": "fa36b5d758c997c7c3ca2c4a55ebc2722d86eca206fa2014512577fbb86f37ca",
+  "compiler_artifact_fresh": false,
+  "application_codegen_units": 16,
+  "optimization_level": 1,
+  "measurement": {
+    "schema": 1,
+    "status": "observed",
+    "measurement": "Windows job committed memory; not RSS",
+    "job_memory_limit_bytes": 2147483648,
+    "peak_job_memory_bytes": 2125107200,
+    "peak_process_memory_bytes": 1748570112,
+    "limit_flags": 8704
+  },
+  "headroom_bytes": 22376448,
+  "proposed_experiment_target_bytes": 1879048192,
+  "target_scope": "Proposed engineering build-commit target 1.75GiB under unchanged 2GiB cap; not a product acceptance threshold",
+  "scope_limits": [
+    "Windows commit charge, not RSS",
+    "Single observed baseline, not a universal bound",
+    "No compiler-memory fix yet established",
+    "Reader before/after comparison pending"
+  ]
+}

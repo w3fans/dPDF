@@ -1,0 +1,9 @@
+{
+  "candidate": "daeb68dd41841ebdd6180a731adf1ed2ce17eb7b",
+  "ci_run": 43468230896,
+  "sha256": {
+    "src/main.rs": "3d7d154fcda06b13d0c961c619a239f5b68e505439f57780f53fd1cc63c83156",
+    "src/encrypted.rs": "0fca6b7713989d8ce818f281f9c1db768d5cac0fda0ed058d10ef9d1fb4d357c",
+    "src/helper_process.rs": "27ef252f663c098a4839ff5e3d18213d5f97dfeddc79568b19f79e4d15d85909"
+  }
+}

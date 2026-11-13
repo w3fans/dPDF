@@ -1,0 +1,10 @@
+{
+  "baseline": "268b234e4336789922a6b15dd1236963e131d707",
+  "platform": "Linux-7.2.15-300.fc45.x86_64-x86_64-with-glibc2.44",
+  "sha256": {
+    "scripts/release-version.py": "bf3b43ca4779847298841cfc86186e425f729a5135060e4bc28b08732157a09c",
+    "scripts/test-release-version.py": "73723a575b1023d905749c3e91ec37f11ed91e402de7fa3971be9c558a723ef8",
+    ".github/workflows/ci.yml": "24bd6c431b2e7f468031455006f6f2ce2ec931bf35d722e918aacec1b692adbb",
+    "docs/TESTING.md": "b28231609fcc1aef250b62e2f12d503308d26fa272e2e55507db0603e9121c7a"
+  }
+}

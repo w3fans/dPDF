@@ -1,0 +1,9 @@
+{
+  "baseline": "268b234e4336789922a6b15dd1236963e131d707",
+  "sha256": {
+    "src/block_probe.rs": "282918fd66675da366d47bc763a04cd54777bba7d222f4a1d7f8931490ec1bea",
+    "src/storage.rs": "dfd37cc2027a241a12001b2f87330e64331c7716ade02e8d6d557c840c665966",
+    "scripts/check-block-rust.py": "97692d7adbd529225e0435950e1918d71dfef9326d1d3202cf26c6b59ab23561",
+    "docs/planning/SECURE-REGION-CONTRACT.md": "0d928d12313567b549d56670ee1c363e7f19f9fa6db6648a0713f9780773ebd7"
+  }
+}

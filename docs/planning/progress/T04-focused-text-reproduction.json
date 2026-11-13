@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "status": "REPRODUCED",
+  "task": "T04 focused text history isolation",
+  "source_commit": "c9153a54197ac8725c30b662f723378e9323672b",
+  "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+  "platform": "Fedora 45 private authenticated X11, scale 1, explicit native window focus",
+  "steps": [
+    "Create a generated review revision",
+    "Escape to reader and Ctrl+Z to undo revision creation",
+    "Ctrl+F and type Text draft stays separate",
+    "Ctrl+Y while Search retains text focus"
+  ],
+  "expected": "Search typing must not redo document review history",
+  "actual": "Existing document revision reappears, dirty marker returns and status says Redid remark edit while Search remains focused",
+  "screenshots": {
+    "created-revision.png": "867322a105512907026c925ab1be1a507d18c93afb3b3fa9a6a0d7fb03acd754",
+    "document-undo-top.png": "4be1d6750ce96d49beae89603a5ef0115d6698d97b3a12a4a0b0936e32c19808",
+    "document-undo.png": "d5593041ba7ab7be1e441f97c2a139694039898b3a6189657684bbf844cd677f",
+    "focused-after-ctrl-y-top.png": "d552f1124681d157ca27d3427cf709fd2b4d443b9d9201d233f53a2519890ab7",
+    "focused-after-ctrl-y.png": "943cd8758f3382867cbd96922edfa1679d6f6df401ae3b8e8e22f629f1a268ed",
+    "focused-before-redo-top.png": "daf5e4a94a61f29ec3e7c7521df4cdce2e02316f1fea2c19dbfbf8bf26b6d612",
+    "focused-before-redo.png": "fa17f01fd4c24fa330080326f2f5b71d48f1bb6d990dbfd8cf6feb59afc1ad2d",
+    "focused-text-redo-top.png": "f579ff682016b8a77a4b21a98e4b79a2e6a7da5aa5abff85a024c7c952a3e15f",
+    "focused-text-redo.png": "53804168fd4d24767c09030ca743a4f0cc19e1cee962ae6d3cf59bc72a4bef64",
+    "focused-text-undo-top.png": "313a9802599b1ea177623c1cf6bc34c4c121b7d0ab4f832d112e4e1234431f3e",
+    "focused-text-undo.png": "11b8ce2d125d8f9cca20decf8403b67c5df5de0ec166304dd5a3c1100c165842"
+  },
+  "script": "/tmp/dpdf-t04-focused-history.py",
+  "script_sha256": "9706f5ec3297896cf445b7ec785a69c6419b0249a6d00f1bf1a3d76ebbc51cf3",
+  "source_unchanged": true
+}

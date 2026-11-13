@@ -356,6 +356,14 @@ exports a 1000-pixel-wide diagnostic raster through the reader's render path.
 These are ordinary editable PDF image objects. They provide no secure baking or
 cryptographic seal, and modified output invalidates existing digital signatures.
 
+The review UI harness accepts `--scale 1`, `--scale 1.5` or `--scale 2` to
+explicitly select fixture scaling; without it the lane setting is retained. Its
+revision-selection diagnostic checks shared controller/filter state and hidden
+remarks independent of marks. Generated native X11 pointer/keyboard checks of toolbar/More selectors, long
+labels and narrow layouts passed at three scales in both themes; see
+[the T04 exit receipt](planning/progress/T04-exit-2026-11-13.md). Real
+Wayland/Windows visual/input acceptance remains T06.
+
 ## Release-file consistency
 
 `PYTHONDONTWRITEBYTECODE=1 python3 scripts/test-release-version.py` runs public
@@ -738,7 +746,11 @@ The pre-fix v0.1.18 executable completed XDND but opened no document; the patche
 native-event hook passes. The Fedora patch gate now runs this check.
 
 The test isolates clipboard/selection and keyboard state on its own X server.
-It does not qualify Wayland compositor drops.
+It does not qualify Wayland compositor drops. Wayland URI-list drops were
+implemented in v0.1.51 with a bounded parser in vendored Winit. v0.1.54 native
+Wayland smoke is recorded in [RELEASE-STATUS.md](RELEASE-STATUS.md); manual
+compositor source behavior still needs T06 acceptance. Keep X11 protocol tests,
+Wayland parser coverage and native interaction evidence distinct.
 
 On a dedicated Windows test desktop:
 
@@ -855,3 +867,44 @@ The tabs window suite types uncommitted page and zoom values before Ctrl+Tab and
 Ctrl+Shift+Tab. The new document must show its own page/zoom, retain its view state
 and restore reader focus. Switching document context cancels field drafts;
 ordinary navigation/relayout while editing retains the existing slow-entry rule.
+
+
+## Workspace keyboard focus
+
+T04 keeps document actions distinct from text editing. These rules describe the
+implemented text-history behavior and merged PR #13's document-switch correction,
+qualified by its hosted gates and corrected native X11 replay. Broader native
+Wayland/Windows visual/input acceptance belongs to T06.
+
+| Focus/context | Enter | Escape | Undo/Redo |
+| --- | --- | --- | --- |
+| Page field | Validate/jump, then return to reader; invalid input leaves the view unchanged and restores the displayed value | Discard uncommitted input and return to reader | Native text history only while focused |
+| Zoom field | Validate/apply, then return to reader; invalid input restores the current display | Discard uncommitted input and restore current zoom | Native text history only while focused |
+| Search field | Run the query; keep text focus | Close Search, clear selection/placement and return to reader | Native text history only while focused |
+| Revision label / remark text | No implicit document edit; use New revision / Update text or place the remark explicitly | Cancel the active placement/selection and return to reader; retain these uncommitted strings until a document-context change | Native text history only while focused |
+| Reader with Review open | No implicit edit | Cancel active selection/placement and close transient panels | Review history, even when empty; independent marks never receive the shortcut |
+| Reader with Review closed | No implicit edit | Cancel active selection/placement and close transient panels | Mark history |
+| Password prompt | Submit the masked password | Cancel the password operation | Native masked text input; document shortcuts remain blocked |
+
+Text widgets receive their native shortcuts first. Unhandled keys in a focused
+text field do not reach document history or page navigation. Linux native text
+Redo is Ctrl+Shift+Z; Windows native text Redo is Ctrl+Y. The reader supports both
+Redo combinations. An unsupported text combination does not edit another history.
+
+Ctrl+O, Ctrl+S/Shift+S, Ctrl+P, Ctrl+F, Ctrl+Tab/Shift+Tab, Ctrl+W and the existing
+zoom shortcuts are captured globally outside password prompts. Ctrl+S and
+Ctrl+Shift+S use the same Save As path: applied document drafts are exported as a
+separate copy, and otherwise Save As writes unchanged opened bytes. Uncommitted
+revision/remark input is not an applied document edit. A pending mark must first
+be placed or cancelled, matching the existing save guard.
+
+A document-context change returns focus to the reader, discards uncommitted
+page/zoom values and restores the selected document's page/zoom and stored search
+query. Revision/remark input is cleared by the existing context reset. Ordinary
+navigation/relayout within the same document preserves text being typed; it must
+not reset slow page or zoom entry on each frame.
+
+Evidence: generated native X11 field/history checks at scales 1/1.5/2, actual
+private GTK-portal Ctrl+S cancel and Ctrl+Shift+S byte-identical save, and the full
+review/viewport/tabs diagnostic suites. Current tab-switch results and exact source
+identities are recorded in planning/progress/T04-tab-input-2026-11-13.md.

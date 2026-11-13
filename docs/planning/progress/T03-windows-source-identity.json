@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "task": "T03 Windows supervisor draft",
+  "status": "IN_PROGRESS",
+  "local_branch": "work/implementation-plan",
+  "local_base": "1cf522aeccc1794e5cbad4af42a7a02fd1b05c75",
+  "candidate_commit": "05154d3a1482b1279c6c90fa86ba917c687b2de9",
+  "candidate_tree": "b62e9f7f444aa227084eb99d20f7da034fcf7327",
+  "parent_linux_candidate": "3c6b21730fc0ddda248cd0fa1fa72219d9d47f6d",
+  "pull_request": "https://github.com/w3fans/dPDF/pull/8",
+  "workflow_run": 43478128715,
+  "checks": {
+    "format": "PASS",
+    "diff_whitespace": "PASS",
+    "linux_retained_notices": "PASS (real offline metadata/tree regeneration)",
+    "windows_retained_notices": "FAIL: stale configuration; native graph generation pending",
+    "native_compilation_and_tests": "PENDING: confirmed live CI",
+    "rust_local_compilation": "NOT RUN (approved remote/hosted routes only)"
+  },
+  "files": [
+    {
+      "path": "Cargo.toml",
+      "sha256": "8dae697e8e1e0b33780446af4ec3c024e6888d64e424e9b4360ca16cc5c9bc65",
+      "git_blob": "2ed82fbb3e96c864e5e69ae273eccb9d14e1b757",
+      "bytes": 2202
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "37424afe59ac656c8d53874a509c3eb027a4c3fa96342105dcbfe364175a3cef",
+      "git_blob": "9352e00e546a83ddf3ca269abe4143c238f38a9c",
+      "bytes": 142789
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "441158d2c52bc4bd76d22a215a3d365c517d1fd2d1b18d492412db56ca489399",
+      "git_blob": "a018c0504c355d7f1d5ea55bcf0c63e17604f73e",
+      "bytes": 10669
+    },
+    {
+      "path": "src/helper_process_windows.rs",
+      "sha256": "bca1bb9b2a8aa11509574a9c868f944677f4b7cfbf7054ea7a56bce1cbfcae24",
+      "git_blob": "50e480d915b7773bdc4cedad0cdc96881c206f0f",
+      "bytes": 16140
+    },
+    {
+      "path": "src/encrypted.rs",
+      "sha256": "a30c4010c520e9325a984cdbaa0b128ad2ba75f0fe49a9b6f4445f3da0c45cd0",
+      "git_blob": "c695eaee3a9d71d58d81d6b8fefb1ae3d3b13cd6",
+      "bytes": 7929
+    },
+    {
+      "path": "src/assembly.rs",
+      "sha256": "f265931216a8dcd0c120637bce35907600364efaa6d36b80d9dcf93799f5df07",
+      "git_blob": "3081319cfb53aacae7cbf5b5b80dd59be1edeba7",
+      "bytes": 22502
+    },
+    {
+      "path": "src/review.rs",
+      "sha256": "57053992e9b3d67c7c0d86eeaa375112b4b3f0af7f02dad24c87ec50847f6165",
+      "git_blob": "223e90c619c502f1dc943799a998c06747f69b65",
+      "bytes": 37679
+    },
+    {
+      "path": "src/platform.rs",
+      "sha256": "45cd04c64339710243e68550ffec86c51d326a4c034e535d08b3797560f03da5",
+      "git_blob": "b7d1d362cebc1f6c07fd7d6e48991eb62cb72753",
+      "bytes": 20693
+    },
+    {
+      "path": "packaging/licenses/rust/inventory-linux.json",
+      "sha256": "0cb8ff8bea03962c7a4ec605246b4b9f57e11931b5ecfab2027b3c357a805091",
+      "git_blob": "0ae5e7d85c7f49aa50761f15f42e0ad38b2711b6",
+      "bytes": 314645
+    },
+    {
+      "path": "packaging/licenses/rust/inventory-windows.json",
+      "sha256": "c5d21583f4ce4a06717c211c40c82b7e4960bcba9260a5a256fa1ed467170b9d",
+      "git_blob": "a3091ced92480e51ec38928e38ac32c673eaf34d",
+      "bytes": 240493
+    }
+  ],
+  "historical_note": "Initial native supervisor candidate receipt; subsequent notice import/reconciliation follows in T03-native-notices-source-identity.json"
+}

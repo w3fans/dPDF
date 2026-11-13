@@ -249,6 +249,12 @@ edited/replaced by a determined editor: this is resistance to casual removal, no
 proof of identity or cryptographic integrity. A later certificate-based seal is a
 separate step; later modifications should invalidate it.
 
+The proposed [production secure-region contract](planning/SECURE-REGION-CONTRACT.md)
+defines T12's support/refusal table, source-bound preflight plan, geometry,
+publication/cancellation and independent verification obligations. It is awaiting
+experienced PDF review; no backend or production capability follows from it.
+Initial annotation refusal explicitly leaves independent-review acceptance open.
+
 ## Review revisions remain separate
 
 Use standard PDF note/highlight/underline annotations for interoperability, plus

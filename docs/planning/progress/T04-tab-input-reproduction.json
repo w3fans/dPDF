@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "status": "REPRODUCED",
+  "task": "T04 tab changes during text input",
+  "source_commit": "43d3dc5bce9835dc1c28e27596373e114ca3cda8",
+  "binary_sha256": "a85939aa202d149a315e8b1f81295b86d0b6625e02223a4b39ff01d1b0b52995",
+  "platform": "Private authenticated X11 scale 1",
+  "source_pages": [
+    50,
+    3
+  ],
+  "steps": [
+    "Focus page field in generated50.pdf and type 12 without Enter",
+    "Ctrl+Tab to secondary3.pdf",
+    "Observe 12 / 3 while the document remains on page 1",
+    "Repeat with an uncommitted zoom value; it remains displayed on the other document"
+  ],
+  "expected": "Document switch cancels uncommitted input and shows destination document page/zoom",
+  "actual": "Text field retains focus and stale page/zoom value across document switch",
+  "screenshots": {
+    "second-after-zoom-field.png.top.png": "029baa7456648911afe092a2257c48cb8ebb04dee1506fa8e656edeebe43f706",
+    "first-zoom-field-edit.png.top.png": "77c74966e9f0729c5a1a7445d629ddbe618bdd0e07d000da4c92a1a2ff7a349c",
+    "second-after-page-field.png.top.png": "b6e55b09f582861d4ff0db878c1457efc50c1f93cf7db283a5e6c96ac31b76bb",
+    "first-page-field-edit.png.top.png": "1b06c10c291a6c6be786e3b48553844be562bfc70f8e72a1a3db6ba4eb075868",
+    "first-after-zoom-field.png": "aa128077cb52fc60ad2eae3926e088ac160a12709951c3b200e287e391dd4380",
+    "second-after-zoom-field.png": "8801b9955ba0b9ee8df15ce44aa96163591c01e586ee631ece3401404e83f9f6",
+    "first-zoom-field-edit.png": "aa128077cb52fc60ad2eae3926e088ac160a12709951c3b200e287e391dd4380",
+    "first-after-page-field.png": "fedde5b875e50a423039cc0bbc60f2e98f55ced14b10a3d4e8e68fee15a26124",
+    "second-after-page-field.png": "9b2e585fc3ca1d97c8c6716c23f4148112c4e698cb8ebcf7e0952ad1b593d649",
+    "first-page-field-edit.png": "fedde5b875e50a423039cc0bbc60f2e98f55ced14b10a3d4e8e68fee15a26124"
+  },
+  "script": "/tmp/dpdf-t04-tab-input.py",
+  "script_sha256": "56f28b8b37e149b1e680cabdf7e226d13a50f7d821112a2eb89111699fcfbdaf"
+}
