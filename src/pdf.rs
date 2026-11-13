@@ -171,12 +171,22 @@ pub struct Worker {
 }
 impl Worker {
     pub fn try_send(&self, command: Command) -> Result<(), &'static str> {
-        self.commands
-            .try_send(command)
-            .map_err(|error| match error {
-                mpsc::TrySendError::Full(_) => "request queue is full",
-                mpsc::TrySendError::Disconnected(_) => "worker is disconnected",
-            })
+        let closed = match &command {
+            Command::Close(id) => Some(*id),
+            _ => None,
+        };
+        let send = || {
+            self.commands
+                .try_send(command)
+                .map_err(|error| match error {
+                    mpsc::TrySendError::Full(_) => "request queue is full",
+                    mpsc::TrySendError::Disconnected(_) => "worker is disconnected",
+                })
+        };
+        match closed {
+            Some(id) => self.shutdown.close_on_success(id, send),
+            None => send(),
+        }
     }
 }
 impl Drop for Worker {
@@ -971,6 +981,7 @@ pub fn start() -> Worker {
                     documents.remove(&id);
                     cache.retain(|k: &RenderKey| k.document != id);
                     if search.as_ref().is_some_and(|s| s.id == id) { search = None; }
+                    stopping.forget_document(id);
                 }
                 Some(Command::Render { generation, key }) => {
                     if generation != active.load(Ordering::Relaxed) { continue; }
@@ -1337,6 +1348,7 @@ mod tests {
             !request.matches(&reply.ticket),
             "Accepted tab close still permits a ready helper result to publish"
         );
+        assert!(!request.claim_publication(&reply.ticket));
     }
 
     #[test]
@@ -1349,6 +1361,52 @@ mod tests {
         assert!(worker.try_send(Command::Snapshot(7)).is_ok());
         assert!(worker.try_send(Command::Close(7)).is_err());
         assert!(request.matches(&reply.ticket));
+    }
+
+    #[test]
+    fn accepted_close_rejects_late_registration_without_leaking_a_lease() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let (worker, requests) = admission_worker(shutdown.clone());
+        assert!(worker.try_send(Command::Close(7)).is_ok());
+        assert!(jobs.submit(7, ()).is_err());
+        assert!(jobs.submit(8, ()).is_ok());
+        assert!(jobs.submit(9, ()).is_ok());
+        assert!(jobs.submit(10, ()).is_err());
+        drop(ready_helper(&jobs));
+        drop(ready_helper(&jobs));
+        assert!(matches!(requests.try_recv(), Ok(Command::Close(7))));
+        shutdown.forget_document(7); // Owner cleanup after preceding FIFO commands.
+        assert!(jobs.submit(7, ()).is_ok());
+    }
+
+    #[test]
+    fn publication_claim_precedes_close_and_is_single_use() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let request = jobs.submit(7, ()).unwrap();
+        let reply = ready_helper(&jobs);
+        let folder = tempfile::tempdir().unwrap();
+        let source = folder.path().join("source.pdf");
+        let destination = folder.path().join("output.pdf");
+        std::fs::write(&source, b"generated immutable source").unwrap();
+        std::fs::write(&destination, b"previous output").unwrap();
+        let staged =
+            crate::assembly::StagedExport::new(&destination, vec![source.clone()]).unwrap();
+        std::fs::write(staged.path(), b"validated generated output").unwrap();
+        assert!(request.claim_publication(&reply.ticket));
+        let (worker, _requests) = admission_worker(shutdown);
+        assert!(worker.try_send(Command::Close(7)).is_ok());
+        assert!(!request.claim_publication(&reply.ticket));
+        staged.with_pages(1).publish().unwrap();
+        assert_eq!(
+            std::fs::read(&destination).unwrap(),
+            b"validated generated output"
+        );
+        assert_eq!(
+            std::fs::read(&source).unwrap(),
+            b"generated immutable source"
+        );
     }
     #[test]
     fn shared_reader_retains_snapshot_without_copy_and_supports_random_access() {

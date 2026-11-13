@@ -1,16 +1,44 @@
 //! One bounded byte-only helper worker. Native engine handles must never enter it.
 use anyhow::{Context, Result, bail};
 use std::{
+    collections::HashSet,
     panic::{AssertUnwindSafe, catch_unwind},
     sync::{
         Arc, Mutex, Weak,
-        atomic::{AtomicBool, AtomicUsize, Ordering},
+        atomic::{AtomicBool, AtomicU8, AtomicUsize, Ordering},
         mpsc::{self, Receiver, SyncSender},
     },
     thread::{self, JoinHandle},
 };
 
 const MAX_OUTSTANDING: usize = 2;
+const RUNNING: u8 = 0;
+const CANCELLED: u8 = 1;
+const PUBLISHING: u8 = 2;
+
+struct Token {
+    cancelled: AtomicBool,
+    phase: AtomicU8,
+}
+impl Token {
+    fn cancel(&self) {
+        if matches!(
+            self.phase
+                .compare_exchange(RUNNING, CANCELLED, Ordering::AcqRel, Ordering::Acquire),
+            Ok(_) | Err(CANCELLED)
+        ) {
+            self.cancelled.store(true, Ordering::Release);
+        }
+        // Publication already claimed is the commit point; its helper has
+        // finished, and cancellation cannot roll back an atomic file replace.
+    }
+}
+
+#[derive(Default)]
+struct Registry {
+    requests: Vec<(u64, Weak<Token>)>,
+    closed: HashSet<u64>,
+}
 
 pub(crate) fn check_cancelled(cancel: Option<&AtomicBool>) -> Result<()> {
     if cancel.is_some_and(|value| value.load(Ordering::Acquire)) {
@@ -24,7 +52,7 @@ pub(crate) struct Cancellation(Arc<CancellationState>);
 #[derive(Default)]
 struct CancellationState {
     stopped: AtomicBool,
-    requests: Mutex<Vec<Weak<AtomicBool>>>,
+    requests: Mutex<Registry>,
 }
 impl Cancellation {
     pub fn stopped(&self) -> bool {
@@ -33,16 +61,59 @@ impl Cancellation {
     pub fn stop(&self) {
         self.0.stopped.store(true, Ordering::Release);
         let requests = self.0.requests.lock().unwrap_or_else(|p| p.into_inner());
-        for request in requests.iter().filter_map(Weak::upgrade) {
-            request.store(true, Ordering::Release);
+        for request in requests
+            .requests
+            .iter()
+            .filter_map(|(_, request)| request.upgrade())
+        {
+            request.cancel();
         }
     }
-    fn register(&self) -> Arc<AtomicBool> {
+    pub fn close_on_success<T, E>(
+        &self,
+        id: u64,
+        send: impl FnOnce() -> std::result::Result<T, E>,
+    ) -> std::result::Result<T, E> {
         let mut requests = self.0.requests.lock().unwrap_or_else(|p| p.into_inner());
-        let cancel = Arc::new(AtomicBool::new(self.stopped()));
-        requests.retain(|request| request.strong_count() != 0);
-        requests.push(Arc::downgrade(&cancel));
-        cancel
+        // The callback only performs nonblocking command admission. Registration
+        // and owner cleanup cannot race this close marker into or out of existence.
+        let result = send()?;
+        requests.closed.insert(id);
+        for request in requests
+            .requests
+            .iter()
+            .filter(|(document, _)| *document == id)
+            .filter_map(|(_, request)| request.upgrade())
+        {
+            request.cancel();
+        }
+        Ok(result)
+    }
+    pub fn forget_document(&self, id: u64) {
+        self.0
+            .requests
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .closed
+            .remove(&id);
+    }
+    fn register(&self, id: u64) -> Result<Arc<Token>> {
+        let mut requests = self.0.requests.lock().unwrap_or_else(|p| p.into_inner());
+        if self.stopped() {
+            bail!("Helper worker is stopping");
+        }
+        if requests.closed.contains(&id) {
+            bail!("Document was closed");
+        }
+        let token = Arc::new(Token {
+            cancelled: AtomicBool::new(false),
+            phase: AtomicU8::new(RUNNING),
+        });
+        requests
+            .requests
+            .retain(|(_, request)| request.strong_count() != 0);
+        requests.requests.push((id, Arc::downgrade(&token)));
+        Ok(token)
     }
 }
 
@@ -50,16 +121,25 @@ impl Cancellation {
 pub(crate) struct Request {
     pub id: u64,
     pub generation: u64,
-    cancel: Arc<AtomicBool>,
+    token: Arc<Token>,
 }
 impl Request {
     pub fn cancel(&self) {
-        self.cancel.store(true, Ordering::Release);
+        self.token.cancel();
     }
     pub fn matches(&self, ticket: &Ticket) -> bool {
         self.id == ticket.request.id
             && self.generation == ticket.request.generation
-            && !self.cancel.load(Ordering::Acquire)
+            && self.token.phase.load(Ordering::Acquire) == RUNNING
+            && !self.token.cancelled.load(Ordering::Acquire)
+    }
+    pub fn claim_publication(&self, ticket: &Ticket) -> bool {
+        self.matches(ticket)
+            && self
+                .token
+                .phase
+                .compare_exchange(RUNNING, PUBLISHING, Ordering::AcqRel, Ordering::Acquire)
+                .is_ok()
     }
 }
 
@@ -99,11 +179,13 @@ impl<T: Send + 'static, R: Send + 'static> Jobs<T, R> {
             .name("dpdf-metadata".into())
             .spawn(move || {
                 for (ticket, task) in requests {
-                    let result = if ticket.request.cancel.load(Ordering::Acquire) {
+                    let result = if ticket.request.token.phase.load(Ordering::Acquire) != RUNNING
+                        || ticket.request.token.cancelled.load(Ordering::Acquire)
+                    {
                         Err("Helper operation cancelled".into())
                     } else {
                         match catch_unwind(AssertUnwindSafe(|| {
-                            execute(task, &ticket.request.cancel)
+                            execute(task, &ticket.request.token.cancelled)
                         })) {
                             Ok(result) => result.map_err(|error| format!("{error:#}")),
                             Err(_) => Err("Background helper task failed".into()),
@@ -147,14 +229,15 @@ impl<T: Send + 'static, R: Send + 'static> Jobs<T, R> {
                 break;
             }
         }
+        let lease = Lease(self.outstanding.clone());
         let request = Request {
             id,
             generation: self.generation,
-            cancel: self.cancellation.register(),
+            token: self.cancellation.register(id)?,
         };
         let ticket = Ticket {
             request: request.clone(),
-            _lease: Lease(self.outstanding.clone()),
+            _lease: lease,
         };
         self.continue_task(ticket, task)?;
         Ok(request)
@@ -236,7 +319,7 @@ mod tests {
         cancellation.stop();
         drop(jobs);
         assert!(start.elapsed() < Duration::from_secs(1));
-        assert!(cancellation.register().load(Ordering::Acquire));
+        assert!(cancellation.register(2).is_err());
     }
     #[test]
     fn failed_task_returns_an_error_and_does_not_poison_the_worker() {

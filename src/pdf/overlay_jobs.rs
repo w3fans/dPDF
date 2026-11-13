@@ -165,6 +165,9 @@ pub(super) fn completed(
         return;
     };
     if !state.request.matches(&completion.ticket) {
+        let _ = responses.send(Event::ExportFinished(Err(
+            "Export cancelled before publication".into(),
+        )));
         return;
     }
     let result = (|| -> Result<Option<crate::assembly::ExportResult>> {
@@ -191,10 +194,10 @@ pub(super) fn completed(
                     Err(message) => bail!(message),
                     _ => bail!("Unexpected prepared export result"),
                 };
-                // Close and publication execute on this same owner thread.
-                // A completion dropped after Close cannot replace its destination.
+                // Successful UI close admission cancels on the UI thread.
+                // Atomically claim publication against that cancellation.
                 ensure!(
-                    state.request.matches(&completion.ticket),
+                    state.request.claim_publication(&completion.ticket),
                     "Export cancelled before publication"
                 );
                 Ok(Some(staged.publish()?))

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Cancel helper requests when tab close is accepted and atomically order staged publication against cancellation, preserving rejected-close retry and lease cleanup.
+
 - Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
 
 - Keep overlay preflight and final exports in the owned helper queue, staging validated bytes for publication by the document owner and discarding late results after tab close.
