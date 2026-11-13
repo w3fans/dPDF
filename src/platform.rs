@@ -168,14 +168,19 @@ pub fn discover_printers() -> Result<Vec<String>> {
 
 #[cfg(target_os = "linux")]
 fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
-    let output = Command::new(executable)
-        .arg("-e")
-        .output()
-        .context("Discover system printers with lpstat")?;
+    let output = cups_output(
+        Command::new(executable).arg("-e"),
+        std::time::Duration::from_secs(5),
+        false,
+    )?;
     if !output.status.success() {
         bail!(
             "Printer discovery failed: {}",
-            String::from_utf8_lossy(&output.stderr).trim()
+            String::from_utf8_lossy(&output.stderr)
+                .chars()
+                .take(2000)
+                .collect::<String>()
+                .trim()
         );
     }
     let mut names: Vec<_> = String::from_utf8_lossy(&output.stdout)
@@ -187,6 +192,33 @@ fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
     names.sort();
     names.dedup();
     Ok(names)
+}
+
+#[cfg(target_os = "linux")]
+fn cups_output(
+    command: &mut Command,
+    timeout: std::time::Duration,
+    submission: bool,
+) -> Result<std::process::Output> {
+    crate::helper_process::run(
+        command,
+        b"",
+        crate::helper_process::Limits {
+            timeout,
+            stdout: 64 * 1024,
+            stderr: 64 * 1024,
+        },
+        None,
+    )
+    .map_err(|error| {
+        if submission {
+            anyhow::anyhow!(
+                "CUPS did not confirm submission: {error}. The job may already be queued; check the print queue before submitting again"
+            )
+        } else {
+            anyhow::anyhow!("Discover system printers with lpstat: {error}")
+        }
+    })
 }
 
 #[cfg(target_os = "linux")]
@@ -222,15 +254,19 @@ fn submit_cups_with_command(
             "print-scaling=none"
         },
     ]);
-    let output = command
-        .arg("--")
-        .arg(path)
-        .output()
-        .context("Start CUPS lp; install cups-client and configure a printer")?;
+    let output = cups_output(
+        command.arg("--").arg(path),
+        std::time::Duration::from_secs(30),
+        true,
+    )?;
     if !output.status.success() {
         bail!(
-            "Printer rejected job: {}",
-            String::from_utf8_lossy(&output.stderr).trim()
+            "CUPS did not confirm submission: {}. The job may already be queued; check the print queue before submitting again",
+            String::from_utf8_lossy(&output.stderr)
+                .chars()
+                .take(2000)
+                .collect::<String>()
+                .trim()
         );
     }
     Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
@@ -257,15 +293,26 @@ pub fn print_pdf(path: &Path, range: &str, printer: &str, fit: bool) -> Result<S
         } else {
             format!("{range},{}", if fit { "fit" } else { "noscale" })
         };
-        let output = command
-            .args(["-silent", "-print-settings", &settings])
-            .arg(path)
-            .output()
-            .context("Start configured Windows print helper")?;
+        let output = crate::helper_process::run(
+            command
+                .args(["-silent", "-print-settings", &settings])
+                .arg(path),
+            b"",
+            crate::helper_process::Limits {
+                timeout: std::time::Duration::from_secs(60),
+                stdout: 64 * 1024,
+                stderr: 64 * 1024,
+            },
+            None,
+        )
+        .map_err(|error| anyhow::anyhow!("Windows print helper did not confirm submission: {error}. The job may already be queued; check the print queue before submitting again"))?;
         if !output.status.success() {
             bail!(
-                "Windows print helper failed: {}",
+                "Windows print helper did not confirm submission: {}. The job may already be queued; check the print queue before submitting again",
                 String::from_utf8_lossy(&output.stderr)
+                    .chars()
+                    .take(2000)
+                    .collect::<String>()
             );
         }
         Ok("Sent to configured Windows print helper".into())
@@ -435,6 +482,69 @@ mod tests {
                 .contains("printer offline")
         );
         drop(writable);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn cups_stalls_and_floods_report_ambiguity_without_resubmitting() {
+        use std::time::{Duration, Instant};
+        let folder = tempfile::tempdir().unwrap();
+        let attempts = folder.path().join("attempts");
+        let source = folder.path().join("source.pdf");
+        std::fs::write(&source, b"%PDF unchanged source").unwrap();
+        let command = |delay: &str| {
+            let mut command = Command::new("/bin/sh");
+            command
+                .args([
+                    "-c",
+                    "printf 'submitted\\n' >> \"$1\"; sleep \"$2\"",
+                    "fixture",
+                ])
+                .arg(&attempts)
+                .arg(delay);
+            command
+        };
+        // Characterize the previous Command::output boundary with a finite
+        // stall before exercising the replacement against the same fixture.
+        let start = Instant::now();
+        assert!(command("0.25").output().unwrap().status.success());
+        assert!(start.elapsed() >= Duration::from_millis(200));
+        assert_eq!(std::fs::read_to_string(&attempts).unwrap(), "submitted\n");
+        std::fs::write(&attempts, b"").unwrap();
+        let start = Instant::now();
+        let error = cups_output(&mut command("30"), Duration::from_millis(150), true)
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("deadline") && error.contains("may already be queued"));
+        assert!(error.contains("check the print queue"));
+        assert!(start.elapsed() < Duration::from_secs(3));
+        assert_eq!(std::fs::read_to_string(&attempts).unwrap(), "submitted\n");
+        for stream in ["cat /dev/zero", "cat /dev/zero >&2"] {
+            let error = cups_output(
+                Command::new("/bin/sh").args(["-c", stream]),
+                Duration::from_secs(3),
+                true,
+            )
+            .unwrap_err()
+            .to_string();
+            assert!(error.contains("byte limit") && error.contains("may already be queued"));
+        }
+        let error = cups_output(
+            Command::new("/bin/sh").args(["-c", "sleep 30"]),
+            Duration::from_millis(150),
+            false,
+        )
+        .unwrap_err()
+        .to_string();
+        assert!(error.contains("deadline") && !error.contains("queued"));
+        let retry = cups_output(
+            Command::new("/bin/sh").args(["-c", "printf 'request id is retry-1'"]),
+            Duration::from_secs(3),
+            true,
+        )
+        .unwrap();
+        assert_eq!(retry.stdout, b"request id is retry-1");
+        assert_eq!(std::fs::read(&source).unwrap(), b"%PDF unchanged source");
     }
 
     #[cfg(target_os = "linux")]

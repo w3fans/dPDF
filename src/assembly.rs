@@ -4,11 +4,12 @@ use anyhow::{Context, Result, bail};
 use serde_json::{Value, json};
 use std::{
     borrow::Cow,
-    io::Read,
     path::{Path, PathBuf},
-    process::{Command, Output, Stdio},
+    process::{Command, Output},
     sync::Arc,
 };
+#[cfg(not(any(target_os = "linux", target_os = "windows")))]
+use std::{io::Read, process::Stdio};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum OperationKind {
@@ -106,32 +107,90 @@ fn checked(output: Output, action: &str) -> Result<Output> {
     Ok(output)
 }
 
+/// Bounded scalar/status qpdf calls. Metadata uses its separate 64-MiB policy.
+pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
+    let output = crate::helper_process::run(
+        command,
+        b"",
+        crate::helper_process::Limits {
+            timeout: std::time::Duration::from_secs(60),
+            stdout: 64 * 1024,
+            stderr: 64 * 1024,
+        },
+        None,
+    )
+    .with_context(|| format!("Run qpdf: {action}"))?;
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    let output = command
+        .output()
+        .with_context(|| format!("Run qpdf: {action}"))?;
+    checked(output, action)
+}
+
 pub(crate) fn inspect_metadata(path: &Path) -> Result<Value> {
-    let mut child = Command::new(qpdf_executable())
-        .arg("--json")
-        .arg("--json-stream-data=none")
-        .arg(path_string(path)?.as_ref())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .context("Start qpdf metadata inspection")?;
-    let mut bytes = Vec::new();
-    let read = child
-        .stdout
-        .take()
-        .context("PDF metadata inspection pipe")?
-        .take(64 * 1024 * 1024 + 1)
-        .read_to_end(&mut bytes);
-    if read.is_err() || bytes.len() > 64 * 1024 * 1024 {
-        let _ = child.kill();
-        let _ = child.wait();
-        read?;
-        bail!("PDF metadata inspection exceeds 64 MiB");
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
+    {
+        inspect_metadata_with(
+            path,
+            &qpdf_executable(),
+            crate::helper_process::Limits {
+                timeout: std::time::Duration::from_secs(30),
+                stdout: 64 * 1024 * 1024,
+                stderr: 0,
+            },
+        )
     }
-    if !child.wait()?.success() {
+    #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+    {
+        let mut child = Command::new(qpdf_executable())
+            .arg("--json")
+            .arg("--json-stream-data=none")
+            .arg(path_string(path)?.as_ref())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()
+            .context("Start qpdf metadata inspection")?;
+        let mut bytes = Vec::new();
+        let read = child
+            .stdout
+            .take()
+            .context("PDF metadata inspection pipe")?
+            .take(64 * 1024 * 1024 + 1)
+            .read_to_end(&mut bytes);
+        if read.is_err() || bytes.len() > 64 * 1024 * 1024 {
+            let _ = child.kill();
+            let _ = child.wait();
+            read?;
+            bail!("PDF metadata inspection exceeds 64 MiB");
+        }
+        if !child.wait()?.success() {
+            bail!("qpdf could not inspect PDF metadata");
+        }
+        serde_json::from_slice(&bytes).context("Read qpdf document metadata")
+    }
+}
+
+#[cfg(any(target_os = "linux", target_os = "windows"))]
+fn inspect_metadata_with(
+    path: &Path,
+    executable: &Path,
+    limits: crate::helper_process::Limits,
+) -> Result<Value> {
+    let output = crate::helper_process::run(
+        Command::new(executable)
+            .arg("--json")
+            .arg("--json-stream-data=none")
+            .arg(path_string(path)?.as_ref()),
+        b"",
+        limits,
+        None,
+    )
+    .context("Inspect PDF metadata")?;
+    if !output.status.success() {
         bail!("qpdf could not inspect PDF metadata");
     }
-    serde_json::from_slice(&bytes).context("Read qpdf document metadata")
+    serde_json::from_slice(&output.stdout).context("Read qpdf document metadata")
 }
 
 /// One immutable metadata snapshot shared by independent page-unit/review readers.
@@ -145,12 +204,10 @@ pub(crate) fn inspect_snapshot(bytes: &[u8]) -> Result<Value> {
 }
 
 pub(crate) fn page_count(executable: &Path, path: &Path) -> Result<usize> {
-    let output = checked(
+    let output = run_qpdf(
         Command::new(executable)
             .arg("--show-npages")
-            .arg(path_string(path)?.as_ref())
-            .output()
-            .context("Start qpdf; install it or set DPDF_QPDF_BINARY")?,
+            .arg(path_string(path)?.as_ref()),
         "Inspect PDF",
     )?;
     let count: usize = String::from_utf8(output.stdout)?
@@ -355,13 +412,7 @@ pub fn export_plan(
     let protected: Vec<_> = sources.iter().map(|source| source.path.as_path()).collect();
     crate::storage::ensure_separate_output(&destination, &protected)?;
     let executable = qpdf_executable();
-    let version = checked(
-        Command::new(&executable)
-            .arg("--version")
-            .output()
-            .context("qpdf is unavailable; install it or set DPDF_QPDF_BINARY")?,
-        "Check qpdf",
-    )?;
+    let version = run_qpdf(Command::new(&executable).arg("--version"), "Check qpdf")?;
     let text = String::from_utf8_lossy(&version.stdout);
     let major = text
         .split_whitespace()
@@ -405,18 +456,15 @@ pub fn export_plan(
             major,
         )?)?,
     )?;
-    checked(
-        Command::new(&executable)
-            .arg(format!("--job-json-file={}", path_string(&job_path)?))
-            .output()?,
+    run_qpdf(
+        Command::new(&executable).arg(format!("--job-json-file={}", path_string(&job_path)?)),
         "Assemble pages",
     )?;
     crate::page_bookmarks::restore(&bookmarks, &temporary, scratch.path())?;
-    checked(
+    run_qpdf(
         Command::new(&executable)
             .arg("--check")
-            .arg(path_string(&temporary)?.as_ref())
-            .output()?,
+            .arg(path_string(&temporary)?.as_ref()),
         "Validate assembled PDF",
     )?;
     if page_count(&executable, &temporary)? != plan.pages().len() {
@@ -483,6 +531,82 @@ mod tests {
         assert_eq!(value["streamData"], "preserve");
         assert_eq!(value["objectStreams"], "preserve");
     }
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn metadata_helpers_bound_stalls_and_reject_bad_output_without_touching_source() {
+        use std::{
+            os::unix::fs::PermissionsExt,
+            time::{Duration, Instant},
+        };
+        let folder = tempfile::tempdir().unwrap();
+        let source = folder.path().join("immutable.pdf");
+        let original = b"%PDF generated metadata snapshot";
+        std::fs::write(&source, original).unwrap();
+        let helper = folder.path().join("metadata-helper");
+        let run = |script: &str, timeout| {
+            std::fs::write(&helper, script).unwrap();
+            std::fs::set_permissions(&helper, std::fs::Permissions::from_mode(0o700)).unwrap();
+            inspect_metadata_with(
+                &source,
+                &helper,
+                crate::helper_process::Limits {
+                    timeout,
+                    stdout: 4096,
+                    stderr: 0,
+                },
+            )
+        };
+        let start = Instant::now();
+        let error = run("#!/bin/sh\nsleep 30\n", Duration::from_millis(150)).unwrap_err();
+        assert!(format!("{error:#}").contains("deadline"));
+        assert!(start.elapsed() < Duration::from_secs(3));
+        for script in [
+            "#!/bin/sh\nprintf not-json\n",
+            "#!/bin/sh\nprintf '%s' '{\"pages\":[]}'\nprintf 'private helper detail' >&2\nexit 3\n",
+            "#!/bin/sh\ncat /dev/zero\n",
+        ] {
+            let error = run(script, Duration::from_secs(3)).unwrap_err();
+            assert!(!format!("{error:#}").contains("private helper detail"));
+            assert_eq!(std::fs::read(&source).unwrap(), original);
+        }
+        let value = run(
+            "#!/bin/sh\nprintf '%s' '{\"pages\":[]}'\n",
+            Duration::from_secs(3),
+        )
+        .unwrap();
+        assert_eq!(value["pages"], json!([]));
+        assert_eq!(std::fs::read(&source).unwrap(), original);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn page_count_rejects_warning_flood_and_bad_counts_before_retry() {
+        use std::os::unix::fs::PermissionsExt;
+        let folder = tempfile::tempdir().unwrap();
+        let source = folder.path().join("source.pdf");
+        let original = b"%PDF generated page-count fixture";
+        std::fs::write(&source, original).unwrap();
+        let helper = folder.path().join("page-count-helper");
+        for (body, expected) in [
+            ("printf 7; exit 3", None),
+            ("cat /dev/zero", None),
+            ("printf invalid", None),
+            ("printf 0", None),
+            ("printf 100001", None),
+            ("printf 7", Some(7)),
+        ] {
+            std::fs::write(&helper, format!("#!/bin/sh\n{body}\n")).unwrap();
+            std::fs::set_permissions(&helper, std::fs::Permissions::from_mode(0o700)).unwrap();
+            let result = page_count(&helper, &source);
+            if let Some(count) = expected {
+                assert_eq!(result.unwrap(), count);
+            } else {
+                assert!(result.is_err());
+            }
+            assert_eq!(std::fs::read(&source).unwrap(), original);
+        }
+    }
+
     #[test]
     fn assembly_job_uses_qpdf_11_rotation_syntax() {
         let snapshots: [PathBuf; 1] = ["original.pdf".into()];

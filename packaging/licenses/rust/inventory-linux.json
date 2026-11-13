@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "target": "x86_64-unknown-linux-gnu",
-  "config_fingerprint": "4cfadf99f0abbc87f17fd3ce3708c57978f8b08b95eb6d1238c13354b1bb8d00",
+  "config_fingerprint": "292aa89d585da88d92488326296fd504ccf1261a34b36a0cc8ea7fc8d495170d",
   "lock_fingerprint": "84037ecc94e8fd3f809ab0cbd1cd844fc7bcf579588348a6f27b485e87690c74",
   "scope": "Cargo target tree: normal/build/proc-macro dependencies",
   "audit_status": "inventory_only",
   "qualified_for_binary_distribution": false,
-  "dependency_fingerprint": "52fb1b3853ef90198d9b057fc98fb486227ec5e372eb1fd2772728bb5e3126c1",
+  "dependency_fingerprint": "93041dbc4f5d886a05f5225ca9b4c730d515ce45a92e62389ec9b25428950c5d",
   "components": [
     {
       "name": "ab_glyph",
@@ -7707,7 +7707,9 @@
         "Win32_System_DataExchange",
         "Win32_System_Diagnostics",
         "Win32_System_Diagnostics_Debug",
+        "Win32_System_Diagnostics_ToolHelp",
         "Win32_System_IO",
+        "Win32_System_JobObjects",
         "Win32_System_LibraryLoader",
         "Win32_System_Memory",
         "Win32_System_Ole",

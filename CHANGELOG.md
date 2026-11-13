@@ -4,6 +4,14 @@
 
 - Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
 
+- Refresh Windows notices from the native target graph, retaining exact notice bytes and excluding Linux build-host packages.
+
+- Prepare owned Windows helper jobs with bounded pipes, deadlines and cancellation for qpdf and silent Quick Print; keep native dialog handling separate.
+
+- Bound Linux CUPS discovery and submission helpers; report uncertain submission without automatically resubmitting.
+
+- Bound Linux noninteractive helper pipes, deadlines and output for decryption, metadata, page assembly/bookmarks/units, review exports and compact-print preparation, with generated failure/retry tests. Windows supervision and app-level cancellation remain pending.
+
 - Expose active-review revision selection in the reader toolbar and narrow More menu, sharing existing review state; check revision/filter synchronization independently of remark and mark visibility.
 
 - Keep Linux staging and summary in separate workflow steps and guard duplicate step keys with a source-only regression test.

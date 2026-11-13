@@ -112,18 +112,15 @@ pub fn set_image_page_unit(bytes: Vec<u8>, unit: f64) -> Result<Vec<u8>> {
         &patch,
         serde_json::to_vec(&serde_json::json!({"qpdf":[{"jsonversion":2},updates]}))?,
     )?;
-    let result = Command::new(qpdf_executable())
-        .arg(path_string(&input)?.as_ref())
-        .arg(format!("--update-from-json={}", path_string(&patch)?))
-        .arg("--stream-data=preserve")
-        .arg("--object-streams=preserve")
-        .arg(path_string(&output)?.as_ref())
-        .output()
-        .context("Preserve image page units")?;
-    ensure!(
-        result.status.success(),
-        "qpdf could not preserve image page units"
-    );
+    crate::assembly::run_qpdf(
+        Command::new(qpdf_executable())
+            .arg(path_string(&input)?.as_ref())
+            .arg(format!("--update-from-json={}", path_string(&patch)?))
+            .arg("--stream-data=preserve")
+            .arg("--object-streams=preserve")
+            .arg(path_string(&output)?.as_ref()),
+        "Preserve image page units",
+    )?;
     ensure!(
         from_metadata(&inspect_metadata(&output)?, 1)? == [unit],
         "Image page units did not survive output"
