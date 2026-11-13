@@ -127,6 +127,9 @@ pub(super) fn completed(
         return;
     };
     if !state.request.matches(&completion.ticket) {
+        let _ = responses.send(Event::ExportFinished(Err(
+            "Page export cancelled before publication".into(),
+        )));
         return;
     }
     let result = (|| -> Result<Option<crate::assembly::ExportResult>> {
@@ -149,7 +152,7 @@ pub(super) fn completed(
             }
             Ok(ReviewData::Exported(staged)) => {
                 ensure!(
-                    state.request.matches(&completion.ticket),
+                    state.request.claim_publication(&completion.ticket),
                     "Export cancelled before publication"
                 );
                 Ok(Some(staged.publish()?))

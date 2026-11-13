@@ -1,9 +1,10 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: draft stacked image/page-preparation increment. Its own compiled/runtime
-qualification and experienced lifecycle review are PENDING. Parent overlay and
-protected qualification retain their exact source scope in PR #10; no prior pass
-is transferred to these changes. Production baking remains disabled.
+Status: draft stacked image/page-preparation increment integrating parent close
+fix a87095b9. Qualification of this combined source and experienced lifecycle
+review are PENDING. Earlier parent overlay head 10b443f4 and image head dfa5a999
+passed their own hosted gates; their evidence does not qualify this new head.
+Production baking remains disabled.
 
 ## Reproduced problem
 
@@ -269,3 +270,34 @@ also be replayed on the built candidate. Full debug/release/Clippy, page/alias/u
 password/recovery and native Windows gates remain required. Print preparation,
 quick-print and native-dialog ownership/cancellation remain separate unfinished
 T03 work. The established experienced lifecycle review gate still applies.
+
+## Close admission and publication claim follow-up
+
+Backend serialization alone does not prove cancellation when the UI accepts a
+close: helper replies are polled before queued commands. A deterministic pure
+worker regression reproduced that an admitted Close left a ready request valid
+until owner cleanup (run 43523509748 on 1985833a). No actual output overwrite is
+claimed from that data-level test; the ready-result gate remained open.
+
+The proposed follow-up centralizes UI admission in Worker::try_send. Close uses
+a short registry lock around nonblocking queue admission, then marks the ID closed
+and cancels existing request tokens before returning success to the UI. Rejected
+admission leaves the still-open document usable. Registration rejects a marked ID,
+and its provisional lease is released. The owner removes the marker only after
+processing Close behind preceding FIFO commands and removing its native state.
+No registry lock is held while sending replies, joining workers, creating native
+objects or publishing files.
+
+Tokens transition atomically from running to cancelled or publishing. Publication
+must claim the latter state after identity/document checks; a close that wins
+first prevents it. A claim that wins before close acceptance is the commit point
+and may finish; cancellation does not roll it back. Children use the existing
+separate atomic cancellation flag, and cancelled queued work is not executed.
+Closed IDs remain only until owner cleanup. Cancelled ready export replies report
+a terminal failure even if they arrive before backend Close, clearing busy state.
+
+This strengthens the earlier backend-order-only description. The follow-up's
+hosted/runtime gates are PENDING. This dependent page/image implementation integrates the same admission and
+publication policy; its cancelled ready replies also send a terminal error. Experienced review must assess
+both orderings, delayed registration, lease release, marker reclamation and no
+mutex held across work that needs a UI callback or native owner to complete.

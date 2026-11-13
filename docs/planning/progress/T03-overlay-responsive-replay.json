@@ -1,0 +1,29 @@
+{
+  "status": "PASS for source-bound Linux replay; Windows final qualification separate",
+  "source_commit": "cf349922cdfab2b8681fb936a95f58161a84d8ff",
+  "binary_sha256": "21145e354f671fbca83f39d253741dcf9ed047f3bbd149b7b43392f7c86a4abc",
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "output_sha256": "106ebe670d7e7d7ffa2e29ddc6ea24944a968f54d4cd87ea4c0451b67bd9e2e5",
+  "helper": {
+    "pid": 3109460,
+    "start": "65226264"
+  },
+  "helper_reaped": true,
+  "source_unchanged": true,
+  "private_portal": true,
+  "pending_viewport_ocr": "dPDF sample contract - page 25\n\nReview clause 25: payment due within 30 days.\n\nSearch for payment; navigate by thumbnail or bookmark.",
+  "pending_viewport_crop": [
+    216,
+    212,
+    1164,
+    770
+  ],
+  "released_viewport_crop": [
+    216,
+    132,
+    1164,
+    690
+  ],
+  "aligned_changed_pixels": 0,
+  "scope": "Original recovered-mark native Ctrl+Shift+S through private GTK portal; page 25 renders before helper release; separate staged output validates after release; source unchanged; helper reaped"
+}

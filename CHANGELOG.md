@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Prepare page-input snapshots and image pixels off the reader, retaining one decoded image per operation and staging cancellable unit/assembly exports for document-owner publication.
+- Cancel helper requests when tab close is accepted and atomically order staged publication against cancellation, preserving rejected-close retry and lease cleanup.
 
 - Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
 

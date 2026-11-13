@@ -1152,7 +1152,7 @@ impl Application {
     }
 
     fn command(&self, ui: &Workspace, command: Command) -> bool {
-        match self.worker.commands.try_send(command) {
+        match self.worker.try_send(command) {
             Ok(()) => true,
             Err(error) => {
                 ui.set_status(format!("PDF worker busy or unavailable: {error}").into());

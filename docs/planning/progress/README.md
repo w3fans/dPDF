@@ -113,3 +113,41 @@ the owned helper pool, with only byte results crossing threads. Final publicatio
 returns to the document owner so Close can discard stale staging files. New
 multi-stage failure injection and pure staging/alias cases are prepared; current
 compiled/runtime qualification is PENDING, lifecycle review still required.
+
+
+Overlay candidate 285843d2 passed full Linux suites and all ten helper cases;
+original native recovered-mark Save As replay renders page 25 before release,
+with zero aligned body-pixel changes after save. Windows strict Clippy found the
+page_count wrapper now used only by Linux printing/tests. Corrected its target
+cfg in current head 10b443f4d6c83cdda2097140fd2eeabcad50f5cc, tree
+d1a4400c5b3b57324f57d0d2d689bf1bb1299872. Run 43519053632 is live. Keep PR #10
+draft; required experienced lifecycle review has not been supplied.
+
+Next image/page increment is isolated in /tmp/dpdf-image-preflight, branch
+work/image-preflight based on 285843d2, with the Linux-wrapper cfg fix also applied.
+Its native image replacement reproduction on qualified 8a26ab45 confirmed blank
+page 25 until target-unit metadata release; see T03-image-stall-reproduction.json.
+Draft code snapshots/decodes one image at a time off the reader, creates native
+PDF image objects on the owner, then finalizes units/assembly in the owned pool.
+Page exports use staged publication. Source-only checks pass; this isolated code
+has no compiled/runtime qualification and has not been published.
+
+
+Overlay 10b443f4 passed all jobs in 43519053632 and repeated exact-source native
+replay (zero aligned body pixel differences). It remains draft for lifecycle
+review. A subsequent deterministic admission test on 1985833a reproduced that a
+successfully queued Close left a ready helper request valid before owner cleanup:
+run 43523509748, 90 tests passed/one intended contract failed. A rejected-close
+case passed. Current proposed fix marks/cancels on successful admission, rejects
+late registration without leaking a lease, and atomically claims publication.
+It still needs its own full hosted/runtime validation.
+
+Image/page draft PR #16: head dfa5a999efea887e599a676e786b446eb7599177, tree
+d0f18952276566a483b8581cccdede9052be2c60. Run 43522795495 passed every job,
+after 72cdbd21's Linux success exposed another legacy Windows-unused wrapper.
+All fifteen Linux helper cases passed, including the 55-page mixed-input retry;
+source-bound native image replacement replay renders page 25 before helper release
+with identical aligned body pixels. Exact-source final-head replay and retention
+are still being completed separately; it depends on PR #10 and must integrate the
+close-admission/publication follow-up before any merge. Its source remains isolated
+under /tmp/dpdf-image-preflight, never overlaid onto this active worktree.
