@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Keep unhandled text-field keys within their editing context so a platform-specific Redo shortcut cannot change independent PDF review or mark history.
+
 - Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
 
 - Refresh Windows notices from the native target graph, retaining exact notice bytes and excluding Linux build-host packages.

@@ -25,6 +25,8 @@ pub(super) struct SmokeCheck {
     password_queue_started: bool,
     review_source: Option<usize>,
     review_marks: usize,
+    history_review: Option<crate::review::Review>,
+    history_generation: u64,
     usage_fixture: Option<crate::marks::AssetUse>,
     pub(super) pending_pointer: Vec<slint::platform::WindowEvent>,
     tab_reopen: Option<PathBuf>,
@@ -475,6 +477,83 @@ impl SmokeCheck {
                     self.stage = 30;
                 }
                 30 if ready => {
+                    app.step_review(ui, true);
+                    if !ui.get_can_redo_remark() {
+                        anyhow::bail!("Text focus fixture lacks independent review Redo");
+                    }
+                    self.history_review =
+                        Some(app.tabs[app.active].review.as_ref().unwrap().model.clone());
+                    self.history_generation = app.tabs[app.active].draft_generation();
+                    ui.set_query("".into());
+                    self.pending_key = Some((true, "f".into()));
+                    self.stage = 36;
+                }
+                36 => {
+                    if !ui.get_search_visible() || !ui.get_text_field_focused() {
+                        anyhow::bail!("Search did not acquire native text focus");
+                    }
+                    self.pending_key = Some((false, "n".into()));
+                    self.stage = 37;
+                }
+                37..=41 => {
+                    let tab = &app.tabs[app.active];
+                    if Some(&tab.review.as_ref().unwrap().model) != self.history_review.as_ref()
+                        || tab.draft_generation() != self.history_generation
+                        || !ui.get_can_redo_remark()
+                    {
+                        anyhow::bail!(
+                            "Focused search shortcut changed independent document history"
+                        );
+                    }
+                    match self.stage {
+                        37 => {
+                            if ui.get_query().as_str() != "n" {
+                                anyhow::bail!("Focused search did not receive text");
+                            }
+                            self.pending_key = Some((true, "y".into()));
+                        }
+                        38 => {
+                            self.pending_shift = true;
+                            self.pending_key = Some((true, "z".into()));
+                        }
+                        39 => self.pending_key = Some((true, "z".into())),
+                        40 => {
+                            if !ui.get_query().is_empty() {
+                                anyhow::bail!("Native text Undo did not remove search input");
+                            }
+                            self.pending_shift = !cfg!(target_os = "windows");
+                            self.pending_key = Some((
+                                true,
+                                if cfg!(target_os = "windows") {
+                                    "y"
+                                } else {
+                                    "z"
+                                }
+                                .into(),
+                            ));
+                        }
+                        41 => {
+                            if ui.get_query().as_str() != "n" {
+                                anyhow::bail!("Native text Redo did not restore search input");
+                            }
+                            self.pending_key = Some((false, slint::platform::Key::Escape.into()));
+                        }
+                        _ => unreachable!(),
+                    }
+                    self.stage += 1;
+                }
+                42 => {
+                    if ui.get_search_visible() || ui.get_text_field_focused() {
+                        anyhow::bail!("Escape did not return input focus to the reader");
+                    }
+                    app.step_review(ui, false);
+                    self.history_review = None;
+                    println!(
+                        "review: focused text owns Undo/Redo without changing document history"
+                    );
+                    self.stage = 43;
+                }
+                43 if ready => {
                     // A recovered review can have empty history while mark edits
                     // remain undoable. Exercise real key dispatch at that boundary.
                     app.tabs[app.active]
