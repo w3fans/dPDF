@@ -1,10 +1,11 @@
 //! Passwords travel in process memory / private stdin pipes, never command arguments.
 use anyhow::{Context, Result, bail};
+#[cfg(not(target_os = "linux"))]
 use std::{
     io::{Read, Write},
-    process::{Command, Stdio},
-    sync::Arc,
+    process::Stdio,
 };
+use std::{process::Command, sync::Arc};
 
 pub fn validate_password(password: &str) -> Result<()> {
     if password.len() > 4096 || password.chars().any(|c| matches!(c, '\0' | '\r' | '\n')) {
@@ -28,42 +29,67 @@ fn decrypt_with(
     let scratch = tempfile::tempdir().context("Create private encrypted-PDF workspace")?;
     let input = scratch.path().join("encrypted.pdf");
     std::fs::write(&input, bytes)?;
-    let mut child = Command::new(executable)
-        .arg("--password-file=-")
-        .arg("--decrypt")
-        .arg("--stream-data=preserve")
-        .arg(crate::assembly::path_string(&input)?.as_ref())
-        .arg("-")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .context("Start qpdf for encrypted editing/printing")?;
-    let written = (|| -> Result<()> {
-        let mut stdin = child.stdin.take().context("Open private password pipe")?;
-        stdin.write_all(password.as_bytes())?;
-        stdin.write_all(b"\n")?;
-        Ok(())
-    })();
-    if let Err(error) = written {
-        let _ = child.kill();
-        let _ = child.wait();
-        return Err(error).context("Write private password pipe");
-    }
-    let mut data = Vec::new();
-    let read = child
-        .stdout
-        .take()
-        .context("Open unlocked-PDF pipe")?
-        .take(256 * 1024 * 1024 + 1)
-        .read_to_end(&mut data);
-    if read.is_err() || data.len() > 256 * 1024 * 1024 {
-        let _ = child.kill();
-        let _ = child.wait();
-        read?;
-        bail!("Unlocked PDF exceeds its 256-MiB limit");
-    }
-    let status = child.wait()?;
+    #[cfg(target_os = "linux")]
+    let (data, status) = {
+        let mut private_input = password.as_bytes().to_vec();
+        private_input.push(b'\n');
+        let result = crate::helper_process::run(
+            Command::new(executable)
+                .arg("--password-file=-")
+                .arg("--decrypt")
+                .arg("--stream-data=preserve")
+                .arg(crate::assembly::path_string(&input)?.as_ref())
+                .arg("-"),
+            &private_input,
+            crate::helper_process::Limits {
+                timeout: std::time::Duration::from_secs(30),
+                stdout: 256 * 1024 * 1024,
+                stderr: 0,
+            },
+            None,
+        )?;
+        (result.stdout, result.status)
+    };
+    #[cfg(not(target_os = "linux"))]
+    let (data, status) = {
+        let mut child = Command::new(executable)
+            .arg("--password-file=-")
+            .arg("--decrypt")
+            .arg("--stream-data=preserve")
+            .arg(crate::assembly::path_string(&input)?.as_ref())
+            .arg("-")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()
+            .context("Start qpdf for encrypted editing/printing")?;
+        let written = (|| -> Result<()> {
+            let mut stdin = child.stdin.take().context("Open private password pipe")?;
+            stdin.write_all(password.as_bytes())?;
+            stdin.write_all(b"\n")?;
+            Ok(())
+        })();
+        if let Err(error) = written {
+            let _ = child.kill();
+            let _ = child.wait();
+            return Err(error).context("Write private password pipe");
+        }
+        let mut data = Vec::new();
+        let read = child
+            .stdout
+            .take()
+            .context("Open unlocked-PDF pipe")?
+            .take(256 * 1024 * 1024 + 1)
+            .read_to_end(&mut data);
+        if read.is_err() || data.len() > 256 * 1024 * 1024 {
+            let _ = child.kill();
+            let _ = child.wait();
+            read?;
+            bail!("Unlocked PDF exceeds its 256-MiB limit");
+        }
+        let status = child.wait()?;
+        (data, status)
+    };
     if !status.success() {
         // Child diagnostics are discarded: a helper must never echo a password into status/logs.
         bail!("qpdf could not prepare this unlocked PDF (exit {status}); original preserved");

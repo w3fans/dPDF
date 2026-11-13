@@ -10,6 +10,8 @@ mod block_probe;
 mod cache;
 mod document;
 mod encrypted;
+#[cfg(target_os = "linux")]
+mod helper_process;
 mod image_pages;
 mod imaging;
 mod mark_studio;
