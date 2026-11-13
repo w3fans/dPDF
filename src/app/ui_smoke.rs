@@ -108,7 +108,14 @@ impl SmokeCheck {
                     self.tab_identity = Some(app.tabs[app.active].info.id);
                     self.tab_reopen = Some(app.tabs[app.active].info.path.clone());
                     if mode == "protected-print" {
+                        // Ordinary smoke disables native dialog admission. This
+                        // generated case must queue it while decryption is held;
+                        // the fixture permits only GTK's file backend and quits
+                        // before preparation can open any print dialog.
+                        let native = ui.get_native_printing();
+                        ui.set_native_printing(true);
                         app.request_native_print(ui, false);
+                        ui.set_native_printing(native);
                         if !app.print_pending {
                             anyhow::bail!("Protected print was not admitted");
                         }

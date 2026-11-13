@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update the locked pulldown-cmark parser to 0.13.6 for the nested-wikilink parsing fix, preserving dependency requirements and MIT notice bytes.
+
 - Defer missing protected print/export working bytes through the bounded helper queue, preserving reader navigation and cancelling queued preparation when its tab closes.
 
 - Prepare cancellable background review and recovery metadata jobs so stalled helpers can leave reader navigation responsive; validate recovery dimensions before publishing the document, reject stale completions and join helper cleanup on normal shutdown.
