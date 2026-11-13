@@ -263,3 +263,29 @@ Normal patch releases remain independent of stable milestone acceptance. Missing
 API authorization is `PENDING_API_AUTH`; missing packages are `PENDING_COPR`;
 missing native Windows outputs are `PENDING_WINDOWS_ARTIFACTS`. Full delivery
 must not be inferred from a successful service exit or source tag alone.
+
+## Bounded Windows compiler memory measurements
+
+Repeated native application builds have hit LLVM out-of-memory under the existing
+2 GiB Job Object cap (for example runs 43476228011 and 43485260680). Other builds
+passed; an isolated later pass does not establish a deterministic memory fix.
+Keep the one-logical-CPU-equivalent and aggregate 2 GiB limits unchanged.
+
+The native job wrapper now queries `JobObjectExtendedLimitInformation` before
+closing each owned job and retains `<suite>.log.memory.json` beside its log.
+`peak_job_memory_bytes` is aggregate Windows committed memory, **not peak RSS**.
+A failed query records `status: unavailable` and an error code, never a fictitious
+zero-memory result. These files inherit the enclosing report's source/toolchain
+and command identity; they do not independently qualify a binary.
+
+Application release codegen units are explicitly 16 for the measurement baseline,
+matching Cargo's default release partition count. Dependency profiles, optimization
+level, Cargo concurrency and resource limits are unchanged. Before comparing a
+codegen experiment, verify the application compiler-artifact has `fresh: false`;
+a Cargo cache hit does not measure application compilation. Retain the exact
+source, compiler identity, memory log and original failed receipt. Any later
+partition change needs native build checks plus same-machine reader performance
+and output comparisons. No compiler-memory improvement is yet claimed.
+
+References: [Cargo profiles](https://doc.rust-lang.org/cargo/reference/profiles.html#codegen-units)
+and [QueryInformationJobObject](https://learn.microsoft.com/en-us/windows/win32/api/jobapi2/nf-jobapi2-queryinformationjobobject).

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Retain observed Windows job committed-memory peaks beside native validation logs and make application codegen units explicit for the bounded-build baseline.
+
 - Keep reader Undo/Redo within Review while its panel is open, including exhausted histories, so remark shortcuts cannot change independent marks.
 
 - Refresh Windows notices from the native target graph, retaining exact notice bytes and excluding Linux build-host packages.

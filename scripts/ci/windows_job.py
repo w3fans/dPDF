@@ -1,6 +1,7 @@
 """Bound an entire Windows child tree before its first instruction executes."""
 import ctypes as C
 from ctypes import wintypes as W
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -49,6 +50,7 @@ def kernel():
     signatures = {
         'CreateJobObjectW': ([C.c_void_p, W.LPCWSTR], W.HANDLE),
         'SetInformationJobObject': ([W.HANDLE, C.c_int, C.c_void_p, W.DWORD], W.BOOL),
+        'QueryInformationJobObject': ([W.HANDLE, C.c_int, C.c_void_p, W.DWORD, C.c_void_p], W.BOOL),
         'AssignProcessToJobObject': ([W.HANDLE, W.HANDLE], W.BOOL),
         'CreateProcessW': ([W.LPCWSTR, W.LPWSTR, C.c_void_p, C.c_void_p, W.BOOL,
                             W.DWORD, C.c_void_p, W.LPCWSTR,
@@ -70,6 +72,18 @@ def checked(value):
     if not value:
         raise C.WinError(C.get_last_error())
     return value
+
+
+def memory_metrics(k, job):
+    """Read aggregate committed-memory peaks before closing this owned job."""
+    usage = EXTENDED_LIMITS()
+    if not k.QueryInformationJobObject(job, 9, C.byref(usage), C.sizeof(usage), None):
+        return dict(schema=1, status='unavailable', windows_error=C.get_last_error())
+    return dict(schema=1, status='observed', measurement='Windows job committed memory; not RSS',
+                job_memory_limit_bytes=usage.JobMemoryLimit,
+                peak_job_memory_bytes=usage.PeakJobMemoryUsed,
+                peak_process_memory_bytes=usage.PeakProcessMemoryUsed,
+                limit_flags=usage.BasicLimitInformation.LimitFlags)
 
 
 def run(command, cwd, env, log: Path, timeout=1800):
@@ -124,7 +138,15 @@ def run(command, cwd, env, log: Path, timeout=1800):
         # Also covers failed assignment before ResumeThread, and leftover descendants.
         if process.hProcess:
             k.TerminateProcess(process.hProcess, 125)
-        k.CloseHandle(job)
-        for handle in (process.hThread, process.hProcess):
-            if handle:
-                k.CloseHandle(handle)
+        try:
+            metrics = memory_metrics(k, job)
+            log.with_suffix(log.suffix + '.memory.json').write_text(
+                json.dumps(metrics, indent=2) + '\n', encoding='utf-8')
+        except OSError:
+            # Telemetry failure must not hide the original child result/error.
+            print('Unable to retain Windows job memory metrics', flush=True)
+        finally:
+            k.CloseHandle(job)
+            for handle in (process.hThread, process.hProcess):
+                if handle:
+                    k.CloseHandle(handle)
