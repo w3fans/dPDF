@@ -1,0 +1,11 @@
+{
+  "baseline": "268b234e4336789922a6b15dd1236963e131d707",
+  "sha256": {
+    "Cargo.toml": "c96f8b0aa6533cbc7411d10c44e988ecb9fab31e656594f6f9b8846261692485",
+    "Cargo.lock": "37424afe59ac656c8d53874a509c3eb027a4c3fa96342105dcbfe364175a3cef",
+    "scripts/ci/runtime.py": "a550625558968a84ce3097c45dc604a110b30f1b987ab5dfb2fe2e67fa1089f3",
+    "packaging/fedora/pdfium-sources.json": "6edbcf1a15787a7bf13a1fa771d92c96fa9f11f6b2895dec83acebb4a16c91c0",
+    "third_party/winit/DPDF_PATCH.md": "ac6c6741c45e3055f8efd01211929ce1513679feccd32f4ff1e65716d82a105c",
+    "docs/DEPENDENCY-MAINTENANCE.md": "056818f5a95fcd1e4a995146049ec80f19963627b4b29586d5a50ae6417df35a"
+  }
+}

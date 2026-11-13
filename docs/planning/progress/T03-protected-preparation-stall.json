@@ -1,0 +1,31 @@
+{
+  "status": "REPRODUCED",
+  "source_commit": "b067f63f58a819bb36150c4eb6d14b466fe83a0b",
+  "binary_sha256": "1208b78afc800451cd44f42582a7f33bd924b5e72ad26b7114c93a74c6fd944d",
+  "source_sha256": "13068757a76855b78a95495072cab8433144abce40fca524b2715ea434379903",
+  "helpers": [
+    {
+      "pid": 3085085,
+      "start": "64884612"
+    },
+    {
+      "pid": 3085075,
+      "start": "64884486"
+    }
+  ],
+  "helpers_reaped": true,
+  "source_unchanged": true,
+  "expected": "Reader page 25 renders while protected preparation is pending",
+  "actual": "Page status advances to 25 but viewport/thumbnail remain blank until both controlled decrypt helpers are released",
+  "assessment": {
+    "stalled_viewport_ocr": "",
+    "released_viewport_ocr": "dPDF sample contract - page 25; Review clause 25: payment due within 30 days.",
+    "crop": [
+      216,
+      132,
+      1164,
+      710
+    ]
+  },
+  "scope": "Native XTest Ctrl+P during first protected review preparation; no print action submitted"
+}

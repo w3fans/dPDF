@@ -1,0 +1,26 @@
+{
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "binary_sha256": "1208b78afc800451cd44f42582a7f33bd924b5e72ad26b7114c93a74c6fd944d",
+  "source_commit": "b067f63f58a819bb36150c4eb6d14b466fe83a0b",
+  "helper_identity": {
+    "pid": 3078648,
+    "start": "64786341"
+  },
+  "helper_reaped": true,
+  "scope": "Generated private X11 native replay; lifecycle review still required",
+  "status": "PASS",
+  "candidate": "2d75b74bdf58dfdb390d7456e82d21965a4feba4",
+  "run": 43506767494,
+  "artifact": 14076992305,
+  "archive_sha256": "e4e0ab39d533004f4ab24a5a1ce11485407bb5b272ac83fc559b7fefeba0e227",
+  "pending_and_released_page25_visible": true,
+  "aligned_viewport_difference_bbox": null,
+  "script_sha256": "efd159a5a5fb2ad44ddcac085eea078e87cd4dd5757fa105c9f150f39098334e",
+  "screenshots": {
+    "released-page25-viewport.png": "e2867c96cfe5cdcb46b0a75664503559ccf197513eb5b50080bf61312a17a318",
+    "stalled-page25-viewport.png": "582a34e84a4d4a523c42b72f957b5353e10d11d3075bf07df76ba1b8ea43bf73",
+    "released-page25.png": "0726a745cc60503f189d7fc53cf238b433e308a98ec94babe9aa237609e35328",
+    "stalled-page25.png": "5716423ef63d802015df5e1c71bfba0f91fff8ab068da7ad602ebde0c1c500a2",
+    "before-recovery.png": "db7998435852659c4d32fae213f3be1ae07c7a112219a7f34f592b28d0960514"
+  }
+}

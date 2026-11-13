@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "task": "T04 native toolbar input increment",
+  "source_commit": "c9153a54197ac8725c30b662f723378e9323672b",
+  "candidate": "9519b5cd6bc5a88b8f0f665c752894884ed0879e",
+  "script_path": "/tmp/dpdf-t04-focused-selectors.py",
+  "script_sha256": "c6c9fa67139712154c989b062c5bbc4f848210e11964c2e83c7711fc453367c4",
+  "logical_sizes": [
+    [
+      1180,
+      800
+    ],
+    [
+      900,
+      800
+    ]
+  ],
+  "cases": [
+    {
+      "scale": 1,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "screenshots": {
+        "after-page-down.png": "3945af2b4d8e129ca886fef822b9e116e96841872e89bde3b75ef839e0c8dbf3",
+        "dark-after-page-down.png": "3c201f1789a7f3821d3c5771a515943e577e2367071323ae9649bd03e199ed31",
+        "dark-more.png": "5bc4ffbdde7558c24e6ebb70c2ce3c42f13825c23e502d91f1a0d024affc7f29",
+        "dark-selected-second.png": "d3faa1e695253f8f0aa2c806d2dda9887a27d82f221e733c3f17bdb3e3bcbab3",
+        "dark-wide.png": "5e8105b87b4f243825a2a9cf91aacb72cb776b5f4620e423d27abb8d525e5db0",
+        "label-before-create.png": "6c249f3e7aef72f2c0328b09ab36b04eb5a5dcab7c13e93248507fc79d622af6",
+        "more-long-label.png": "eadfe5cfc90e254b1ada54790219c4f391bf19c275c8633062e36a0002f357f7",
+        "selected-first.png": "49bc0e5ac3ae90ffcff41369506aeeefe6e7ca1e952133d366845f0b4a161dce",
+        "wide-long-label.png": "e3b4b6aea9dd9a08836f49c8317cafa2976f18b19369c178b3f052a67aa087f9"
+      },
+      "observed": [
+        "Long revision label created through native text input",
+        "Light: More selects Revision 1, closes and PageDown renders page 2",
+        "Dark: More selects long-label revision, closes and PageDown renders page 3"
+      ]
+    },
+    {
+      "scale": 1.5,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "screenshots": {
+        "after-page-down.png": "31bd7887281378f12b7421f4c508160cac94e823c5857263f83dd3309e7d3bce",
+        "dark-after-page-down.png": "072b1f2f7745338781b5ead27f3190ad728b1a291c91cd9784bd651ce5291335",
+        "dark-more.png": "273573b44d4e4fefaa4fe8d9ff6a8a2728abbb9a92dca624b5c7d775a421f072",
+        "dark-selected-second.png": "323a687f3f67999465adfbfa1185a7fbba1d88ee328954c30d5ccf9e56533a16",
+        "dark-wide.png": "1279a8f7fe6b8af83cdb523801d801cd9ef61122c4d39d0c39ac8bf50903699d",
+        "label-before-create.png": "0081f53b6d7b2cc1fad533edb2347fcf9fe932b10a27e442ac0a257726f3e926",
+        "more-long-label.png": "4cb0f35e35353ce9bbd132cf45902e59e93cbfae3da69847d19f132a311b6003",
+        "selected-first.png": "70471178624c68920a51efcd58303e417324d97c5c3a2be26402684334cb9bab",
+        "wide-long-label.png": "6d5a67654901d5e6dc13b851a3874b6b89cb3106962662b6e8dad765a71e1a26"
+      },
+      "observed": [
+        "Long revision label created through native text input",
+        "Light: More selects Revision 1, closes and PageDown renders page 2",
+        "Dark: More selects long-label revision, closes and PageDown renders page 3"
+      ]
+    },
+    {
+      "scale": 2,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "screenshots": {
+        "after-page-down.png": "b652ec66718182786a675de14933f70ddb577395ac7ee2d235780b67b99e44bf",
+        "dark-after-page-down.png": "28c2dcc4a364add5670a65c6b543fd230253ae2b59d8456d076755cbe564ea46",
+        "dark-more.png": "19bafdecff230144819dcf2ccabc48d974a410e7436dcc13296e344a1af27cee",
+        "dark-selected-second.png": "072056f760105919322682e680305cb29470dc9e520bd7b4c06098f7f267b3a5",
+        "dark-wide.png": "587eeb8eb0ceab196c21ad04600f6a6fbc849d94238c4eaab145a3d3f45a6f20",
+        "label-before-create.png": "894cbc776bc0bae233d3934fa7133a4a1a6cbf714c62ffd447e580b9c77e5446",
+        "more-long-label.png": "7bac7fc1a0afd033aa636eb726285a8ead51b7a8b45c5d154163ae97bc231234",
+        "selected-first.png": "fc4dec749ba96369b9c7b0a0d6e7a17898e474419ffd37b607149b21afdb33f3",
+        "wide-long-label.png": "f3daebe37152fed6cb864f229cfdd75a5201fc9a63188632acbcda15e1e5ff08"
+      },
+      "observed": [
+        "Long revision label created through native text input",
+        "Light: More selects Revision 1, closes and PageDown renders page 2",
+        "Dark: More selects long-label revision, closes and PageDown renders page 3"
+      ]
+    }
+  ],
+  "scope": "Generated private X11 native XTest input only; lifecycle review and Fedora Wayland/Windows acceptance not supplied"
+}

@@ -1,0 +1,10 @@
+{
+  "baseline": "268b234e4336789922a6b15dd1236963e131d707",
+  "sha256": {
+    "packaging/windows/test-msi.ps1": "53b3938a92d35e94fbc81c48ac1431f69949f24d7e08feb2324c0e39924ab59a",
+    "packaging/windows/dpdf.wxs": "ca4e5e70c0345eb7efb6df7e9306a3a763be88c456f7439d7ccbcf2c2423fdb7",
+    "src/preferences.rs": "37a076095c76eeaf9b8cd2be5e21a6f67438dbf05bff0d57ea4630c2ec72a978",
+    "src/marks.rs": "8728c356d0affded6be86e5343816a79479dc59e1805f41944c33b5728811c04",
+    "docs/TESTING.md": "99f64dc395d2e08a6619c9134496b6453d4383ef336043b229cc06c9022dde1c"
+  }
+}

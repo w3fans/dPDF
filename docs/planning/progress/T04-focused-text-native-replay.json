@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "task": "T04 focused text history correction",
+  "pr": 12,
+  "candidate": "8ff4332ebda60cd6752189c62a15d2b7ff05ee52",
+  "run": 43495909681,
+  "source_commit": "43d3dc5bce9835dc1c28e27596373e114ca3cda8",
+  "binary_sha256": "a85939aa202d149a315e8b1f81295b86d0b6625e02223a4b39ff01d1b0b52995",
+  "artifact": 14072961005,
+  "archive_sha256": "3ab5a365807db7abdc48ebed421dda7259cb215b49c84594349656cdfd1cf733",
+  "unchanged_regions": {
+    "review_controls": [
+      0,
+      160,
+      1180,
+      275
+    ],
+    "toolbar": [
+      0,
+      44,
+      1180,
+      117
+    ],
+    "status": [
+      0,
+      773,
+      1180,
+      800
+    ]
+  },
+  "changed_pixels": 0,
+  "native_text_undo_redo": "Observed empty search after Ctrl+Z and original text after Linux Ctrl+Shift+Z",
+  "screenshots": {
+    "focused-text-redo-input.png": "8c531d3773425289c536e8dc1dcaf61e41e258180e5dd0cc8b64c0b06e9de12e",
+    "focused-text-undo-input.png": "0b5b7bf86fd38b42983f9c989e26f07c394dfbcb3af06d810776cc8f1c7c95dd",
+    "focused-text-redo.png": "fa17f01fd4c24fa330080326f2f5b71d48f1bb6d990dbfd8cf6feb59afc1ad2d",
+    "focused-text-undo.png": "5446658c453baa0c4d6c5f386e5f5544c963728694f6f536ab4a616b6e5eb7e3",
+    "focused-after-ctrl-y.png": "486156c649de943ee1973562e9b604351389a29f4ec2376015529294ae2cda55",
+    "focused-before-redo.png": "fa17f01fd4c24fa330080326f2f5b71d48f1bb6d990dbfd8cf6feb59afc1ad2d",
+    "document-undo.png": "d5593041ba7ab7be1e441f97c2a139694039898b3a6189657684bbf844cd677f",
+    "created-revision.png": "867322a105512907026c925ab1be1a507d18c93afb3b3fa9a6a0d7fb03acd754"
+  },
+  "merged_commit": "a50144cc03d693ec6810ebcce33113bca026330b",
+  "scope": "Generated native XTest on private authenticated X11; not manual Wayland/Windows acceptance"
+}

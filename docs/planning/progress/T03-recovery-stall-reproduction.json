@@ -1,0 +1,27 @@
+{
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "binary_sha256": "797319200d5341956bb4370e2ccf0e7a9a69a59dc2bea3a22737eb402c87555d",
+  "source_commit": "c9153a54197ac8725c30b662f723378e9323672b",
+  "helper_identity": {
+    "pid": 3065579,
+    "start": "64606767"
+  },
+  "helper_reaped": true,
+  "scope": "Generated native X11 recovery metadata stall; visual/OCR assessment pending",
+  "status": "REPRODUCED",
+  "task": "T03 recovery metadata still blocks reader worker",
+  "expected": "Opened reader renders page 25 while recovery snapshot metadata waits",
+  "actual": "Page 25 status updates but reader and thumbnails stay blank until controlled helper release",
+  "viewport_ocr": {
+    "stalled": "",
+    "released": "dPDF sample contract - page 25\n\nReview clause 25: payment due within 30 days.\n\nSearch for payment; navigate by thumbnail or bookmark.\n"
+  },
+  "script_sha256": "50d20f3f2eb038b6a5ffb0dd9167557b82628ee266fa4d95835456aacaa69af5",
+  "screenshots": {
+    "released-page25-viewport.png": "e2867c96cfe5cdcb46b0a75664503559ccf197513eb5b50080bf61312a17a318",
+    "stalled-page25-viewport.png": "a1bc31eb76f446708a3942dede8481e9b84929f9607769954b18cdd9677788af",
+    "released-page25.png": "0726a745cc60503f189d7fc53cf238b433e308a98ec94babe9aa237609e35328",
+    "stalled-page25.png": "6226dce04689b34e431ec53cd44e1fd9b907d1c53fec27b470cefe36984edfe6",
+    "before-recovery.png": "db7998435852659c4d32fae213f3be1ae07c7a112219a7f34f592b28d0960514"
+  }
+}

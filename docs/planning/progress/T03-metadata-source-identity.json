@@ -1,0 +1,8 @@
+{
+  "baseline_supervisor_candidate": "daeb68dd41841ebdd6180a731adf1ed2ce17eb7b",
+  "scope": "Uncommitted Linux metadata migration; not yet compiled or pushed",
+  "sha256": {
+    "src/assembly.rs": "44ef081229c39f158bb84b349c82e41e2ad59c1c7fcddf32ce5ff34ac3d9e04f",
+    "src/helper_process.rs": "27ef252f663c098a4839ff5e3d18213d5f97dfeddc79568b19f79e4d15d85909"
+  }
+}

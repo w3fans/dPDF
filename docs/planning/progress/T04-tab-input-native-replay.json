@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "candidate": "28a0af12e6dfd3b7f172e6acd0d9b28955775191",
+  "run": 43502593114,
+  "artifact": 14074088714,
+  "archive_sha256": "c80e0cfbd282a1ad5e3e7ff6cfc6f229feaf4f434b20590e1859c11d3d97a713",
+  "source_commit": "cecc72e1f6dfa611ba540aa4153f19586e7814f7",
+  "binary_sha256": "17148ceecfe0c7d73c0413b66087c2b800773f6e0a13661e18f6f2eea13e1191",
+  "cases": [
+    {
+      "scale": 1,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "17148ceecfe0c7d73c0413b66087c2b800773f6e0a13661e18f6f2eea13e1191",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "screenshots": {
+        "second-after-zoom-field.png.toolbar.png": "6b6627b44d4b8427cfcb2ede2d5cbedda90dc25860977a7f2ec4cb3e3ae4eee0",
+        "second-after-page-field.png.toolbar.png": "6b6627b44d4b8427cfcb2ede2d5cbedda90dc25860977a7f2ec4cb3e3ae4eee0",
+        "first-after-zoom-field.png": "6d33074857fae7099e79f5fd4642578abc377d8ed98da92badbd3d9014c32146",
+        "second-after-zoom-field.png": "f4d5641bf428e225544135b228162cea2cb0a7404110b31af15cd9c37bd86c20",
+        "first-zoom-field-edit.png": "aa128077cb52fc60ad2eae3926e088ac160a12709951c3b200e287e391dd4380",
+        "first-after-page-field.png": "6d33074857fae7099e79f5fd4642578abc377d8ed98da92badbd3d9014c32146",
+        "second-after-page-field.png": "f4d5641bf428e225544135b228162cea2cb0a7404110b31af15cd9c37bd86c20",
+        "first-page-field-edit.png": "fedde5b875e50a423039cc0bbc60f2e98f55ced14b10a3d4e8e68fee15a26124"
+      },
+      "observed": "Page 1 / 3 and canonical 82% zoom after both tab switches"
+    },
+    {
+      "scale": 1.5,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "17148ceecfe0c7d73c0413b66087c2b800773f6e0a13661e18f6f2eea13e1191",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "screenshots": {
+        "second-after-zoom-field.png.toolbar.png": "e90b3d21c5af16493da16e4273eba194c6dd08d5741fdd6d020961f4059c386d",
+        "second-after-page-field.png.toolbar.png": "e90b3d21c5af16493da16e4273eba194c6dd08d5741fdd6d020961f4059c386d",
+        "first-after-zoom-field.png": "d7bfca86835e749882d9d96c5ca4269e5791557be8d4ac94f4e91e125d90a8db",
+        "second-after-zoom-field.png": "eb526bdc035917ce8163e66823ecd5f2a84a1c328d3c311d057c1a36e68acfc8",
+        "first-zoom-field-edit.png": "838a398055d72d9b34e706981da1e247465a8d161ba9e2d02a25c7a06dc7a634",
+        "first-after-page-field.png": "d7bfca86835e749882d9d96c5ca4269e5791557be8d4ac94f4e91e125d90a8db",
+        "second-after-page-field.png": "eb526bdc035917ce8163e66823ecd5f2a84a1c328d3c311d057c1a36e68acfc8",
+        "first-page-field-edit.png": "91dfa5bbd8876ed137a860db06ddfe8dcb9484723303ebc9ec38d1964a004f48"
+      },
+      "observed": "Page 1 / 3 and canonical 82% zoom after both tab switches"
+    },
+    {
+      "scale": 2,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "binary_sha256": "17148ceecfe0c7d73c0413b66087c2b800773f6e0a13661e18f6f2eea13e1191",
+      "display": "private authenticated X11 2560x1800",
+      "explicit_windowfocus_verified": true,
+      "screenshots": {
+        "second-after-zoom-field.png.toolbar.png": "ac3d3e3d682c92deac59a3638f96583a804267aa4ac17c50732a2c4b89ac6103",
+        "second-after-page-field.png.toolbar.png": "ac3d3e3d682c92deac59a3638f96583a804267aa4ac17c50732a2c4b89ac6103",
+        "first-after-zoom-field.png": "8115bbb0899f8a7e962c3a06b193c963f28788dff3e0be73c45619beef8590bf",
+        "second-after-zoom-field.png": "260e0eeafc0cfd615a7b8d1e61602e57225554bcabc11e9e391f92e37aaa470d",
+        "first-zoom-field-edit.png": "6d8fcbafb1824b9bd53fcd4a013b5f17ddc384afe58ecb4193ea9e2d7099c355",
+        "first-after-page-field.png": "8115bbb0899f8a7e962c3a06b193c963f28788dff3e0be73c45619beef8590bf",
+        "second-after-page-field.png": "260e0eeafc0cfd615a7b8d1e61602e57225554bcabc11e9e391f92e37aaa470d",
+        "first-page-field-edit.png": "b5218b162ba72284b716256efa07dd8d2104e07b2e182b36ea00ae13c94c1c72"
+      },
+      "observed": "Page 1 / 3 and canonical 82% zoom after both tab switches"
+    }
+  ],
+  "scope": "Generated native XTest on private authenticated X11; T06 real Wayland/Windows acceptance remains separate"
+}

@@ -1,0 +1,8 @@
+{
+  "baseline": "268b234e4336789922a6b15dd1236963e131d707",
+  "sha256": {
+    "ui/workspace.slint": "3156a1cbbf25e7b0dc0ea69b0360f6535188ecae34ed193a8091f11b1f2c96ab",
+    "src/app/ui_smoke.rs": "d1224bbf358af17fd98fd95a5dc634cc78413ab03eaf414ad58d5499821315d9",
+    "scripts/check-review-ui.py": "f89781a92a0bd91e6fa7ae8ed9a61bc881639c3fbdccdd659284966161a45ea7"
+  }
+}

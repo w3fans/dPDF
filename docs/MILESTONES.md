@@ -3,7 +3,7 @@
 Requirements: [PRODUCT_SPEC.md](PRODUCT_SPEC.md). Per-requirement status and evidence:
 [REQUIREMENTS_MATRIX.md](REQUIREMENTS_MATRIX.md).
 
-Development starts at the existing **0.1.0**, not 0.2.0. The milestone numbers below
+Development continues in **0.1.x** (published preview v0.1.54). The milestone numbers below
 name stable outcomes. Standard release tools calculate development release versions;
 0.2.0 is held until the first section passes acceptance. No milestone is complete
 merely because its UI or build scaffold exists.
@@ -14,8 +14,9 @@ unrelated development remains outstanding; see
 [development release cadence](DEVELOPMENT_WORKFLOW.md#when-to-cut-a-preview).
 An audit recommendation to stabilize does not impose a blanket release freeze.
 
-The current private-repository workflow uses the established controlled build
-hosts; earlier hosted evidence retains its original version and scope
+The active public repository uses public PR CI and the established controlled
+build hosts. Published v0.1.54 evidence is in [RELEASE-STATUS.md](RELEASE-STATUS.md);
+earlier hosted evidence retains its original version and scope
 ([build infrastructure](BUILD-INFRASTRUCTURE.md)). Automated synthetic evidence
 never satisfies the physical-printer, Windows test machine or real-user gates below.
 Open owner-side gates are tracked as GitHub issues with acceptance checklists:
@@ -40,7 +41,8 @@ not close the real compositor input, physical-printer or Windows gates below.
 - Validate drag-and-drop, keyboard behavior, focus, scroll, tabs, malformed files,
   and resize/HiDPI behavior on Fedora and Windows. Native X11 multi-file drops,
   cancelled hovers and keyboard tab switching now have a protocol regression;
-  Wayland compositor and Windows Explorer drop acceptance remain.
+  Wayland drops are implemented in v0.1.51 and v0.1.54 native Wayland smoke is
+  recorded; real compositor source behavior and Windows Explorer acceptance remain.
 - Validate search occurrence highlighting and wheel zoom on Windows/HiDPI; improve text selection.
 - Fedora native GTK printer discovery/dialog, ranges/current page and physical
   fit/actual-size output are implemented and tested to files. The Windows native
@@ -58,7 +60,8 @@ not close the real compositor input, physical-printer or Windows gates below.
 - Stage complete runtimes with matching PDFium and license notices; validate packaged
   launch/file association paths and document any security/compatibility constraints.
   Fedora user-level registration now has an isolated Gio launch/argv/MIME test;
-  installer integration and real file-manager checks remain.
+  v0.1.54 Windows MSI/portable and Fedora installed qualification are recorded;
+  manual installer/default-app and real file-manager acceptance remain.
 - Record Scenario A results on both platforms, then qualify the stable release
   using the user's standard tools. No 0.2.0 tag before this.
 
@@ -90,15 +93,14 @@ exported ordinary PDF image. Local idle checkpoints now recover placed drafts an
 the immutable opened PDF after interruption; cross-platform recovery qualification
 and real-office acceptance remain.
 
-Remaining sequence:
+Remaining qualification and repairs (existing page/mark features above are implemented):
 
-1. qpdf discovery/version checking and an immutable page plan with atomic export.
-2. Replace a contract's final page from another PDF or PNG/JPEG scan; qualify phone-photo and print-size behavior.
-3. Insert, remove, reorder by thumbnail drag, extract, merge, rotate selected pages.
-4. Local signature/stamp/initials library, original and cleaned image preservation.
-5. Crop/deskew/white-background removal/contrast and transparency mini-studio.
-6. On-page placement with resize handles, mm size controls, aspect lock, reset,
-   opacity, per-asset preferred size; simple overlay export.
+1. Add protected secondary-source prompts and preserve source identity on page edits (T07).
+2. Qualify replacement, insert/remove/reorder/extract/merge/rotate with annotations,
+   forms, bookmarks and links in external viewers (T07/T10).
+3. Exercise real scanner/phone images, cleanup/transparency, library sizing and
+   mixed recovery across platforms (T10).
+4. Measure printed physical sizes and record owner Scenarios B/C (T09/T20).
 
 Acceptance: Scenarios B/C pass in dPDF and common external viewers. Pages 1–9 retain
 original vector/text content and resource fidelity when page 10 is replaced. Save
@@ -114,8 +116,10 @@ history for remark edits. Native Windows review input, printing and broader
 interoperability remain qualification work.
 
 The generated combined-block prototype now removes contained live labels/lines/date
-and two synthetic assets, inserts one 350-DPI image, preserves the other page and
-passes independent Poppler checks. It refuses unsupported structures and remains
+and two synthetic assets. The historical Python prototype inserts one 350-DPI
+image and records independent Poppler checks; the current Rust probe uses a
+400-DPI constant (`src/block_probe.rs::BLOCK_DPI`). Historical evidence retains
+its original settings and does not qualify a production backend. It refuses unsupported structures and remains
 outside the production app; see docs/validation/combined-block-prototype.md.
 
 First prove secure region replacement using the architecture's investigation gate.
@@ -126,9 +130,10 @@ PZB/IDZ-style templates, print-quality baking, and explicit searchability/integr
 warnings. Plan a separate digital-seal interface without claiming cryptographic
 signing is already available.
 
-Independently implement native note/highlight/underline remarks, revision sets,
-global visibility, all/current/selected revision filters, persistence, and clean vs
-remark-bearing export. Keep revision metadata compatible with ordinary PDF use.
+Retain the implemented native note/highlight/underline remarks, revision sets,
+global visibility, all/current/selected filters, persistence and clean versus
+remark-bearing exports. Qualify external-viewer round trips and native input
+(T11), then verify independence from production baking (T18).
 
 Acceptance: Scenarios D/E pass; extraction/editor checks show no independent live
 signature/label content inside the replaced block; outside text is preserved;

@@ -1,0 +1,171 @@
+# Metadata helper worker and normal shutdown — review draft
+
+Status: recovery candidate 2d75b74b passed all jobs in run 43506767494 and
+native replay; see progress/T03-recovery-2026-11-13.md. The current increment
+also defers early protected print/export decryption. Its compiled/runtime
+qualification is pending. Experienced lifecycle review remains required before
+merge. This does not qualify all helper callers or production baking.
+
+## Reproduced problem
+
+`LoadReview` previously decrypted, inspected metadata, wrote a clean reading copy
+and validated it on the sole PDF worker. Even finite helper deadlines could leave
+navigation waiting for tens of seconds. A generated 50-page PDF and a controlled
+metadata helper reproduced a blank page 25 until helper release on verified source
+`df8a27b4abe4115114dbdde9f6950db2b0699701`. Ordinary UI input continued, but the
+queued page render could not run. The source PDF remained unchanged.
+
+## Ownership and admission
+
+One existing PDF worker retains the sole reader PDFium instance and every native
+document/page handle. One additional helper thread accepts owned immutable bytes,
+private password input, metadata values and prepared byte-only review operations.
+No PDFium handle, borrowed page or library initialization enters that thread.
+Geometry conversion and loading the resulting clean PDF stay on the PDF worker.
+
+Two admission leases cover active work, queued work and unconsumed results together.
+Only one helper task executes at a time. The inspection-to-cleaning continuation
+reuses its lease rather than admitting another task. Busy admission returns a
+visible retryable review error; it does not suspend rendering or create more threads.
+Original snapshots use shared immutable bytes, not re-reading a mutable source.
+Decryption retains its 256 MiB output limit; metadata stdout remains 64 MiB. Clean
+reading bytes are bounded by the working source size plus 64 MiB and read in
+cancellable chunks. These are logical byte limits, not a measured whole-app RSS
+budget. Large-metadata CPU work and aggregate reader memory remain performance work.
+
+## Identity and cancellation
+
+Each task carries document ID, pool generation and an atomic cancellation token.
+Each UI review request also has a monotonically increasing per-tab generation,
+carried through page-unit and review events. Both worker and UI reject stale work.
+A tab close or retry cancels its previous request. Late replies release their
+bytes/lease without changing a closed/reopened tab or newer review request.
+
+Decryption, metadata inspection and clean-copy qpdf calls observe that token.
+Existing supervisor cleanup kills the owned Linux process group or Windows job
+and waits for the root helper. Private password stdin and discarded diagnostics
+remain unchanged. Clean preparation uses temporary output, preserving the original
+and existing atomic destination checks. It checks cancellation before publication.
+
+## Normal shutdown and review gate
+
+`Worker::drop` cancels registered metadata tasks, releases its response receiver
+before joining the PDF worker (so a full event queue cannot deadlock teardown),
+and releases command admission. The worker checks stop state between requests with
+a finite idle wait. Its helper pool closes admission, cancels queued/active tasks
+and joins the helper thread. The native document/library destructors remain on
+the existing PDF thread, with native handles destroyed before their PDFium owner.
+
+This adds an explicit wait for normal worker teardown instead of allowing process
+exit to race detached cleanup. It therefore needs experienced lifecycle review
+before merge, as required by the implementation plan's lifecycle/engine rule.
+Review must check destructor order, blocked event sends, cancellation during each
+phase, no engine handles across threads, and no dependency on another UI callback
+to finish shutdown. The candidate must remain a draft until that gate is satisfied.
+
+This does not promise cleanup after SIGKILL, native-engine preemption, cancellation
+of user-owned print dialogs, or supervision of every existing detached export/print
+thread. Overlay/image metadata and detached export/print ownership still require
+subsequent migration. Native user dialogs retain their existing separate policy.
+
+## Required evidence
+
+- Pure worker tests: two-lease bound including unconsumed replies, continuation,
+  cancelled identity rejection, joined shutdown and recovery after task panic.
+- Generated Linux window test: render a distant page while metadata stays stalled,
+  cancel/reopen without stale completion, retry to a new generation, and normal
+  app shutdown with direct helper reaped. Source hash must remain unchanged.
+- Existing password, review, page-unit, alias, reader, recovery and print suites,
+  including native Windows compilation/hosted corpora. Explicit desktop/printer
+  acceptance remains separate.
+- Replay the visible controlled-stall reproduction on the corrected, verified
+  binary. A build or source inspection alone does not prove responsiveness.
+
+Run the generated Linux regression with isolated data and a private display:
+
+```sh
+python3 scripts/check-helper-responsiveness.py --binary /path/to/dpdf \
+  --pdfium /path/to/libpdfium.so --qpdf /usr/bin/qpdf
+```
+
+Reviewer decision: **PENDING** (GO / REVISE / NO-GO, reviewer/date/source required).
+
+
+## Recovery snapshot validation increment
+
+The prior LoadReview candidate still used synchronous metadata inside
+`describe_open(..., recovery=true)`. A generated durable checkpoint, controlled
+helper and native XTest page jump reproduced a blank page 25 until helper release
+on c9153a54, executable 79731920. Source and checkpoint were generated; the helper
+was reaped after release. See progress/T03-recovery-stall-reproduction.json.
+
+The current increment describes native geometry on the PDF worker, then submits
+owned snapshot bytes/private password to the same two-lease helper pool. Native
+PDF documents stay in the worker's map while recovery is pending; they are never
+passed to the helper thread. A pending record holds the request identity and
+owned DocumentInfo only. Recovery's Opened event is withheld until returned
+metadata validates the physical page sizes, preserving the existing mark-size
+safety check. Protected input caches validated decrypted bytes for later use.
+
+On failure, the pending native document is removed on its owner thread and an
+OpenFailed event leaves the durable checkpoint available. Busy admission also
+fails visibly before publication; it never restores at guessed units. Close
+cancels pending recovery by document/request identity. Normal shutdown uses the
+existing shared cancellation/join path. Late results cannot publish a closed or
+replaced request. No new native engine, helper thread or admission capacity.
+
+The added generated window regression prepares a real durable checkpoint, arms a
+metadata stall only after ordinary reading is ready, begins recovery, renders
+page 25 in the still-open original tab, then exits normally with recovery pending.
+It requires the owned helper reaped, source unchanged and checkpoint retained.
+Existing changed/missing/protected recovery, geometry, passwords and review suites
+remain required. Recovery candidate 2d75b74b passed the full build, this regression and native
+replay in run 43506767494. That evidence is scoped to that candidate; subsequent
+increments require their own gates.
+
+Experienced lifecycle review must include this unpublished-to-opened transition,
+pending document cleanup, pool admission failure and shutdown ordering on the
+reviewed head. The prior review request remains outstanding; green CI alone does
+not satisfy it. Production baking and unrelated detached export/print ownership
+are outside this increment and remain unqualified.
+
+
+## Early protected print/export preparation increment
+
+A generated encrypted 50-page PDF and two controlled decryption helpers reproduced
+a remaining stall on recovery candidate 2d75b74b (Linux merge b067f63f). Ctrl+P
+before initial review inspection finishes invokes another synchronous decrypt
+through working_bytes. Page status advances to 25 while the viewport/thumbnail
+remain blank until release. Both children were released/reaped and the source
+remained unchanged; see progress/T03-protected-preparation-stall.json.
+
+All six print/export command variants now defer missing protected working bytes
+through the existing two-lease helper pool. A pending record owns the command
+and its document/request identity; no native handle enters it. Commands resume
+on the PDF worker only after a matching completion caches immutable decrypted
+bytes. The reader-side working_bytes accessor now refuses a missing cache; it
+has no synchronous decryption fallback. Passwords remain private process memory
+and child stdin, never command arguments, logs or durable drafts.
+
+Multiple operations are keyed by pool generation, so print and export requests
+cannot overwrite one another. Admission failure produces the appropriate terminal
+print/export event. Tab close cancels all pending commands for that document and
+produces terminal failures that clear UI busy state. Late replies cannot restart
+a closed operation. Normal shutdown cancels active/queued work and joins the
+existing pool; cancelled queued decryptions never start a child. Prepared commands
+are drained before accepting more operations, keeping their queue within the
+same two-result admission bound. A concurrently completed review may have already
+populated the identical immutable decrypted snapshot.
+
+Two new generated window cases keep initial decryption stalled, queue an early
+native print or page export, then navigate to page 25. Print quits normally while
+preparation is pending; export closes its tab and requires busy state cleared.
+Both require source/existing destination preservation, child reaping, and exactly
+one child launch (queued decryption must not start after cancellation). GTK is
+limited to the file backend; no print is submitted. Full current-source gates and
+native replay remain PENDING for this increment. Existing detached final export/
+print threads and overlay/image metadata are still separate unfinished work.
+
+The required reviewer must assess this command retention/resumption, shared
+admission bound, completion routing, failure event and close/shutdown policy on
+the actual reviewed head. Prior green CI does not waive that review gate.

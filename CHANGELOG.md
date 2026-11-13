@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
+
 - Update the locked pulldown-cmark parser to 0.13.6 for the nested-wikilink parsing fix, preserving dependency requirements and MIT notice bytes.
 
 - Cancel uncommitted page/zoom field values and restore reader focus when switching documents, including Ctrl+Tab.

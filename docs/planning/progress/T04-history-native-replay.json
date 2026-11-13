@@ -1,0 +1,27 @@
+{
+  "source_commit": "df8a27b4abe4115114dbdde9f6950db2b0699701",
+  "binary_sha256": "da8d01e41fd9b1af87f955704df2251d89236403e4a813074a5ed36731b5283f",
+  "scale": 1,
+  "host": "Fedora45 Workstation; private authenticated X11; 1180x800 window",
+  "page_crop": "328x424+526+332",
+  "empty_review_undo_changed_pixels": 0,
+  "closed_review_mark_undo_changed_pixels": 1669,
+  "screenshots": [
+    {
+      "path": "/tmp/dpdf-t04-native-undo-fixed/fixed-after-closed-review-undo.png",
+      "sha256": "9136c2b35bda16c5bb879f86ab5f77811e0ddfe0b12905e71e7566c1705ecc0f"
+    },
+    {
+      "path": "/tmp/dpdf-t04-native-undo-fixed/fixed-after-review-undo.png",
+      "sha256": "b16e9bda561546859281e66a5dc603a90dd3124f6ab42279362fec4d1f4a759d"
+    },
+    {
+      "path": "/tmp/dpdf-t04-native-undo-fixed/fixed-fit.png",
+      "sha256": "8535d4296885ec333b2e343d1c1692fd8b11c53b5ef80c34d7c3233b53966b9b"
+    },
+    {
+      "path": "/tmp/dpdf-t04-native-undo-fixed/fixed-moved.png",
+      "sha256": "b16e9bda561546859281e66a5dc603a90dd3124f6ab42279362fec4d1f4a759d"
+    }
+  ]
+}
