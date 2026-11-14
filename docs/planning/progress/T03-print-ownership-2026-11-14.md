@@ -245,3 +245,26 @@ secure-baking change.
 The reconciled checkout passes fifteen source suites (124 tests: 120 pass, four
 existing platform skips), formatting and whitespace checks. No local Rust
 compilation; fresh source-bound hosted/runtime qualification remains pending.
+
+
+## Final review integration with accepted diagnostic main
+
+Readiness check found this draft conflicted against accepted main 414a040f.
+Normally merge refreshed page-input parent e1af0ea8 (qualified lifecycle
+6963578a and main 414a040f), retaining historical 6b82779e. Local merge is
+clean; no production print/discovery/lifecycle, manifest/lock or UI byte changes.
+Only inherited test-only decryption cause-chain formatting differs under src;
+strict native registration diagnostics remain unchanged from qualified main.
+All 49 source/manifest/UI paths were compared.
+
+Prior 6b82779e passed all hosted/native/minimum-compiler gates, eighteen held
+helper windows, three original print scenarios, panel-open discovery and exact
+overlay/image replays. That evidence remains source-bound. New-source hosted
+gates and affected runtime checks are PENDING after integration. Neither
+historical decryption startup nor registration failure is explained by later
+passes. Experienced lifecycle review remains REQUIRED for #10/#16/#17; keep
+draft, with no version/tag/release, resource-cap/private-builder, runtime-pin
+or production baking change. Original dirty worktrees are preserved.
+
+Local final-integration checks pass: fifteen suites, 127 tests (123 pass/four
+existing platform skips), formatting and whitespace. No local Rust compilation.

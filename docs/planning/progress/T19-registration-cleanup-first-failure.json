@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "source_commit": "79ae289479a0186b8575b47e716a424171abf1bc",
+  "run_id": 43560066579,
+  "job_id": 132341541114,
+  "artifact_id": 14100695241,
+  "artifact_sha256": "cb0e315fe75d92d9f94a832bc447dc12c31473e92d6a2069009853f49606f4f3",
+  "failed_checks": [
+    {
+      "name": "user-registration",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\dPDF\\dPDF\\source\\scripts\\check-windows-registration.py",
+        "--binary",
+        "D:\\a\\_temp\\native-artifacts\\79ae289479a0186b8575b47e716a424171abf1bc\\9e3ad3c6a663c3301c251a11fffa28064eab99fca6671d0cdd7dfaec7cd084dd\\affe156f400a57c516f53be45a53af98f1f940d3ce17de29681d85e0f45824dc\\dpdf.exe",
+        "--pdfium",
+        "C:\\Users\\runneradmin\\AppData\\Local\\Temp\\dpdf-validation-39a8m_0y\\runtime\\pdfium\\bin\\pdfium.dll"
+      ],
+      "status": "FAIL",
+      "exit_code": 1,
+      "seconds": 5.593
+    }
+  ],
+  "failure_log": "Staged development runtime: C:\\Users\\runneradmin\\AppData\\Local\\Temp\\dpdf-validation-39a8m_0y\\temp\\dpdf-user-registration-hm9mb0so\\package \u017d [preview] with spaces & comma,\nRegistered dPDF in Start Menu / Open With for this user; PDF default settings were not changed.\nRegistered dPDF in Start Menu / Open With for this user; PDF default settings were not changed.\nRemoved this dPDF user registration; PDF default settings were not changed.\nTraceback (most recent call last):\n  File \"D:\\a\\dPDF\\dPDF\\source\\scripts\\check-windows-registration.py\", line 186, in <module>\n    main()\n  File \"D:\\a\\dPDF\\dPDF\\source\\scripts\\check-windows-registration.py\", line 171, in main\n    assert snapshot(registered) == (before[registered] or [])\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+  "log_sha256": "ba46fd764805ee79717d22c711a715ff8aac4a816f8014bdda27161786ec712d",
+  "memory": {
+    "schema": 1,
+    "status": "observed",
+    "measurement": "Windows job committed memory; not RSS",
+    "job_memory_limit_bytes": 2147483648,
+    "peak_job_memory_bytes": 109064192,
+    "peak_process_memory_bytes": 97034240,
+    "limit_flags": 8704
+  },
+  "diagnosis": "unknown: prior log retained no before/after shared registry snapshot; do not infer absent-key normalization, external mutation or product corruption",
+  "followup": "bounded names/value-hashed failure evidence; exact existing predicates, default checks, deadlines and production registration unchanged"
+}

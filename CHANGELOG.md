@@ -13,6 +13,9 @@
 
 - Cancel helper requests when tab close is accepted and atomically order staged publication against cancellation, preserving rejected-close retry and lease cleanup.
 
+- Retain bounded, value-redacted evidence when Windows shared registration
+  cleanup assertions fail, preserving strict restoration and default checks.
+
 - Verify generated mark-library data survives MSI installation/uninstallation and
   reloads through the exact candidate executable; retain native toolchain receipts.
 
