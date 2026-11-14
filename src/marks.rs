@@ -460,6 +460,11 @@ fn metadata_lock(root: &Path, id: &str) -> Result<std::fs::File> {
                 std::thread::sleep(std::time::Duration::from_millis(5));
             }
             Err(error) => {
+                #[cfg(test)]
+                eprintln!(
+                    "metadata lock failed after {} ms: {error:?}",
+                    started.elapsed().as_millis()
+                );
                 return Err(anyhow::anyhow!(
                     "Asset metadata is locked or unavailable: {error}"
                 ));
@@ -689,27 +694,55 @@ mod tests {
         assert!(load(&root, &asset.id).unwrap().last_used_at.is_none());
         let barrier = Arc::new(Barrier::new(2));
         let now = timestamp();
+        let started = std::time::Instant::now();
         let size_thread = {
             let (root, id, barrier) = (root.clone(), asset.id.clone(), barrier.clone());
             std::thread::spawn(move || {
                 barrier.wait();
+                let mut trace = Vec::new();
                 for step in 1..=16 {
+                    let begin = std::time::Instant::now();
                     let width = 30.0 + step as f32;
-                    save_size(&root, &id, width, width / 2.0, true).unwrap();
+                    let result = save_size(&root, &id, width, width / 2.0, true);
+                    trace.push((
+                        step,
+                        begin.duration_since(started).as_millis(),
+                        begin.elapsed().as_millis(),
+                    ));
+                    if let Err(error) = result {
+                        return (trace, Err(format!("{error:#}")));
+                    }
                 }
+                (trace, Ok(()))
             })
         };
         let usage_thread = {
             let (root, id) = (root.clone(), asset.id.clone());
             std::thread::spawn(move || {
                 barrier.wait();
+                let mut trace = Vec::new();
                 for step in 1..=16 {
-                    record_use_at(&root, &id, now + step).unwrap();
+                    let begin = std::time::Instant::now();
+                    let result = record_use_at(&root, &id, now + step);
+                    trace.push((
+                        step,
+                        begin.duration_since(started).as_millis(),
+                        begin.elapsed().as_millis(),
+                    ));
+                    if let Err(error) = result {
+                        return (trace, Err(format!("{error:#}")));
+                    }
                 }
+                (trace, Ok(()))
             })
         };
-        size_thread.join().unwrap();
-        usage_thread.join().unwrap();
+        let size = size_thread.join().unwrap();
+        let usage = usage_thread.join().unwrap();
+        eprintln!("metadata writers (step, start_ms, duration_ms): size={size:?}; usage={usage:?}");
+        assert!(
+            size.1.is_ok() && usage.1.is_ok(),
+            "metadata writers (step, start_ms, duration_ms): size={size:?}; usage={usage:?}"
+        );
         // An older queued event cannot roll back a newer usage time.
         record_use_at(&root, &asset.id, now + 1).unwrap();
         let stored = load(&root, &asset.id).unwrap();

@@ -27,6 +27,9 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
     tests = [('build', ['powershell.exe', '-NoProfile', '-NonInteractive', '-ExecutionPolicy',
                         'Bypass', '-File', str(source / 'build.ps1'), '-Release'], 2700),
              ('unit-tests', [cargo, 'test', '--locked', '--release'], 1500),
+             ('mark-metadata-contention', [cargo, 'test', '--locked', '--release', '--bin', 'dpdf',
+              'marks::tests::concurrent_usage_and_size_updates_preserve_assets_and_future_metadata',
+              '--', '--exact', '--nocapture'], 240),
              ('clippy', [cargo, 'clippy', '--locked', '--', '-D', 'warnings'], 1500),
              ('format', [cargo, 'fmt', '--check'], 120)]
     common = ['--binary', str(binary)]
