@@ -56,3 +56,32 @@ No new build service, worker, resource cap or production policy is introduced.
 Two injected-runner contracts prove failure stops immediately and incomplete
 budget is not PASS. No local Rust compilation runs. Inspect the bounded samples
 before selecting a production or fixture correction; no root cause is asserted.
+
+
+## Qualified bounded sampling and minimum-compiler main reconciliation
+
+Head 56e29774 / run 43548629971 passed all jobs. Verified both artifact ZIP
+digests, Linux runtime/source/tree identity, exact native notice inventories and
+all 648/485 referenced notice texts. Windows completed all 32 generated cases
+(1,024 updates) in 29.688 seconds, retaining sixteen updates per writer and every
+original assertion. Largest observed operation was 666 ms (case 31, size writer,
+first update). Full parallel unit suite separately passed 68 tests with one
+intentional subprocess fixture ignored. The named samples run independently of
+that parallel suite; their timings combine waiting and transaction I/O. See
+[T19-mark-metadata-qualified-56e29774.json](T19-mark-metadata-qualified-56e29774.json)
+for source, archive/report hashes and all synthetic traces.
+
+No failed sample or error-kind trace occurred, so the original five-second
+failure remains unexplained. Retain instrumentation for a future reproduced
+failure; these passes justify no production lock change or relaxed fixture.
+
+Main now includes minimum-compiler PR #19 as 847d1c58. Reconciled it through a
+normal merge, keeping both changelog entries and every CI contract from both
+branches. AST comparison proves all 23 helper/test methods are retained unchanged
+(22 tests). This combined source must pass fresh hosted gates, including both
+actual minimum-compiler checks; earlier qualified sources remain historical
+evidence. No app behavior, locking policy, resource cap, release or version change.
+
+All fifteen source contract suites pass on the combined checkout: 124 tests,
+120 passed and four existing platform skips. Formatting, metadata verification
+and whitespace checks pass. No Rust compiler was run locally.
