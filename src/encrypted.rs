@@ -181,7 +181,7 @@ mod tests {
         let (tx, rx) = mpsc::channel();
         let worker = thread::spawn(move || {
             let result = decrypt_with(original, "generated password", &helper)
-                .map_err(|error| error.to_string());
+                .map_err(|error| format!("{error:#}"));
             let _ = tx.send(result);
         });
         let startup = Instant::now();

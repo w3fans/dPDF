@@ -4,6 +4,7 @@ import argparse
 import atexit
 import ctypes as C
 from ctypes import wintypes as W
+import hashlib
 import importlib.util
 import json
 import os
@@ -11,6 +12,37 @@ from pathlib import Path
 import subprocess
 import tempfile
 import uuid
+
+
+def assert_shared_snapshot_restored(label, before, after, owned_name):
+    """Keep the original predicate; expose bounded, value-redacted failure evidence."""
+    expected = before or []
+    if after != expected:
+        def fingerprint(value):
+            encoded = json.dumps(value, ensure_ascii=True, sort_keys=True,
+                                 default=lambda item: {'bytes_hex': item.hex()},
+                                 separators=(',', ':')).encode('ascii')
+            return hashlib.sha256(encoded).hexdigest()
+
+        old = {name: (kind, value) for name, value, kind in before or []}
+        new = {name: (kind, value) for name, value, kind in after or []}
+        changes = []
+        total = 0
+        for name in sorted(old.keys() | new.keys()):
+            if name in old and name in new and old[name] == new[name]:
+                continue
+            total += 1
+            if len(changes) < 32:
+                changes.append(dict(name_sha256=fingerprint(name), owned=name == owned_name,
+                                    change='added' if name not in old else 'removed' if name not in new else 'modified',
+                                    before_sha256=fingerprint(old[name]) if name in old else None,
+                                    after_sha256=fingerprint(new[name]) if name in new else None))
+        print('REGISTRY_RESTORATION ' + json.dumps(dict(
+            label=label, before_absent=before is None, after_absent=after is None,
+            before_values=len(before or []), after_values=len(after or []),
+            changed_values=total, omitted_changes=max(0, total - len(changes)),
+            changes=changes), sort_keys=True), flush=True)
+    assert after == expected, label + ' shared values changed; see REGISTRY_RESTORATION evidence'
 
 
 def main():
@@ -167,8 +199,8 @@ def main():
             subprocess.run([*base, '-Unregister'], check=True, timeout=60)
             assert not any(exists(path) for path in owned)
             assert not (menu / (app_id + '.lnk')).exists()
-            assert snapshot(open_with) == (before[open_with] or [])
-            assert snapshot(registered) == (before[registered] or [])
+            assert_shared_snapshot_restored('OpenWithProgids', before[open_with], snapshot(open_with), app_id)
+            assert_shared_snapshot_restored('RegisteredApplications', before[registered], snapshot(registered), app_id)
             # Remove only shared empty containers that this fixture created.
             for path in reversed(created_shared):
                 try:

@@ -336,3 +336,32 @@ All startup, stall, fallback and completion bounds and all existing assertions
 remain unchanged. There is no production decryption/process supervision change
 and no claim of a fixed timing failure. Fresh hosted checks remain required;
 experienced lifecycle review is still required before merge.
+
+
+### Strict registration diagnostics on the failed lifecycle candidate
+
+Historical 79ae2894 passed Linux/policy, both actual native minimum compilers
+and the exact Linux original overlay responsiveness replay. Its Windows
+stable report has eighteen passes and one user-registration failure at the
+final RegisteredApplications shared snapshot comparison. That cause remains
+UNKNOWN, with exact failed artifact and suite log retained in the inherited
+T19 registration diagnostic receipt. A passing independent run is not a fix.
+
+This follow-up normally merges accepted main 414a040f, which contains qualified
+strict, bounded, names/value-hashed registration diagnostics from PR #24. Only
+changelog insertion conflicted; both entries remain. Every lifecycle source,
+manifest/lock, UI and production registration byte remains unchanged except one
+test-only error-chain formatting expression: the generated decryption fixture
+now retains underlying causes rather than only the outer anyhow context.
+Production bytes, every assertion and startup/stall/completion deadline remain
+unchanged; neither retained failure has an identified production fix.
+
+Fresh source-bound hosted gates remain PENDING on this combined source. Keep
+draft for experienced lifecycle review. Passed #16/#17 and independent engine
+#18 need no new qualification solely for this test-only diagnostic increment;
+combine their affected gates when production/dependency source changes or review
+requires it. Their existing manual/review/Fedora gates remain mandatory. No
+release/version/tag, resource-cap, runtime pin or production baking change.
+
+Local combined-source checks pass: fifteen suites, 127 tests (123 passed/four
+existing platform skips), formatting and whitespace. No local Rust compilation.
