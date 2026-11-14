@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Retain bounded, value-redacted evidence when Windows shared registration
+  cleanup assertions fail, preserving strict restoration and default checks.
+
 - Verify generated mark-library data survives MSI installation/uninstallation and
   reloads through the exact candidate executable; retain native toolchain receipts.
 

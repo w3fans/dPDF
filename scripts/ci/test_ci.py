@@ -47,6 +47,49 @@ def check_ci_step_keys(content):
 
 
 class Contracts(unittest.TestCase):
+    def registration_checker(self):
+        path = Path(__file__).resolve().parents[1] / 'check-windows-registration.py'
+        spec = importlib.util.spec_from_file_location('registration_check', path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_registration_diagnostics_preserve_strict_snapshot_predicate(self):
+        check = self.registration_checker().assert_shared_snapshot_restored
+        with redirect_stdout(io.StringIO()) as output:
+            check('fixture', [('owned', 'value', 1)], [('owned', 'value', 1)], 'owned')
+            check('fixture', None, [], 'owned')
+        self.assertEqual(output.getvalue(), '')
+        with redirect_stdout(io.StringIO()) as output, self.assertRaises(AssertionError):
+            check('fixture', None, None, 'owned')
+        receipt = json.loads(output.getvalue().split(' ', 1)[1])
+        self.assertTrue(receipt['before_absent'] and receipt['after_absent'])
+        self.assertEqual(receipt['changed_values'], 0)
+
+    def test_registration_diagnostics_detect_mutations_without_printing_names_or_values(self):
+        check = self.registration_checker().assert_shared_snapshot_restored
+        before = [('private-name', 'private-value', 1), ('owned', b'old-secret', 3)]
+        after = [('added-private-name', 'added-private-value', 1), ('owned', b'new-secret', 3)]
+        with redirect_stdout(io.StringIO()) as output, self.assertRaises(AssertionError):
+            check('fixture', before, after, 'owned')
+        receipt = json.loads(output.getvalue().split(' ', 1)[1])
+        self.assertEqual(receipt['changed_values'], 3)
+        self.assertEqual({x['change'] for x in receipt['changes']}, {'added', 'removed', 'modified'})
+        self.assertEqual(sum(x['owned'] for x in receipt['changes']), 1)
+        for text in ['private-name', 'private-value', 'old-secret', 'new-secret']:
+            self.assertNotIn(text, output.getvalue())
+        self.assertTrue(all(len(x['name_sha256']) == 64 for x in receipt['changes']))
+
+    def test_registration_diagnostic_bounds_detail_without_hiding_failure(self):
+        check = self.registration_checker().assert_shared_snapshot_restored
+        after = [(str(index), 'value', 1) for index in range(100)]
+        with redirect_stdout(io.StringIO()) as output, self.assertRaises(AssertionError):
+            check('fixture', [], after, 'owned')
+        receipt = json.loads(output.getvalue().split(' ', 1)[1])
+        self.assertEqual(receipt['changed_values'], 100)
+        self.assertEqual(len(receipt['changes']), 32)
+        self.assertEqual(receipt['omitted_changes'], 68)
+
     def test_metadata_diagnostic_stops_at_first_failure_without_retry(self):
         calls = []
         def runner(command, **kwargs):
