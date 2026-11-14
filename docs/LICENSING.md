@@ -17,8 +17,8 @@ The GPL text is retained in `packaging/licenses/slint/GPL-3.0-only.txt`.
 Fedora COPR source RPMs include the exact product source, build scripts and all
 locked Cargo dependency sources. Keep the source RPM available alongside binaries.
 
-The Fedora preview builds PDFium chromium/7881 from upstream commit
-`91b9d569b34be4f38eed7b3c49b227356c3aadad`, using the immutable component
+The candidate Fedora recipe selects PDFium chromium/8125 from upstream commit
+`43d55e429cf72c21e9a1e60475b50feefa16fda9`, using the immutable component
 revisions in `packaging/fedora/pdfium-sources.json`. PDFium's top-level license is
 BSD-3-Clause; its dependencies retain their individual permissive/font licenses
 and notices. The source bundle retains these texts, and the RPM installs the

@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "target": "x86_64-pc-windows-msvc",
-  "config_fingerprint": "6340cdac1f8bf1ca3966afa0de2b69b15d8d4e1ee732e2b31abc4f4d4eead8da",
-  "lock_fingerprint": "26f53b3ae9f7e5944fea50ece9b733fee5ada2d49b1826bf3933bf51a04188cc",
+  "config_fingerprint": "9e351aadc587c5a53820bb2b95818f2e6a5da10e4d6189c3d164926b62134cae",
+  "lock_fingerprint": "f7f041e4cd6862a9e2cae6829dc6fdce5fec9d53b3e89768223dfcfd6be3617d",
   "scope": "Cargo target tree: normal/build/proc-macro dependencies",
   "audit_status": "inventory_only",
   "qualified_for_binary_distribution": false,
-  "dependency_fingerprint": "375c024fcd2ae224a16802155fd8b742c957dc2c258df1e1e36619d15f9cf815",
+  "dependency_fingerprint": "823b2b438173f0b38f645fafb92d680a86598c8a6a55bd54b3f3d3943b04f74f",
   "components": [
     {
       "name": "adler2",
@@ -2993,14 +2993,14 @@
     },
     {
       "name": "pdfium-render",
-      "version": "0.9.4",
+      "version": "0.9.5",
       "license_declaration": "MIT OR Apache-2.0",
       "repository": "https://github.com/ajrcarey/pdfium-render",
-      "registry_checksum": "8948a803616a9e936b15a6637af2cd48c5fb8ae0fcdeb3c32eac3a540e255a19",
+      "registry_checksum": "296b1146652b486ea6eea0d316e85ab6837ff69e8d2b1568e6fa7bc38bd4c00e",
       "resolved_features": [
         "image_025",
         "image_api",
-        "pdfium_7881",
+        "pdfium_8125",
         "thread_safe"
       ],
       "notices": [

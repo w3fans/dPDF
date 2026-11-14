@@ -171,7 +171,7 @@ pub(crate) fn bind_pdfium_library() -> Result<Box<dyn PdfiumLibraryBindings>> {
     }
     #[cfg(not(target_os = "windows"))]
     {
-        Pdfium::bind_to_system_library().context("PDFium is unavailable. Set DPDF_PDFIUM_LIBRARY to a PDFium 7881 library, or place the library next to dPDF. See docs/BUILDING.md.")
+        Pdfium::bind_to_system_library().context("PDFium is unavailable. Set DPDF_PDFIUM_LIBRARY to a PDFium 8125 library, or place the library next to dPDF. See docs/BUILDING.md.")
     }
 }
 

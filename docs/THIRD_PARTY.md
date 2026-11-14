@@ -4,9 +4,9 @@
   open-source application uses Slint's GPL-3.0-only option, with attribution.
   dPDF-owned source retains Apache-2.0. See docs/LICENSING.md and the retained text under
   packaging/licenses/slint; Slint itself is not Apache-licensed.
-- [pdfium-render 0.9.4](https://github.com/ajrcarey/pdfium-render): Rust bindings.
-- [PDFium](https://pdfium.googlesource.com/pdfium/): PDF engine; the tested binary
-  distribution is [chromium/7881](https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F7881).
+- [pdfium-render 0.9.5](https://github.com/ajrcarey/pdfium-render): Rust bindings.
+- [PDFium](https://pdfium.googlesource.com/pdfium/): PDF engine; the configured binary
+  distribution is [chromium/8125](https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F8125).
   Include its LICENSE and licenses/ directory, including third-party dependencies.
   Fedora RPMs build this pinned engine from the source manifest in
   packaging/fedora/pdfium-sources.json, using Fedora's GN and Clang toolchain;

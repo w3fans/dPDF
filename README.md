@@ -46,7 +46,7 @@ one-build/one-CPU/2-GiB limits. Do not bypass the wrapper to compile locally.
 `build.sh` delegates to `./build`. Dependencies and compilation caches stay on remote build service;
 final executables download to `target/` here.
 
-PDFium is loaded at runtime. Use the matching **7881** distribution and set:
+PDFium is loaded at runtime. Use the matching **8125** distribution and set:
 
 ```sh
 export DPDF_PDFIUM_LIBRARY=/path/to/pdfium/lib/libpdfium.so

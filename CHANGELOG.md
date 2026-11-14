@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Select matching PDFium 8125 and pdfium-render 0.9.5 for engine-update qualification, retaining source-only Fedora packaging and existing license choices.
+
 - Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
 
 - Update the locked pulldown-cmark parser to 0.13.6 for the nested-wikilink parsing fix, preserving dependency requirements and MIT notice bytes.

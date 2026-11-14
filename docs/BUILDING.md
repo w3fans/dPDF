@@ -34,8 +34,8 @@ GTK. Native file dialogs use the desktop portal service.
 
 ## PDFium
 
-Bindings are pinned to `pdfium-render` 0.9.4 and its `pdfium_7881` API feature.
-Use [PDFium binaries release chromium/7881](https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F7881)
+Bindings are pinned to `pdfium-render` 0.9.5 and its `pdfium_8125` API feature.
+Use [PDFium binaries release chromium/8125](https://github.com/bblanchon/pdfium-binaries/releases/tag/chromium%2F8125)
 for the matching OS/architecture, or build that revision yourself. The archive
 contains the library plus LICENSE and licenses/; retain those with a staged runtime.
 
@@ -222,7 +222,7 @@ repository-scoped ephemeral Actions token.
 ### Windows installer and portable zip
 
 `.github/workflows/windows-installer.yml` runs for every `v*` tag on a hosted
-Windows runner. It builds `dpdf.exe`, downloads the pinned PDFium 7881 and
+Windows runner. It builds `dpdf.exe`, downloads the pinned PDFium 8125 and
 qpdf 12.4.2 Windows archives (SHA-256 checked by `scripts/ci/runtime.py`), stages
 them with `packaging/windows/stage.ps1 -QpdfBin`, and builds with WiX 5.0.2
 (`packaging/windows/build-msi.ps1`, source `packaging/windows/dpdf.wxs`):

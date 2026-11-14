@@ -5,6 +5,13 @@ Inventory checked 2026-11-13 against source baseline
 The initial snapshot is T19 inventory/procedure work. Subsequent scoped updates
 are recorded below; no new installer acceptance follows from them. [Release status](RELEASE-STATUS.md) retains published evidence.
 
+This branch selects an **unqualified 8125 / binding 0.9.5 candidate**. Historical
+7881 advisory/provenance receipts below retain their original identities. New
+selection and source-only checks are in
+[the implementation receipt](planning/progress/T19-engine-8125-2026-11-14.md).
+Hosted runtime, Fedora source build, package/operator and experienced engine
+review gates remain required before acceptance; no broad security clearance.
+
 ## Ownership and supported baseline
 
 The contributor preparing an update owns its source inventory, advisory triage,
@@ -19,8 +26,8 @@ people or services. An unavailable reviewer/operator is a pending gate.
 | Component | Current configuration | Source of truth / update coupling |
 | --- | --- | --- |
 | Rust | Edition 2024, declared minimum 1.92; hosted workflows install stable | Cargo.toml, build.ps1 and CI; record actual rustc/Cargo/MSVC versions per artifact. Minimum version is not an exact compiler pin; test declared minimum separately before claiming MSRV support. |
-| PDFium binding | pdfium-render =0.9.4 with pdfium_7881, thread_safe and image_025 | Cargo.toml/lock; change API selection together with engine revision and distributions. Preserve engine-thread ownership. |
-| PDFium runtime | chromium/7881; Fedora root revision 91b9d569b34be4f38eed7b3c49b227356c3aadad | packaging/fedora/pdfium-sources.json includes dependency revisions; Linux CI URL/hash in ci.yml; Windows URL/hash in scripts/ci/runtime.py. Fedora builds source rather than repackaging downloaded binaries. |
+| PDFium binding | Candidate pdfium-render =0.9.5 with pdfium_8125, thread_safe and image_025 | Cargo.toml/lock; change API selection together with engine revision and distributions. Preserve engine-thread ownership. |
+| PDFium runtime | Candidate chromium/8125; Fedora root revision 43d55e429cf72c21e9a1e60475b50feefa16fda9 | packaging/fedora/pdfium-sources.json includes dependency revisions; Linux CI URL/hash in ci.yml; Windows URL/hash in scripts/ci/runtime.py. Fedora builds source rather than repackaging downloaded binaries. |
 | UI | Slint and slint-build =1.18.1, software renderer/Winit 0.30 ABI | Cargo.toml/lock and retained GPL/desktop attribution texts; review binding/compiler/license compatibility together. |
 | Vendored Winit | 0.30.13 plus bounded Wayland receive changes | third_party/winit/DPDF_PATCH.md: upstream e9809ef54b18499bb4f2cac945719ecc2a61061b, archive SHA256 a6755fa58a9f8350bd1e472d4c3fcc25f824ec358933bba33306d0b63df5978d. Retain patch provenance and upstream license. |
 | Image/clipboard | image =0.25.10 (PNG/JPEG only); arboard =3.7.0 | Cargo.toml/lock; image input limits, EXIF, transparency and both clipboard backends need affected tests. |
@@ -31,12 +38,15 @@ people or services. An unavailable reviewer/operator is a pending gate.
 | System print libraries | GTK3, GLib/GObject, Cairo, CUPS | Distribution-managed; record package versions in native print receipts. No new bundled copy. |
 
 Linux CI PDFium archive SHA256:
-`1470e21b8b4a3b4ad7f85684e2da11d94f3b69a86d81dee11b9b6709d927ac1d`.
+`e1c3ce6e270cb5e0c20816b379ad9f2c1309972697c505f508de92bf5e7d6659`.
 Windows PDFium archive SHA256:
-`73cc0de638ac2095e7445bf56a38200a5b7c7ca0e9f4ba144598f2457377ac08`.
+`9a964261760cff52570aabf038ab346d3a5034dd8b30d0d5fe8861235d356b8b`.
 Windows qpdf archive SHA256:
 `db87077e683630c1217e0e8f9a20a9749d952ab676e881c3689187763a5de25d`.
-These are configured hashes, not fresh archive downloads in this receipt.
+The two candidate PDFium archives were freshly downloaded and verified against
+upstream release asset digests; their VERSION/build arguments/notices are bound
+in the candidate provenance receipt. This is not Fedora source-build or package
+acceptance. The qpdf configuration is unchanged.
 
 ## Advisory triage on 2026-11-13
 
@@ -98,6 +108,47 @@ search-index details were available but do not substitute for artifact evidence.
 The November bulletin also lists PDFium CVE-2026-121113 and CVE-2026-121179;
 include both in the remaining engine triage instead of clearing the pin after one
 V8-specific finding. Their direct issue pages were sign-in-only here.
+
+### Archive-bound V8 configuration follow-up (2026-11-14 local)
+
+Downloaded the configured Linux and Windows 7881 archives again and verified
+both configured SHA-256 values before inspection. Both embed VERSION 151.0.7881.0
+and args.gn with V8 and XFA disabled. Their non-V8 x64 workflow callers explicitly
+disable those features; the staging script includes generated build arguments.
+The Linux library bytes match the qualified a87095b9 runtime exactly. Windows'
+verified archive DLL hash is retained, but the hosted artifact does not include
+DLL bytes for a second direct equality check.
+
+Official pinned and fix source retrieval now succeeded. The pinned enumeration
+function retains the reentrant array writes removed by fix cce5c5ed; its pinned
+[build target](https://pdfium.googlesource.com/pdfium/+/91b9d569b34be4f38eed7b3c49b227356c3aadad/fxjs/BUILD.gn)
+includes that source only under pdf_enable_v8. Inference: the described V8-specific
+route is excluded by these inspected archive settings. This resolves the previous
+missing archive/caller configuration evidence; it does not clear other PDFium
+advisories, establish a binary backport or qualify an installed Fedora artifact.
+See [provenance receipt](planning/progress/T19-pdfium-7881-provenance-2026-11-14.json)
+for source/archive/configuration/library hashes and exact remaining scope.
+No binding, engine revision or runtime pin changed.
+
+### Other PDFium routes: source comparison (2026-11-14 local)
+
+Mapped bulletin issue 567106301 / CVE-2026-121113 to upstream
+[fix 4150fb56](https://pdfium.googlesource.com/pdfium/+/4150fb564e0d83109f33a06385d22bb13cc3cd97).
+The historical pinned decoder is jpegmodule.cpp, not the later file name. Its
+input-repair method casts away const on caller source bytes; upstream replaces
+that approach with an owned copy. This is core JPEG code, so V8/XFA exclusion
+is insufficient. **Engine upgrade/backport review is required**; no binary exploit
+or qualified replacement is claimed from this source match.
+
+Issue 567936263 / CVE-2026-121179 maps to
+[fix 0a21f66d](https://pdfium.googlesource.com/pdfium/+/0a21f66dd0c665dc4d6dbdafc150e93528cb0020).
+Pinned form focus code lacks the new observed-self lifetime checks. Exact dPDF
+callback/reentrancy applicability remains unresolved; rendering form data alone
+is not proof of exploitability. Direct issue pages still require sign-in.
+[Source receipt](planning/progress/T19-pdfium-other-advisories-2026-11-14.json)
+retains URLs, hashes, historical-path resolution and precise findings. Select and
+qualify a compatible binding/runtime upgrade or backport separately; no pin,
+license choice, build workflow or release authority changes by this analysis.
 
 ### Complete lockfile OSV lookup (2026-11-13)
 

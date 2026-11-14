@@ -1,0 +1,375 @@
+{
+  "archives": [
+    {
+      "asset": "pdfium-linux-x64.tgz",
+      "url": "https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/8125/pdfium-linux-x64.tgz",
+      "archive_sha256": "e1c3ce6e270cb5e0c20816b379ad9f2c1309972697c505f508de92bf5e7d6659",
+      "args.gn": {
+        "content": "clang_use_chrome_plugins = false\nis_component_build = false\nis_debug = false\npdf_enable_v8 = false\npdf_enable_xfa = false\npdf_is_standalone = true\npdf_use_partition_alloc = false\ntarget_cpu = \"x64\"\ntarget_os = \"linux\"\ntreat_warnings_as_errors = false\n",
+        "sha256": "962426b1d9d24084e2d61980b38f322cbfb47d92464c339fe443545cecee9f9c"
+      },
+      "VERSION": {
+        "content": "MAJOR=158\nMINOR=0\nBUILD=8125\nPATCH=0\n",
+        "sha256": "77f606e89976f8563ad68506f457f9e37e8049793a0f8abe485840171db822d2"
+      },
+      "binary_path": "lib/libpdfium.so",
+      "binary_sha256": "1c251efce460d67437a4c76d4be9033ae2f17bf5603f5bff1af10209b94ca723"
+    },
+    {
+      "asset": "pdfium-win-x64.tgz",
+      "url": "https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/8125/pdfium-win-x64.tgz",
+      "archive_sha256": "9a964261760cff52570aabf038ab346d3a5034dd8b30d0d5fe8861235d356b8b",
+      "args.gn": {
+        "content": "is_component_build = false\nis_debug = false\npdf_enable_v8 = false\npdf_enable_xfa = false\npdf_is_standalone = true\npdf_use_partition_alloc = false\ntarget_cpu = \"x64\"\ntarget_os = \"win\"\ntreat_warnings_as_errors = false\n",
+        "sha256": "161bf08999e403b7da9d924c45b7ee7bc8beb3038b08f9e174ba6761dd06a976"
+      },
+      "VERSION": {
+        "content": "MAJOR=158\nMINOR=0\nBUILD=8125\nPATCH=0\n",
+        "sha256": "77f606e89976f8563ad68506f457f9e37e8049793a0f8abe485840171db822d2"
+      },
+      "binary_path": "bin/pdfium.dll",
+      "binary_sha256": "4b0dec92555d69437bef0df37be630181ab3e83a6823ca264ede355a4f2ef994"
+    }
+  ],
+  "source_revision": "43d55e429cf72c21e9a1e60475b50feefa16fda9",
+  "source_commit_time": "Thu Oct 22 16:08:11 2026 -0700",
+  "source_files": [
+    {
+      "path": "core/fxcodec/jpeg/libjpeg_scanline_decoder.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/core/fxcodec/jpeg/libjpeg_scanline_decoder.cpp?format=TEXT",
+      "sha256": "8bf26f23b4f0846751e43c274a5ca9404e08f9bf0a9ef99e1d3d982b6ad7d9c1",
+      "bytes": 14887
+    },
+    {
+      "path": "fpdfsdk/formfiller/cffl_formfield.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/fpdfsdk/formfiller/cffl_formfield.cpp?format=TEXT",
+      "sha256": "d95ecb5724b30ab32e9b776e8249e8ba1089b7e2cd482f352e49a46f93d2bd4c",
+      "bytes": 18089
+    },
+    {
+      "path": "fxjs/cjs_global.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/fxjs/cjs_global.cpp?format=TEXT",
+      "sha256": "dbbff7f754c1ecd2202347a3d862997f9ba3c7f1c55cac71b20ccea415e71f27",
+      "bytes": 18838
+    },
+    {
+      "path": "DEPS",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/DEPS?format=TEXT",
+      "sha256": "e95c97e4651e7e6a2dc44d85fd3ca24f5877df7ee9781bd424a2dc4054bededa",
+      "bytes": 42270
+    }
+  ],
+  "binding": {
+    "version": "0.9.5",
+    "features": [
+      "pdfium_8125",
+      "thread_safe",
+      "image_025"
+    ],
+    "crate_sha256": "296b1146652b486ea6eea0d316e85ab6837ff69e8d2b1568e6fa7bc38bd4c00e",
+    "upstream_source_commit": "06952ffbca7d7c9336ac7f0313e84fa259712df6",
+    "license_declaration": "MIT OR Apache-2.0",
+    "retained_license_md_identical_to_0_9_4": true,
+    "license_md_sha256": "819dfb7c49a24bec7511f29304478d67f272bfd1f976b728095f2eb2c522791c"
+  },
+  "source_manifest_sha256": "21de2db28a1747c550f36a11a8ad309d241a6424e2254b2841dcb493204f0dd4",
+  "source_manifest_components": 32,
+  "source_only_dependency_data_parser": "Literal AST constants/dictionaries/lists, string concatenation and whitelisted Str/Var calls; no upstream Python or hooks executed",
+  "new_unconditional_source_components": [
+    "third_party/dragonbox/src",
+    "third_party/highway/src",
+    "third_party/instrumented_libs",
+    "third_party/libyuv"
+  ],
+  "build_adapter_patch_sites": [
+    {
+      "file": "root-BUILD.gn",
+      "expected_occurrences": 1,
+      "observed_occurrences": 1
+    },
+    {
+      "file": "fpdfview.h",
+      "expected_occurrences": 1,
+      "observed_occurrences": 1
+    },
+    {
+      "file": "clang-BUILD.gn",
+      "expected_occurrences": 1,
+      "observed_occurrences": 1
+    },
+    {
+      "file": "clang-BUILD.gn",
+      "expected_occurrences": 1,
+      "observed_occurrences": 1
+    },
+    {
+      "file": "compiler-BUILD.gn",
+      "expected_occurrences": 1,
+      "observed_occurrences": 1
+    },
+    {
+      "file": "compiler-BUILD.gn",
+      "expected_occurrences": 1,
+      "observed_occurrences": 1
+    },
+    {
+      "file": "sanitizers.gni",
+      "expected_occurrences": 1,
+      "observed_occurrences": 1
+    }
+  ],
+  "build_adapter_source_files": [
+    {
+      "name": "root-BUILD.gn",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/BUILD.gn?format=TEXT",
+      "sha256": "173941fee85170ace93e4926b5e9a6dac817c26c370c2b7b03b18084a1d78e13",
+      "bytes": 10730
+    },
+    {
+      "name": "fpdfview.h",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/public/fpdfview.h?format=TEXT",
+      "sha256": "bb9e359d39c132807f731dd2b3c8d5b29dc311f2127aee8f206b5f2ef06f7cc2",
+      "bytes": 65988
+    },
+    {
+      "name": "clang-BUILD.gn",
+      "url": "https://chromium.googlesource.com/chromium/src/build.git/+/ebdaeefa62db7c40f27cacb0eb034db3a5cdb849/config/clang/BUILD.gn?format=TEXT",
+      "sha256": "70201760676147b8e574f56c92a5a963d17bc2665dbd36f74f847975dc3c90a3",
+      "bytes": 9921
+    },
+    {
+      "name": "compiler-BUILD.gn",
+      "url": "https://chromium.googlesource.com/chromium/src/build.git/+/ebdaeefa62db7c40f27cacb0eb034db3a5cdb849/config/compiler/BUILD.gn?format=TEXT",
+      "sha256": "5fd8410dce79947067a656feb24d150bb838269f3f934f3028b00a62fc56b859",
+      "bytes": 119458
+    },
+    {
+      "name": "sanitizers.gni",
+      "url": "https://chromium.googlesource.com/chromium/src/build.git/+/ebdaeefa62db7c40f27cacb0eb034db3a5cdb849/config/sanitizers/sanitizers.gni?format=TEXT",
+      "sha256": "62b2e6339b590ed0a47c1c23ba90d51695813ea86e1087e9cee4562c2e92e638",
+      "bytes": 23229
+    }
+  ],
+  "binary_archive_notice_inventories": [
+    {
+      "target": "linux",
+      "archive": "pdfium-linux-x64.tgz",
+      "notices": [
+        {
+          "path": "LICENSE",
+          "bytes": 1177,
+          "sha256": "ba26c1263131696b86c10496b5066b918a20b7161822a80c274d0080105f6c93"
+        },
+        {
+          "path": "licenses/abseil.txt",
+          "bytes": 11361,
+          "sha256": "c79a7fea0e3cac04cd43f20e7b648e5a0ff8fa5344e644b0ee09ca1162b62747"
+        },
+        {
+          "path": "licenses/libopenjpeg.txt",
+          "bytes": 1794,
+          "sha256": "c5ab0890a737c2dfa7ba675036554f6d17741d98629b0c2a145354d00617e6b2"
+        },
+        {
+          "path": "licenses/icu.txt",
+          "bytes": 27718,
+          "sha256": "e55522d81edc687a341a4411e0776e54ca654e90147f354a90458aaced4116af"
+        },
+        {
+          "path": "licenses/libjpeg_turbo.md",
+          "bytes": 5620,
+          "sha256": "96f5b328adbb78eeaaec6980d73fd558cb1e4d62560ed615646bc3cf5e532430"
+        },
+        {
+          "path": "licenses/dragonbox-Boost.txt",
+          "bytes": 1338,
+          "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+        },
+        {
+          "path": "licenses/harfbuzz.txt",
+          "bytes": 1971,
+          "sha256": "ba8f810f2455c2f08e2d56bb49b72f37fcf68f1f4fade38977cfd7372050ad64"
+        },
+        {
+          "path": "licenses/dragonbox-Apache2-LLVM.txt",
+          "bytes": 12262,
+          "sha256": "9e45e856bedccee9f67254082ca11851d954de2fed7448c4bed19ad9aab99a91"
+        },
+        {
+          "path": "licenses/freetype.txt",
+          "bytes": 6741,
+          "sha256": "f4b133e25df1f86ad3ffea453aa0e613f0474f34778dbbb3e437e7b2724937d8"
+        },
+        {
+          "path": "licenses/simdutf.txt",
+          "bytes": 1059,
+          "sha256": "fc8dbc04e03ad4efc08a647ffe7f995b811a95bc04c0e85a56d5277c6593fa5f"
+        },
+        {
+          "path": "licenses/libjpeg_turbo.ijg",
+          "bytes": 12799,
+          "sha256": "75815e3bf6484201a3c3d17a1bbf10f2e8e3237f84df10a2357ea896db2a81d6"
+        },
+        {
+          "path": "licenses/lcms.txt",
+          "bytes": 1353,
+          "sha256": "7312b68c5b25e9bf2b828706fb4e29588f22705112f411fd42e1f7d84c3d139a"
+        },
+        {
+          "path": "licenses/highway.txt",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "path": "licenses/pdfium.txt",
+          "bytes": 12818,
+          "sha256": "961eacd9633fff6d051db7208b755e9210e30efac7adec3e6a6d52798f0ccf0e"
+        },
+        {
+          "path": "licenses/zlib.txt",
+          "bytes": 1332,
+          "sha256": "33fd641c9f3b0e0be64bc78fea9e94807674cdd70c48477599226cb8956565fe"
+        },
+        {
+          "path": "licenses/agg23.txt",
+          "bytes": 725,
+          "sha256": "c110d3ea2ad77467ce0dcff7d3337e6c8be8049a5103f4b9bd5fd911a77972e5"
+        },
+        {
+          "path": "licenses/fast_float.txt",
+          "bytes": 1079,
+          "sha256": "e562f3f974ced7e69dd1db77b820b36bcf8f30377f1aa105723fba449c53c4e6"
+        },
+        {
+          "path": "licenses/llvm-libc.txt",
+          "bytes": 15140,
+          "sha256": "ebcd9bbf783a73d05c53ba4d586b8d5813dcdf3bbec50265860ccc885e606f47"
+        },
+        {
+          "path": "licenses/libpng.txt",
+          "bytes": 5345,
+          "sha256": "bdb0a645ea18c60507d0368379b1ac5474b92255fcc2d115e07486a7672ba526"
+        }
+      ]
+    },
+    {
+      "target": "windows",
+      "archive": "pdfium-win-x64.tgz",
+      "notices": [
+        {
+          "path": "LICENSE",
+          "bytes": 1184,
+          "sha256": "8854f4388f1ca13b3ad9baa42e95f5546b4c0b17109c159256d3eca7be39b09b"
+        },
+        {
+          "path": "licenses/abseil.txt",
+          "bytes": 11564,
+          "sha256": "f54fff0b905df5b3464527c652a30e903b172d6dcab4d89b5e6f105d5e4a4603"
+        },
+        {
+          "path": "licenses/libopenjpeg.txt",
+          "bytes": 1794,
+          "sha256": "c5ab0890a737c2dfa7ba675036554f6d17741d98629b0c2a145354d00617e6b2"
+        },
+        {
+          "path": "licenses/icu.txt",
+          "bytes": 28286,
+          "sha256": "93679f4389d53b6835d89843f251844fb9bc455b35bab036d3c8e7abe497a47a"
+        },
+        {
+          "path": "licenses/libjpeg_turbo.md",
+          "bytes": 5755,
+          "sha256": "be2b2b5ab168bce87bc3e31f2a5c5adba4b7f6e9e51d618e958d1d46972ebd95"
+        },
+        {
+          "path": "licenses/dragonbox-Boost.txt",
+          "bytes": 1361,
+          "sha256": "beb8e42e9d6b4284e03304d05a81a0755200a965fc8d0a5e0aea1e84cf805d6e"
+        },
+        {
+          "path": "licenses/harfbuzz.txt",
+          "bytes": 2013,
+          "sha256": "bd836c0ddca8ea0bab54a03cd32b6ff7256cbb3840fca2edc1249a4ed92c5b02"
+        },
+        {
+          "path": "licenses/dragonbox-Apache2-LLVM.txt",
+          "bytes": 12480,
+          "sha256": "4964a7aaf2801a42d2342d2f5bbccd2126be7a5d8d46150e1338a43ea70da5de"
+        },
+        {
+          "path": "licenses/freetype.txt",
+          "bytes": 6741,
+          "sha256": "f4b133e25df1f86ad3ffea453aa0e613f0474f34778dbbb3e437e7b2724937d8"
+        },
+        {
+          "path": "licenses/simdutf.txt",
+          "bytes": 1077,
+          "sha256": "c172a0ba936ff31230febb5dad869e25cb7c1a07480c7a381be8cf011bb52719"
+        },
+        {
+          "path": "licenses/libjpeg_turbo.ijg",
+          "bytes": 13059,
+          "sha256": "db16a04128171879c60708d171b88d97345a2dd20f9bfc173680a4497c73f704"
+        },
+        {
+          "path": "licenses/lcms.txt",
+          "bytes": 1353,
+          "sha256": "7312b68c5b25e9bf2b828706fb4e29588f22705112f411fd42e1f7d84c3d139a"
+        },
+        {
+          "path": "licenses/highway.txt",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+        },
+        {
+          "path": "licenses/pdfium.txt",
+          "bytes": 12818,
+          "sha256": "961eacd9633fff6d051db7208b755e9210e30efac7adec3e6a6d52798f0ccf0e"
+        },
+        {
+          "path": "licenses/zlib.txt",
+          "bytes": 1332,
+          "sha256": "33fd641c9f3b0e0be64bc78fea9e94807674cdd70c48477599226cb8956565fe"
+        },
+        {
+          "path": "licenses/agg23.txt",
+          "bytes": 725,
+          "sha256": "c110d3ea2ad77467ce0dcff7d3337e6c8be8049a5103f4b9bd5fd911a77972e5"
+        },
+        {
+          "path": "licenses/fast_float.txt",
+          "bytes": 1106,
+          "sha256": "bf1b57355feca8fce77ee95f48002f8d4789fb71b30ec7599c06cda4901fbb2b"
+        },
+        {
+          "path": "licenses/llvm-libc.txt",
+          "bytes": 15418,
+          "sha256": "3b6226c32e168c83b891d8d6f0d3c29c2116dc3ef93dc93c307b54f279ecf383"
+        },
+        {
+          "path": "licenses/libpng.txt",
+          "bytes": 5479,
+          "sha256": "452390433ba0f88aa3e2b122c647741b72a0c117cd6ed7a329b49785aecb5511"
+        }
+      ]
+    }
+  ],
+  "qualification_status": "UNQUALIFIED candidate: local source/notice/contract checks only; hosted Rust/runtime, Fedora source build and experienced review pending",
+  "notice_inventory_scope": "Retained existing package graph and license bytes, retargeted exact binding identity/API feature based on identical verified dependency sections; hosted metadata/tree collection must confirm before qualification",
+  "local_checks": {
+    "rust_fmt": "PASS",
+    "diff_whitespace": "PASS",
+    "release_metadata": "PASS 0.1.54",
+    "retained_notices_linux": "PASS 349 components / 648 references, hashes/config only",
+    "retained_notices_windows": "PASS 255 components / 485 references, hashes/config only",
+    "python_contracts": {
+      "suites": 16,
+      "tests": 121,
+      "passed": 117,
+      "skipped": 4,
+      "scope": "Existing test_ci platform skips retained; no platform pass inferred"
+    },
+    "rust_cpp_compilation": "NOT RUN LOCALLY",
+    "fedora_gn_source_collection_packaging": "NOT RUN"
+  }
+}

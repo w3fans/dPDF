@@ -78,3 +78,14 @@ Before advancing to merged a50144c, saved tracked patch, all 62 edited/untracked
 file hashes and a complete file archive under /tmp/dpdf-before-main-a501.*.
 Applied the validated focused fix without discarding async/T02/T12/T19 work;
 unrelated file identities were checked unchanged. No release/tag/version changes.
+
+
+## Independent T19 engine update candidate (14 November local)
+
+Prepared paired PDFium 8125 / pdfium-render 0.9.5 from main e7bec79 in isolated
+/tmp/dpdf-engine-upgrade. This source does not include the unmerged T03 lifecycle
+drafts. See T19-engine-8125-2026-11-14.md and its exact provenance receipt for
+verified crates/archive/source/license identities, coupled pin/source changes and
+actual source-only checks. Hosted compilation/runtime, Fedora source build,
+remaining advisories and experienced engine review are PENDING. No new platform
+or security clearance, version/tag/release or production baking.

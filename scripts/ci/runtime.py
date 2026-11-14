@@ -8,8 +8,8 @@ import urllib.request
 import zipfile
 
 RUNTIMES = {
-    'pdfium': ('https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/7881/pdfium-win-x64.tgz',
-               '73cc0de638ac2095e7445bf56a38200a5b7c7ca0e9f4ba144598f2457377ac08', 'pdfium.dll'),
+    'pdfium': ('https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/8125/pdfium-win-x64.tgz',
+               '9a964261760cff52570aabf038ab346d3a5034dd8b30d0d5fe8861235d356b8b', 'pdfium.dll'),
     'qpdf': ('https://github.com/qpdf/qpdf/releases/download/v12.4.2/qpdf-12.4.2-msvc64.zip',
              'db87077e683630c1217e0e8f9a20a9749d952ab676e881c3689187763a5de25d', 'qpdf.exe'),
 }

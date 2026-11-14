@@ -28,10 +28,23 @@ def snapshot_url(component):
     return url + '/+archive/' + revision + '.tar.gz'
 
 
+def validate_manifest(manifest):
+    components = manifest.get('components')
+    if (manifest.get('chromium_branch') != 8125 or manifest.get('binary_downloads') is not False
+            or manifest.get('checkout_configuration') != 'minimal'
+            or not isinstance(components, list) or not components
+            or components[0] != {
+                'path': '.', 'url': 'https://pdfium.googlesource.com/pdfium',
+                'revision': '43d55e429cf72c21e9a1e60475b50feefa16fda9'}):
+        raise ValueError('Require the reviewed source-only PDFium 8125 manifest and root revision')
+    # Reject malformed immutable component identities before any download.
+    for component in components:
+        snapshot_url(component)
+
+
 def collect(manifest_path, output, cache):
     manifest = json.loads(manifest_path.read_text())
-    if manifest['chromium_branch'] != 7881 or manifest['binary_downloads'] is not False:
-        raise ValueError('Require the reviewed source-only PDFium 7881 manifest')
+    validate_manifest(manifest)
     cache.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='pdfium-sources-', dir=cache) as directory:
         tree = Path(directory) / 'pdfium-source'
