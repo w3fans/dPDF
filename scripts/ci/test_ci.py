@@ -18,6 +18,7 @@ import runtime
 import validate_windows
 import windows_job
 import validate_linux
+import check_minimum_rust
 
 
 def check_ci_step_keys(content):
@@ -42,6 +43,73 @@ def check_ci_step_keys(content):
 
 
 class Contracts(unittest.TestCase):
+    def minimum_fixture(self, root, version='1.92'):
+        source = root / 'source'
+        source.mkdir()
+        (source / 'Cargo.toml').write_text('[package]\nrust-version = ' + json.dumps(version) + '\n')
+        return source
+
+    def test_minimum_check_rejects_wrong_source_before_any_compiler_command(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = self.minimum_fixture(root)
+            with patch.object(check_minimum_rust, 'git', return_value='different'), \
+                    patch.object(check_minimum_rust, 'native_admission'):
+                report = check_minimum_rust.check(source, 'requested', root / 'report',
+                                                 runner=lambda *args: self.fail('Compiler must not run'))
+            self.assertEqual(report['status'], 'FAIL')
+            self.assertFalse(report['checks'])
+            self.assertIn('clean source', report['error'])
+
+    def test_minimum_check_never_calls_newer_compiler_a_minimum_pass(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = self.minimum_fixture(root)
+            def runner(command, source, env, log, timeout):
+                host = 'x86_64-pc-windows-msvc' if os.name == 'nt' else 'x86_64-unknown-linux-gnu'
+                log.write_text('rustc 1.99.0 (fixture)\nhost: ' + host + '\n')
+                return 0
+            with patch.object(check_minimum_rust, 'git', side_effect=lambda source, *args: 'requested' if args[0] == 'rev-parse' else ''), \
+                    patch.object(check_minimum_rust, 'native_admission'), \
+                    patch.object(check_minimum_rust.shutil, 'which', side_effect=lambda name: name):
+                report = check_minimum_rust.check(source, 'requested', root / 'report', runner)
+            self.assertEqual(report['status'], 'FAIL')
+            self.assertIn('Actual compiler version', report['error'])
+            self.assertFalse(any(c['name'].startswith('check-') for c in report['checks']))
+
+    def test_minimum_check_retains_failed_compiler_result_and_cleans_private_target(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = self.minimum_fixture(root)
+            targets = []
+            def runner(command, source, env, log, timeout):
+                targets.append(Path(env['CARGO_TARGET_DIR']))
+                self.assertEqual(env['CARGO_BUILD_JOBS'], '1')
+                self.assertEqual(env['RUSTUP_TOOLCHAIN'], '1.92.0')
+                self.assertEqual(env['RUSTC'], 'rustc')
+                self.assertEqual(env['RUSTC_WRAPPER'], '')
+                self.assertEqual(env['RUSTC_WORKSPACE_WRAPPER'], '')
+                host = 'x86_64-pc-windows-msvc' if os.name == 'nt' else 'x86_64-unknown-linux-gnu'
+                log.write_text('rustc 1.92.0 (fixture)\nhost: ' + host + '\n')
+                return 42 if 'check' in command else 0
+            with patch.object(check_minimum_rust, 'git', side_effect=lambda source, *args: 'requested' if args[0] == 'rev-parse' else ''), \
+                    patch.object(check_minimum_rust, 'native_admission'), \
+                    patch.object(check_minimum_rust.shutil, 'which', side_effect=lambda name: name), \
+                    patch.dict(os.environ, {'RUSTC': 'newer-compiler', 'RUSTC_WRAPPER': 'wrapper'}):
+                report = check_minimum_rust.check(source, 'requested', root / 'report', runner)
+            self.assertEqual(report['status'], 'FAIL')
+            self.assertEqual(report['checks'][-1]['exit_code'], 42)
+            self.assertEqual(json.loads((root / 'report/report.json').read_text())['status'], 'FAIL')
+            self.assertTrue((root / 'report/check-all-targets.log').exists())
+            self.assertTrue(targets and all(not p.exists() for p in targets))
+
+    def test_minimum_version_does_not_accept_toolchain_alias_or_command_text(self):
+        for value in ['stable', 'nightly', '1.92;echo invalid', '1.92-beta', '1']:
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as folder:
+                source = self.minimum_fixture(Path(folder), value)
+                with self.assertRaises(ValueError):
+                    check_minimum_rust.minimum_toolchain(source)
+
     def test_job_memory_metrics_preserve_committed_peak_and_limit(self):
         class Kernel:
             def QueryInformationJobObject(self, job, info, pointer, length, returned):

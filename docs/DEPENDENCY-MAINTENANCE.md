@@ -142,6 +142,17 @@ head f3cb4bf3 passed every job in run 43510850834. Other maintenance findings,
 PDFium applicability, real package upgrade/default/data acceptance and owner gates
 remain open. This is one scoped patch, not whole-project security clearance.
 
+## Minimum compiler validation candidate
+
+The project declares Rust 1.92. Previously public jobs selected stable only;
+those successful builds do not establish the declared minimum. The independent
+[T19 compiler receipt](planning/progress/T19-minimum-rust-2026-11-14.md) describes
+new exact-version native Linux/MSVC source checks in those same approved public
+jobs, with separate targets/reports and unchanged Windows admission/resource
+limits. This candidate needs hosted evidence before minimum compatibility is
+claimed. A source check does not qualify a release executable or native operator
+acceptance on that compiler. No dependency, runtime or app-version pin changes.
+
 ## Update procedure
 
 1. Prepare one focused branch with current source identity. Record the old/new
