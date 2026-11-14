@@ -1,0 +1,98 @@
+{
+  "schema": 1,
+  "status": "PASS_GENERATED_DISPLAY_ONLY",
+  "scope": "generated malformed JPEG display regression, not a memory-safety exploit or internal COW proof",
+  "upstream_fix": "4150fb564e0d83109f33a06385d22bb13cc3cd97",
+  "public_upstream_fix_contains_regression_fixture": false,
+  "jpeg_source_sha256": "31572ce204726029c3521c9794fc501b8943b410f9986e987857336e1af54497",
+  "cases": [
+    {
+      "name": "valid",
+      "source_sha256": "7861dee36b082149d41eac2191f3f6e4d07fb3effa2bbb85388a9482351b1df2",
+      "jpeg_sha256": "31572ce204726029c3521c9794fc501b8943b410f9986e987857336e1af54497",
+      "runtimes": {
+        "old": {
+          "binary_sha256": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+          "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        },
+        "new": {
+          "binary_sha256": "72a83d2094c0959f94136954dd6325ad1f5e4b4d82c0468128bafef1f8c80766",
+          "pdfium_sha256": "1c251efce460d67437a4c76d4be9033ae2f17bf5603f5bff1af10209b94ca723",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        }
+      },
+      "source_unchanged": true,
+      "old_new_pixels_identical": true,
+      "status": "PASS"
+    },
+    {
+      "name": "invalid-trailer",
+      "source_sha256": "79ff009d4a578a6f7736dbc9da4c75e9b8fadfb68d339dadd0cb8be5f22dc72c",
+      "jpeg_sha256": "92487f8b5df9fea910543edada0b94a505e35d07c3fc4e3e806b8c29962d8229",
+      "runtimes": {
+        "old": {
+          "binary_sha256": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+          "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        },
+        "new": {
+          "binary_sha256": "72a83d2094c0959f94136954dd6325ad1f5e4b4d82c0468128bafef1f8c80766",
+          "pdfium_sha256": "1c251efce460d67437a4c76d4be9033ae2f17bf5603f5bff1af10209b94ca723",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        }
+      },
+      "source_unchanged": true,
+      "old_new_pixels_identical": true,
+      "status": "PASS"
+    },
+    {
+      "name": "invalid-height",
+      "source_sha256": "ff07a69018d198d29d3d934275a842a41a7549efe6d8b1a36553c025f0f5525c",
+      "jpeg_sha256": "27da20e86db42212faca8be70e761cafc1de9b21345f5745ee9a9daccc7386a7",
+      "runtimes": {
+        "old": {
+          "binary_sha256": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+          "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        },
+        "new": {
+          "binary_sha256": "72a83d2094c0959f94136954dd6325ad1f5e4b4d82c0468128bafef1f8c80766",
+          "pdfium_sha256": "1c251efce460d67437a4c76d4be9033ae2f17bf5603f5bff1af10209b94ca723",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        }
+      },
+      "source_unchanged": true,
+      "old_new_pixels_identical": true,
+      "status": "PASS"
+    },
+    {
+      "name": "both-repairs",
+      "source_sha256": "2ce3aaf8a1c86877b8dbffc929e10b2d0185963c2cb4891af395d213df580e9b",
+      "jpeg_sha256": "b5d778b0261ad886068e5b380fa028f2fc04db5b10b50c801728383a3529b44b",
+      "runtimes": {
+        "old": {
+          "binary_sha256": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+          "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        },
+        "new": {
+          "binary_sha256": "72a83d2094c0959f94136954dd6325ad1f5e4b4d82c0468128bafef1f8c80766",
+          "pdfium_sha256": "1c251efce460d67437a4c76d4be9033ae2f17bf5603f5bff1af10209b94ca723",
+          "render_sha256": "3214daad30f86447a4cb75cef4e884a085341106abe8e9a6de85436a48bf5e79",
+          "changed_pixels_vs_valid": 0
+        }
+      },
+      "source_unchanged": true,
+      "old_new_pixels_identical": true,
+      "status": "PASS"
+    }
+  ]
+}

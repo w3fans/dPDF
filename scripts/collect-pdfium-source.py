@@ -40,6 +40,16 @@ def validate_manifest(manifest):
     # Reject malformed immutable component identities before any download.
     for component in components:
         snapshot_url(component)
+    exclusions = manifest.get('excluded_precompiled_test_fixtures', [])
+    if not isinstance(exclusions, list):
+        raise ValueError('Require a list of excluded test fixtures')
+    for name in exclusions:
+        if not isinstance(name, str):
+            raise ValueError('Require relative test fixture paths')
+        path = PurePosixPath(name)
+        if (path.is_absolute() or '..' in path.parts
+                or path.as_posix() in ('', '.') or '\\' in name):
+            raise ValueError('Excluded test fixture escapes the source tree')
 
 
 def collect(manifest_path, output, cache):
@@ -73,11 +83,15 @@ def collect(manifest_path, output, cache):
             with tarfile.open(snapshot) as archive:
                 archive.extractall(destination, filter='data')
             print('SOURCE:', component['path'], component['revision'], flush=True)
+        excluded = []
         for name in manifest.get('excluded_precompiled_test_fixtures', []):
             path = tree / name
             if not path.resolve().is_relative_to(tree.resolve()):
                 raise ValueError('Excluded test fixture escapes source tree')
+            if path.is_file():
+                excluded.append({'path': name, 'sha256': sha256_file(path), 'bytes': path.stat().st_size})
             path.unlink(missing_ok=True)
+        manifest['excluded_test_fixture_receipt'] = excluded
         (tree / 'SOURCE-MANIFEST.json').write_text(json.dumps(manifest, indent=2) + '\n')
         # Retain every upstream notice with its component-relative location.
         notices = tree / 'dpdf-source-notices'

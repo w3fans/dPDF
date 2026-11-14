@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Exclude NASM preassembled regression golden files from the paired PDFium source
+  candidate; retain assembly inputs/notices and record removed-file hashes.
+
 - Select matching PDFium 8125 and pdfium-render 0.9.5 for engine-update qualification, retaining source-only Fedora packaging and existing license choices.
 
 - Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.

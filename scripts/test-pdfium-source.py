@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Immutable source-manifest contracts; no downloads, compiler or packaging."""
 import copy
+import hashlib
 import importlib.util
+import io
 import json
 from pathlib import Path
 import tempfile
+import tarfile
 import unittest
 from unittest.mock import patch
 
@@ -55,6 +58,59 @@ class ManifestContracts(unittest.TestCase):
             bad['components'][1][key] = value
             with self.subTest(key=key), self.assertRaises(ValueError):
                 collector.validate_manifest(bad)
+
+    def test_invalid_fixture_exclusions_refuse_before_network_or_cache_creation(self):
+        for value in [['../escape'], ['/absolute'], ['.'], ['a/../../escape'],
+                      ['a\\escape'], [None], 'not-a-list']:
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                bad = copy.deepcopy(self.manifest)
+                bad['excluded_precompiled_test_fixtures'] = value
+                manifest = root / 'manifest.json'
+                manifest.write_text(json.dumps(bad))
+                with patch.object(collector.urllib.request, 'urlopen', side_effect=AssertionError('Network forbidden')):
+                    with self.assertRaises(ValueError):
+                        collector.collect(manifest, root / 'output.tgz', root / 'cache')
+                self.assertFalse((root / 'cache').exists())
+
+    def test_bundle_excludes_preassembled_golden_outputs_and_retains_sources_and_notices(self):
+        manifest = copy.deepcopy(self.manifest)
+        manifest['components'] = manifest['components'][:1]
+        golden = ['third_party/nasm/travis/test/br3005117.o.t',
+                  'third_party/nasm/travis/test/binexe.exe.t']
+        self.assertTrue(set(golden).issubset(manifest['excluded_precompiled_test_fixtures']))
+        self.assertEqual(len([p for p in manifest['excluded_precompiled_test_fixtures']
+                              if p.startswith('third_party/nasm/travis/test/')]), 200)
+        entries = {golden[0]: b'\x7fELF generated object fixture',
+                   golden[1]: b'MZ generated golden fixture',
+                   'third_party/nasm/travis/test/binexe.asm': b'; generated source\nnop\n',
+                   'LICENSE': b'Generated test notice\n'}
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            cache = root / 'cache'
+            cache.mkdir()
+            url = collector.snapshot_url(manifest['components'][0])
+            snapshot = cache / (hashlib.sha256(url.encode()).hexdigest() + '.tar.gz')
+            with tarfile.open(snapshot, 'w:gz') as tar:
+                for name, data in entries.items():
+                    member = tarfile.TarInfo(name)
+                    member.size = len(data)
+                    tar.addfile(member, io.BytesIO(data))
+            path = root / 'manifest.json'
+            path.write_text(json.dumps(manifest))
+            with patch.object(collector.urllib.request, 'urlopen', side_effect=AssertionError('Network forbidden')):
+                output = collector.collect(path, root / 'bundle.tgz', cache)
+            with tarfile.open(output) as tar:
+                names = set(tar.getnames())
+                self.assertTrue(all('pdfium-source/' + name not in names for name in golden))
+                for name in ('third_party/nasm/travis/test/binexe.asm', 'LICENSE',
+                             'dpdf-source-notices/LICENSE'):
+                    original = 'LICENSE' if name.startswith('dpdf-source-notices/') else name
+                    self.assertEqual(tar.extractfile('pdfium-source/' + name).read(), entries[original])
+                retained = json.load(tar.extractfile('pdfium-source/SOURCE-MANIFEST.json'))
+                self.assertEqual({item['path'] for item in retained['excluded_test_fixture_receipt']}, set(golden))
+                for item in retained['excluded_test_fixture_receipt']:
+                    self.assertEqual(item['sha256'], hashlib.sha256(entries[item['path']]).hexdigest())
 
 
 if __name__ == '__main__':

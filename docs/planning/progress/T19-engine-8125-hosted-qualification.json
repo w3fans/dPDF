@@ -1,0 +1,310 @@
+{
+  "schema": 1,
+  "status": "PASS_HOSTED_AND_GENERATED_COMPARISON; REQUIRED_GATES_PENDING",
+  "candidate_head": "c89d8f861cb7662fa5af9c95ac181acf1bf82db9",
+  "candidate_tree": "6db42cec43907f9631ca31ca6f46b2c059d8dff7",
+  "base_main": "e7bec799b0d5ff30175fa28cd2ff743d9b9b4a72",
+  "run_id": 43538066209,
+  "run_url": "https://github.com/w3fans/dPDF/actions/runs/43538066209",
+  "jobs": [
+    {
+      "id": 132271845769,
+      "name": "policy",
+      "conclusion": "success"
+    },
+    {
+      "id": 132271846538,
+      "name": "Linux",
+      "conclusion": "success"
+    },
+    {
+      "id": 132271846240,
+      "name": "Windows",
+      "conclusion": "success"
+    }
+  ],
+  "artifacts": [
+    {
+      "platform": "linux",
+      "id": 14089998694,
+      "archive_sha256": "65cce9364670f4e29bd2f98db77c92a76a3558336a342f1a7acb7fee605b0c2e",
+      "report_sha256": "f305eb504ffa80e8b4939ba5d745430c2533c1136220b7307f1a7250c41007d2",
+      "source_commit": "2ebb7825a20e90f4fd26f8ac5a3a79f7b204c9ae",
+      "binary_sha256": "72a83d2094c0959f94136954dd6325ad1f5e4b4d82c0468128bafef1f8c80766",
+      "pdfium_sha256": "1c251efce460d67437a4c76d4be9033ae2f17bf5603f5bff1af10209b94ca723",
+      "check_count": 33,
+      "checks": [
+        {
+          "name": "reader",
+          "status": "PASS"
+        },
+        {
+          "name": "geometry",
+          "status": "PASS"
+        },
+        {
+          "name": "engine-paths",
+          "status": "PASS"
+        },
+        {
+          "name": "pages",
+          "status": "PASS"
+        },
+        {
+          "name": "marks",
+          "status": "PASS"
+        },
+        {
+          "name": "overlays",
+          "status": "PASS"
+        },
+        {
+          "name": "page-units",
+          "status": "PASS"
+        },
+        {
+          "name": "review",
+          "status": "PASS"
+        },
+        {
+          "name": "aliases",
+          "status": "PASS"
+        },
+        {
+          "name": "block-probe",
+          "status": "PASS"
+        },
+        {
+          "name": "poppler",
+          "status": "PASS"
+        },
+        {
+          "name": "desktop-entry",
+          "status": "PASS"
+        },
+        {
+          "name": "file-drop",
+          "status": "PASS"
+        },
+        {
+          "name": "about",
+          "status": "PASS"
+        },
+        {
+          "name": "viewport-1",
+          "status": "PASS"
+        },
+        {
+          "name": "physical-reader-1",
+          "status": "PASS"
+        },
+        {
+          "name": "tabs-1",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-placement-1",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-image-1",
+          "status": "PASS"
+        },
+        {
+          "name": "viewport-1-5",
+          "status": "PASS"
+        },
+        {
+          "name": "physical-reader-1-5",
+          "status": "PASS"
+        },
+        {
+          "name": "tabs-1-5",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-placement-1-5",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-image-1-5",
+          "status": "PASS"
+        },
+        {
+          "name": "viewport-2",
+          "status": "PASS"
+        },
+        {
+          "name": "physical-reader-2",
+          "status": "PASS"
+        },
+        {
+          "name": "tabs-2",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-placement-2",
+          "status": "PASS"
+        },
+        {
+          "name": "clipboard-image-2",
+          "status": "PASS"
+        },
+        {
+          "name": "review-ui",
+          "status": "PASS"
+        },
+        {
+          "name": "passwords",
+          "status": "PASS"
+        },
+        {
+          "name": "recovery",
+          "status": "PASS"
+        },
+        {
+          "name": "native-print",
+          "status": "PASS"
+        }
+      ],
+      "runtime_executable_retained": true,
+      "native_inventory_equal": true,
+      "inventory_sha256": "4cfbeffc778d2e2c4969d35baf66565e96f4379c174f77bf1363e2d20ad25196",
+      "packages": 349,
+      "verified_notice_references": 648
+    },
+    {
+      "platform": "windows",
+      "id": 14091200261,
+      "archive_sha256": "431f3869fdae957ffe9d00297535ca1e12c40999bca4ae50ea11e236cb26a501",
+      "report_sha256": "d1d93c4def07175d3ad341e7f7a3118bf57da37d98d2fa9a4571bd150a3b7c47",
+      "source_commit": "c89d8f861cb7662fa5af9c95ac181acf1bf82db9",
+      "binary_sha256": "fe19f23557ac695a8c07f08d5ca8b7f9d42ac7b3d60868715dbb791bd2c1a32f",
+      "pdfium_sha256": "4b0dec92555d69437bef0df37be630181ab3e83a6823ca264ede355a4f2ef994",
+      "check_count": 18,
+      "checks": [
+        {
+          "name": "ci-contract",
+          "status": "PASS"
+        },
+        {
+          "name": "powershell-syntax",
+          "status": "PASS"
+        },
+        {
+          "name": "build",
+          "status": "PASS"
+        },
+        {
+          "name": "unit-tests",
+          "status": "PASS"
+        },
+        {
+          "name": "clippy",
+          "status": "PASS"
+        },
+        {
+          "name": "format",
+          "status": "PASS"
+        },
+        {
+          "name": "reader",
+          "status": "PASS"
+        },
+        {
+          "name": "pages",
+          "status": "PASS"
+        },
+        {
+          "name": "marks",
+          "status": "PASS"
+        },
+        {
+          "name": "overlays",
+          "status": "PASS"
+        },
+        {
+          "name": "page-units",
+          "status": "PASS"
+        },
+        {
+          "name": "review",
+          "status": "PASS"
+        },
+        {
+          "name": "aliases",
+          "status": "PASS"
+        },
+        {
+          "name": "geometry",
+          "status": "PASS"
+        },
+        {
+          "name": "engine-paths",
+          "status": "PASS"
+        },
+        {
+          "name": "block-probe",
+          "status": "PASS"
+        },
+        {
+          "name": "staged-reader",
+          "status": "PASS"
+        },
+        {
+          "name": "user-registration",
+          "status": "PASS"
+        }
+      ],
+      "runtime_executable_retained": false,
+      "native_inventory_equal": true,
+      "inventory_sha256": "1f03d601cca6208555d958f127fbb09370c1b335be9ec4ca51475d2d17d5e2ef",
+      "packages": 255,
+      "verified_notice_references": 485
+    }
+  ],
+  "comparisons": [
+    {
+      "path": "T19-engine-8125-render-text-geometry-comparison.json",
+      "sha256": "cb22a877fab43929531ec3bb142a12c2c32913bc37d82add7c087a1d485ab926"
+    },
+    {
+      "path": "T19-engine-8125-window-comparison.json",
+      "sha256": "990781a2a68e4f79a443b6b941d827ad48014ccf30e04a073a6a336f0e867f85"
+    },
+    {
+      "path": "T19-engine-8125-jpeg-repair-comparison.json",
+      "sha256": "ac6d081f2cb9c7b41ec600816d87f5e63db17768464c01a4e337bd3125375405"
+    }
+  ],
+  "drivers": [
+    {
+      "path": "fixtures/T19-engine-8125-compare.py",
+      "sha256": "a9518071d0673c39ff58cf7fc26864428f67e3ddb59586d757b4b081f913b118",
+      "scope": "Exact archived qualification driver; fixed scratch paths described in receipt. Not an application or release command."
+    },
+    {
+      "path": "fixtures/T19-engine-8125-native-compare.py",
+      "sha256": "e25e8a82c311d0f145202b6c940d61049e7d282a2b28039c699c4e678381bedc",
+      "scope": "Exact archived qualification driver; fixed scratch paths described in receipt. Not an application or release command."
+    },
+    {
+      "path": "fixtures/T19-engine-8125-jpeg-compare.py",
+      "sha256": "de96c691d70ab5bf32c803f41b52f0c63c5b7ee853040c92af67104935dfd044",
+      "scope": "Exact archived qualification driver; fixed scratch paths described in receipt. Not an application or release command."
+    }
+  ],
+  "pending": [
+    "Fedora buildroot GN configure and full source build",
+    "source-bound installed Fedora and Windows package lifecycle qualification",
+    "experienced engine review",
+    "affected combined T03 integration gates",
+    "real operator and physical/native acceptance as required"
+  ],
+  "not_claimed": [
+    "whole-engine security clearance",
+    "memory-safety exploit reproduction or internal copy-on-write proof",
+    "eighteen unmerged T03 helper cases on this source",
+    "retained Windows executable: this artifact contains reports/notices only"
+  ]
+}

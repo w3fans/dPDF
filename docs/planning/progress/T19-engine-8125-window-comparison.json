@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "status": "PASS_IDENTICAL_GENERATED_WINDOWS",
+  "scope": "actual X11 software windows; no physical/native compositor acceptance",
+  "cases": [
+    {
+      "scale": 1,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "source_unchanged": true,
+      "dimensions": [
+        1180,
+        800
+      ],
+      "old_screenshot_sha256": "1fa6e9f1481401cf787e6a6668f5826decc0c3b96449254b60fb6f4efdad2241",
+      "new_screenshot_sha256": "1fa6e9f1481401cf787e6a6668f5826decc0c3b96449254b60fb6f4efdad2241",
+      "changed_pixels": 0,
+      "status": "PASS"
+    },
+    {
+      "scale": 1.5,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "source_unchanged": true,
+      "dimensions": [
+        1180,
+        800
+      ],
+      "old_screenshot_sha256": "f36730c2fbd03d15c7e3a3b048141a146f7952be92872ed0451781ec9f0c8c79",
+      "new_screenshot_sha256": "f36730c2fbd03d15c7e3a3b048141a146f7952be92872ed0451781ec9f0c8c79",
+      "changed_pixels": 0,
+      "status": "PASS"
+    },
+    {
+      "scale": 2,
+      "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "source_unchanged": true,
+      "dimensions": [
+        1180,
+        800
+      ],
+      "old_screenshot_sha256": "c53281ca4d3d4a9f100b59adb0cac87446be07fc25280eb55fd418e80af5832f",
+      "new_screenshot_sha256": "c53281ca4d3d4a9f100b59adb0cac87446be07fc25280eb55fd418e80af5832f",
+      "changed_pixels": 0,
+      "status": "PASS"
+    }
+  ],
+  "visual_assessment": {
+    "page_25_body_and_field_visible_at_all_scales": true,
+    "assessment": "Viewed candidate screenshots at all three scales after exact full-window old/new RGB comparison; each body and page field shows page 25. Scale 2 at 1180 physical pixels clips some controls in both baselines; this is not usability or physical desktop acceptance."
+  }
+}

@@ -9,8 +9,11 @@ This branch selects an **unqualified 8125 / binding 0.9.5 candidate**. Historica
 7881 advisory/provenance receipts below retain their original identities. New
 selection and source-only checks are in
 [the implementation receipt](planning/progress/T19-engine-8125-2026-11-14.md).
-Hosted runtime, Fedora source build, package/operator and experienced engine
-review gates remain required before acceptance; no broad security clearance.
+Hosted Linux/Windows and generated old/new comparisons passed on c89d8f86.
+Source-bundle inspection found and excluded 200 NASM preassembled golden outputs;
+its corrective source change requires updated hosted gates. Fedora source build,
+package/operator and experienced engine review remain pending. No broad security
+clearance.
 
 ## Ownership and supported baseline
 

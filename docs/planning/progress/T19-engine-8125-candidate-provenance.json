@@ -72,7 +72,7 @@
     "retained_license_md_identical_to_0_9_4": true,
     "license_md_sha256": "819dfb7c49a24bec7511f29304478d67f272bfd1f976b728095f2eb2c522791c"
   },
-  "source_manifest_sha256": "21de2db28a1747c550f36a11a8ad309d241a6424e2254b2841dcb493204f0dd4",
+  "source_manifest_sha256": "58d2e13fa3d5d97a13f29fa5431fdde6c8f7511d07fc62f6662ecf30de8ef620",
   "source_manifest_components": 32,
   "source_only_dependency_data_parser": "Literal AST constants/dictionaries/lists, string concatenation and whitelisted Str/Var calls; no upstream Python or hooks executed",
   "new_unconditional_source_components": [
@@ -371,5 +371,6 @@
     },
     "rust_cpp_compilation": "NOT RUN LOCALLY",
     "fedora_gn_source_collection_packaging": "NOT RUN"
-  }
+  },
+  "source_bundle_followup": "T19-engine-8125-source-bundle-qualification.json"
 }
