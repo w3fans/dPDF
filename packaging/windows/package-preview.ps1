@@ -42,7 +42,7 @@ try {
     $fixture = Join-Path $test 'fixture.pdf'
     & $python -c "import importlib.util,sys; s=importlib.util.spec_from_file_location('m','scripts/make-sample.py'); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); open(sys.argv[1],'wb').write(m.make_pdf(50))" $fixture
     if ($LASTEXITCODE -ne 0) { throw 'Controlled fixture generation failed' }
-    & (Join-Path $PSScriptRoot 'test-msi.ps1') -Msi $msi -Version $Version -Fixture $fixture -WorkDirectory $test
+    & (Join-Path $PSScriptRoot 'test-msi.ps1') -Msi $msi -Version $Version -Fixture $fixture -WorkDirectory $test -SeedBinary (Join-Path $stage 'dpdf.exe') -SeedImage (Join-Path $root 'scripts\fixtures\page-photo.jpg')
     Get-ChildItem $out -File | Where-Object { $_.Name -ne 'SHA256SUMS.txt' } | Sort-Object Name | ForEach-Object {
         "$((Get-FileHash -Algorithm SHA256 $_.FullName).Hash.ToLowerInvariant())  $($_.Name)"
     } | Set-Content -Encoding ascii (Join-Path $out 'SHA256SUMS.txt')

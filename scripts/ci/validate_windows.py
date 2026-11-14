@@ -27,6 +27,8 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
     tests = [('build', ['powershell.exe', '-NoProfile', '-NonInteractive', '-ExecutionPolicy',
                         'Bypass', '-File', str(source / 'build.ps1'), '-Release'], 2700),
              ('unit-tests', [cargo, 'test', '--locked', '--release'], 1500),
+             ('mark-metadata-contention', [python, str(source / 'scripts/ci/trace_mark_metadata.py'),
+                                           '--cargo', cargo, '--cases', '32'], 240),
              ('clippy', [cargo, 'clippy', '--locked', '--', '-D', 'warnings'], 1500),
              ('format', [cargo, 'fmt', '--check'], 120)]
     common = ['--binary', str(binary)]
@@ -47,7 +49,7 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
         command += ['--output', str(probe_report)]
     tests.append(('block-probe', command, 1200))
     tests.append(('staged-reader', [python, str(source / 'scripts' / 'check-windows-stage.py'),
-                                    *common, '--pdfium', str(pdfium)], 180))
+                                    *common, '--pdfium', str(pdfium), '--qpdf', str(qpdf)], 180))
     tests.append(('user-registration', [python, str(source / 'scripts' / 'check-windows-registration.py'),
                                         *common, '--pdfium', str(pdfium)], 300))
     if mode == 'desktop':

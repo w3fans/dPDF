@@ -255,3 +255,19 @@ hosted/runtime gates are PENDING. The dependent page/image implementation must
 integrate the same admission/publication policy. Experienced review must assess
 both orderings, delayed registration, lease release, marker reclamation and no
 mutex held across work that needs a UI callback or native owner to complete.
+
+
+## Accepted main reconciliation for lifecycle review (14 November)
+
+This #10 review candidate now includes accepted main 68910141, retaining
+qualified a87095b9 as a normal merge parent. Only changelog insertion conflicted;
+both the lifecycle entry and all accepted maintenance entries are preserved.
+Every prior lifecycle source blob is byte-identical; the sole src change from
+main is the separately qualified test-only mark timing instrumentation. Cargo
+manifest/lock, UI crate manifest and workspace UI bytes are unchanged.
+
+New main supplies the declared Rust 1.92 native source checks, bounded mark
+diagnostics and complete portable/MSI checks. Their presence does not qualify
+this combined lifecycle source. Current-source hosted gates and original native
+responsive/close replay must be repeated. Experienced lifecycle review remains
+PENDING; no review, manual platform acceptance or production baking GO is inferred.

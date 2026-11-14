@@ -4,6 +4,21 @@
 
 - Cancel helper requests when tab close is accepted and atomically order staged publication against cancellation, preserving rejected-close retry and lease cleanup.
 
+- Verify generated mark-library data survives MSI installation/uninstallation and
+  reloads through the exact candidate executable; retain native toolchain receipts.
+
+- Check bundled qpdf assembly and missing/invalid-helper preservation in complete
+  Windows portable runtimes under Unicode paths, without runtime overrides.
+
+- Retain both writer timing traces when the concurrent mark-metadata regression
+  fails, without changing its assertions or the bounded production lock wait.
+
+- Check the declared minimum Rust compiler on hosted Linux and native MSVC,
+  retaining source-check logs separately from qualified stable runtime artifacts.
+
+- Correct the vendored Winit manifest provenance note and retain dated,
+  source-scoped dependency-advisory evidence for the unmerged engine candidate.
+
 - Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
 
 - Keep overlay preflight and final exports in the owned helper queue, staging validated bytes for publication by the document owner and discarding late results after tab close.
