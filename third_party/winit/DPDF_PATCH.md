@@ -12,6 +12,18 @@ Transfer size, lifetime and concurrent transfers are bounded; files are opened
 only after a completed drop. X11 and Windows code stays upstream.
 
 The original crate archive is independently checksum-verified before extraction.
-Registry cache files and agent state are not part of this copy. Cargo.toml is
-the published normalized manifest; its original is retained as Cargo.toml.orig.
+Registry cache files and agent state are not part of this copy. Cargo.toml derives from the published normalized manifest with two downstream
+feature additions: activate the existing optional percent-encoding dependency for
+Wayland, and enable fs on the existing Unix rustix dependency for nonblocking
+receive setup. Dependency versions are unchanged. Cargo.toml.orig retains the
+unchanged upstream original manifest.
 This is a downstream patch, not an upstream Winit release.
+
+
+A fresh archive comparison on 14 November 2026 found only those two normalized
+manifest changes, three modified Wayland integration modules, and the added
+Wayland file_drop.rs and uri_list.rs implementation files. DPDF_PATCH.md is the
+local provenance note; upstream .cargo_vcs_info.json is omitted from this copy,
+and its revision is recorded above. All other upstream files, including LICENSE
+and X11/Windows source, match byte-for-byte. This verifies patch provenance, not
+native Wayland behavior or a security qualification.

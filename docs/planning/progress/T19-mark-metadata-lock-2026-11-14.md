@@ -34,3 +34,25 @@ source Windows timing traces, decide whether production locking or the fixture's
 throughput assumption is wrong, then implement and qualify only the evidenced
 correction. A single subsequent pass does not erase the original failed receipt.
 No release, tag, dependency, signing or production baking change.
+
+
+## First timing result and bounded follow-up
+
+Head 4ed03140 / run 43546562452 passed all three jobs. Verified Windows artifact
+14094533080 (ZIP eb85415aa57203d1fefb31d7fabd4d260bcb938385af06bfaf51745f629a27fb)
+and exact-source timing log. Both writers completed all sixteen updates; largest
+observed operation was 75 ms. Full release unit suite also passed. This does not
+explain or erase the prior five-second acquisition failure. Durations include
+waiting plus the metadata transaction, not isolated hold time. See
+[the retained observation](T19-mark-metadata-qualified-4ed03140.json).
+
+Reconcile main 3518aedf documentation, preserving both changelog entries. Replace
+the single diagnostic invocation with at most 32 identical cases, all original
+writer/update/assertion behavior unchanged. Stop at the first nonzero exit and
+retain it; never retry a failed case to obtain green. A 210-second scheduling
+budget reports INCOMPLETE/nonzero if exhausted; the enclosing existing Windows
+Job Object still owns the unchanged 240-second deadline and all descendants.
+No new build service, worker, resource cap or production policy is introduced.
+Two injected-runner contracts prove failure stops immediately and incomplete
+budget is not PASS. No local Rust compilation runs. Inspect the bounded samples
+before selecting a production or fixture correction; no root cause is asserted.
