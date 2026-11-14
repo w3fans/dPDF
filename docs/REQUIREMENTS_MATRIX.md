@@ -165,6 +165,21 @@ Production baking is **disabled**. No row below may be read as production-ready.
 | R-INT-5 view-only / exact Save As | Automated tests passed | `src/pdf.rs` | unit test; byte-identical Save As smoke (v0.1.43); encrypted Save As | ✓ | ✓ | – | – | — |
 | Password-protected PDFs | Automated tests passed | `src/encrypted.rs` | `check-passwords.py` (AES-256/128, retry, queue) | ✓ | ✓ | ✓ v0.1.10 (adapted) | – | Native password entry by hand on Windows |
 
+Portable-helper coverage preparation (14 November): R-PLAT-7's staging check now
+accepts the pinned qpdf input and exercises complete bundled-helper discovery,
+Unicode paths and failed-helper source/destination preservation. The candidate
+requires exact-source native hosted execution; see
+[the T19 receipt](planning/progress/T19-portable-qpdf-2026-11-14.md). This changes
+no installer, native operator or milestone qualification mark above.
+
+MSI retention preparation (14 November): the artifact-only source 847d1c58 run
+passed fresh generated install/probe/registration/uninstall and sentinel checks;
+this qualifies that source/profile only. Valid generated mark-library seeding,
+exact installed-binary comparison and CLI reload through uninstall are a separate
+candidate; see [the receipt](planning/progress/T19-msi-mark-retention-2026-11-14.md).
+Native execution of the new check, older-package upgrade, recovery/GUI reopening,
+explicit default-app starting states and owner acceptance remain separate gates.
+
 ## Milestone summary
 
 | Milestone | State | Open gates |
@@ -182,3 +197,14 @@ jobs passed and [PR #5](https://github.com/w3fans/dPDF/pull/5) merged to main
 `1cf522aeccc1794e5cbad4af42a7a02fd1b05c75`. T01 is complete under its explicit
 exit criteria; authority-side integration retains a separate PENDING status. This tooling receipt does not promote
 any application requirement or transfer historical platform qualification.
+
+
+Dated T19 evidence supplement (14 November): the independent unmerged engine
+candidate and complete scoped advisory lookup are recorded in
+[the receipt](planning/progress/T19-engine-8125-advisory-refresh-2026-11-14.md).
+It also links the verified vendored Winit provenance correction. These records do
+not change main's runtime pins, row qualification marks, manual platform/package
+acceptance or experienced review gates. Native minimum-compiler source checks merged in [PR #19](https://github.com/w3fans/dPDF/pull/19)
+after final source 87e12390 passed all jobs in run 43548625649; actual Rust 1.92.0
+and explicit GNU/MSVC targets were verified. This qualifies source compatibility,
+not a release binary or runtime/operator acceptance on the minimum compiler.

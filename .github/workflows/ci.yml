@@ -166,6 +166,12 @@ jobs:
             cd "$stage"
             sha256sum dpdf libpdfium.so > SHA256SUMS.txt
           )
+      - name: Minimum supported Rust source checks
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          python3 scripts/ci/check_minimum_rust.py --source . --commit "$GITHUB_SHA" \
+            --output "$RUNNER_TEMP/linux-validation/minimum-rust"
       - name: Summary
         if: always()
         run: |
@@ -223,6 +229,17 @@ jobs:
           $ErrorActionPreference = 'Stop'
           Get-Content (Join-Path $env:VALIDATION_REPORT_DIR 'README.md') | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           if ($code -ne 0) { throw "Windows validation failed ($code)" }
+      - name: Minimum supported Rust source checks
+        if: ${{ !cancelled() }}
+        shell: powershell
+        env:
+          VALIDATION_REPORT_DIR: ${{ runner.temp }}/dpdf-validation-pr
+          VALIDATED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $python = (Get-Command python.exe -CommandType Application | Select-Object -First 1).Source
+          & $python harness/scripts/ci/check_minimum_rust.py --source source --commit $env:VALIDATED_COMMIT --output (Join-Path $env:VALIDATION_REPORT_DIR 'minimum-rust')
+          if ($LASTEXITCODE -ne 0) { throw 'Minimum supported Rust source checks failed' }
       - name: Upload report and per-suite logs
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6

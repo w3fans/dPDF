@@ -43,3 +43,27 @@ Windows, Wayland, physical printer and real-user gaps explicitly. This work may
 proceed independently of the unmerged T03 lifecycle drafts, but any later combined
 source needs its affected gates repeated. Production baking and release authority
 remain unchanged.
+
+
+## Accepted main reconciliation and minimum compiler gate (14 November)
+
+This review candidate now includes accepted main 68910141 as a normal merge
+parent, retaining qualified 5456aa4f. Only changelog insertion conflicted; keep
+both entries. Binding/runtime pair, lockfile, both target inventories, Fedora
+source manifest, source-only collector and build adapter are byte-identical to
+the qualified engine candidate. The new main supplies native Rust 1.92 source
+checks, test-only mark diagnostics and portable/MSI checks.
+
+Prior stable compiler/runtime qualification does not establish this combined
+source or its advertised minimum compiler. Fresh hosted gates on both native
+targets and affected exact-source comparisons remain PENDING. The canonical
+8125 source bundle's upstream revisions and collector inputs are unchanged;
+this is not a new Fedora GN/C++ build or installed-package qualification.
+Experienced engine review and actual Fedora source-build/operator evidence
+remain REQUIRED. Keep this PR draft; no security clearance, release, tag,
+version or production baking approval follows from CI or this reconciliation.
+
+Sixteen local source suites pass: 129 tests, 125 passed/four existing platform
+skips, including all five source-collector cases. Formatting, metadata, local
+links/JSON/whitespace checks pass; no local Rust or C++ compilation. New native
+minimum-compiler and ordinary hosted/runtime evidence remain PENDING.
