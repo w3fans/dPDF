@@ -45,3 +45,23 @@ then record both native minimum targets and all existing regression outcomes.
 No experienced lifecycle/engine review gate is waived for the other drafts.
 Rollback: revert this focused CI/checker/docs increment; preserve qualified
 artifacts and all source/user data.
+
+
+## First hosted result and independent-check admission correction
+
+Head 1b5f6927, run 43544105201: policy and Linux passed. Linux's actual compiler
+report verifies Rust 1.92.0 / x86_64-unknown-linux-gnu and both locked all-target
+checks. Stable Linux executable matches main's qualified bytes. Windows built,
+passed its other reported corpora, but release unit tests failed in the existing
+concurrent mark usage/size metadata test (67 passed, one failed, one intentional
+subprocess fixture ignored). A writer exhausted metadata_lock's five-second wait.
+No production cause is claimed yet; timing evidence must distinguish one slow
+write from repeated-writer starvation. The failed report/log/artifact are retained.
+
+Windows's minimum step was skipped after that stable-suite failure, so native
+Windows Rust 1.92 remains untested. Make both independent minimum checks run when
+the job has not been cancelled, including after another validation failure. The
+overall job retains its earlier FAIL. This reports each independent result without
+rerunning, skipping or relabelling the failed mark test. No deadline/resource cap
+is increased. Mark-lock diagnosis is separate work; full corrected-source gates
+and native Windows minimum evidence remain required before merge.
