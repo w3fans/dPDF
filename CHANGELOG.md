@@ -13,6 +13,9 @@
 
 - Cancel helper requests when tab close is accepted and atomically order staged publication against cancellation, preserving rejected-close retry and lease cleanup.
 
+- Release recovery-store ownership explicitly after cleanup so lingering
+  duplicate or inherited handles cannot retain the ended owner's lock.
+
 - Retain bounded, value-redacted evidence when Windows shared registration
   cleanup assertions fail, preserving strict restoration and default checks.
 

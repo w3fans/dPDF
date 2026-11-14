@@ -268,3 +268,34 @@ or production baking change. Original dirty worktrees are preserved.
 
 Local final-integration checks pass: fifteen suites, 127 tests (123 pass/four
 existing platform skips), formatting and whitespace. No local Rust compilation.
+
+
+## Qualified recovery handoff fix integration
+
+Normally merge refreshed page/image parent b0c86141, including lifecycle
+parent ab93ca98 and accepted main 30767936, retaining a9b3b7b3 as a normal
+parent. The merge is clean. The exact qualified main recovery guard and new
+duplicate-handle regression are the only Rust production changes; all other
+source, manifests/lock and UI bytes remain unchanged. The original dirty
+print/root/image worktrees remain preserved.
+
+Parent e1af0ea8 failed the original recovery Store handoff in Linux debug
+run 43565022530; its skipped release/runtime gates are not passes. See
+[the retained failure and qualified fix](T03-recovery-lock-handoff-2026-11-14.md).
+The deterministic inherited-descriptor reproduction establishes the mechanism,
+but descriptors from the original transient CI failure were not captured and
+attribution remains inferred. Unrelated historical decryption/registration
+failures are not diagnosed by this fix.
+
+Historical a9b3b7b3 passed all jobs in 43565320025. Its exact-source Linux and
+Windows artifacts, both actual native Rust 1.92 receipts, 349/255 notice inventory
+objects and all 648/485 notice text references were verified. Its Linux compiled
+pair is byte-identical to 6b82779e's qualified replay pair. This historical
+evidence does not qualify the new recovery-fixed source. Fresh combined-source
+hosted/native/minimum-compiler and affected print/discovery/runtime gates remain
+PENDING. Experienced lifecycle and parent review remain REQUIRED; keep draft.
+No assertion/deadline/resource-cap, runtime pin, release/version/tag or production
+baking change.
+
+Local recovery-integration checks pass: fifteen suites, 127 tests: 123 pass/four
+existing platform skips. Formatting/whitespace pass; no local Rust compilation.
