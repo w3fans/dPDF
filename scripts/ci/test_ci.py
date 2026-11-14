@@ -263,6 +263,8 @@ class Contracts(unittest.TestCase):
         self.assertIn('block-probe', names)
         self.assertIn('engine-paths', names)
         self.assertIn('page-units', names)
+        staged = next(command for name, command, _ in plan if name == 'staged-reader')
+        self.assertEqual(staged[staged.index('--qpdf') + 1], 'qpdf.exe')
         self.assertNotIn('windows-print', names)
         self.assertNotIn('passwords', names)
         self.assertFalse(any(name.startswith('clipboard-') for name in names))
