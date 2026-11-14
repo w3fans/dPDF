@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Check the declared minimum Rust compiler on hosted Linux and native MSVC,
+  retaining source-check logs separately from qualified stable runtime artifacts.
+
 - Correct the vendored Winit manifest provenance note and retain dated,
   source-scoped dependency-advisory evidence for the unmerged engine candidate.
 
