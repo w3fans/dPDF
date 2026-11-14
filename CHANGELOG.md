@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Preserve early helper errors in the generated decryption-stall regression,
+  retaining failed-run evidence without relaxing its bounds or assertions.
+
 - Cancel helper requests when tab close is accepted and atomically order staged publication against cancellation, preserving rejected-close retry and lease cleanup.
 
 - Verify generated mark-library data survives MSI installation/uninstallation and

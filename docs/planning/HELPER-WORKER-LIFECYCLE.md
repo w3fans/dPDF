@@ -271,3 +271,22 @@ diagnostics and complete portable/MSI checks. Their presence does not qualify
 this combined lifecycle source. Current-source hosted gates and original native
 responsive/close replay must be repeated. Experienced lifecycle review remains
 PENDING; no review, manual platform acceptance or production baking GO is inferred.
+
+
+### Fresh main reconciliation: release fixture failure
+
+Source 15983766 in run 43558979273 failed Linux release unit tests: 92 passed,
+one failed, at the generated decryption helper's startup handshake. Debug tests,
+both Clippy checks and the Linux native Rust 1.92 source check passed. Later
+release/runtime gates were skipped and are not qualified. The retained first
+failure receipt is [here](progress/T03-decryption-stall-first-failure.json).
+The artifact contains minimum-compiler reports only; the failed release test's
+assertion is retained from the source-bound job log.
+
+The cause remains UNKNOWN. The old fixture consumed an early completion/error
+then discarded it before asserting the handshake. The diagnostic follow-up
+preserves that result and reports only a byte count or sanitized helper error.
+All startup, stall, fallback and completion bounds and all existing assertions
+remain unchanged. There is no production decryption/process supervision change
+and no claim of a fixed timing failure. Fresh hosted checks remain required;
+experienced lifecycle review is still required before merge.
