@@ -1,7 +1,8 @@
 # T19 declared minimum Rust source checks
 
-Status: IN_PROGRESS; implementation and process-injected contracts prepared,
-actual compiler validation PENDING approved public CI.
+Status: IN_PROGRESS. Both native minimum targets and all hosted gates passed
+on 63607995; current main reconciliation and explicit-target follow-up require
+updated gates before merge.
 Base main e7bec799b0d5ff30175fa28cd2ff743d9b9b4a72; isolated
 /tmp/dpdf-minimum-rust, branch test/minimum-rust. Independent of unmerged lifecycle
 and engine drafts #10/#16/#17/#18. It does not qualify their changed sources.
@@ -65,3 +66,30 @@ overall job retains its earlier FAIL. This reports each independent result witho
 rerunning, skipping or relabelling the failed mark test. No deadline/resource cap
 is increased. Mark-lock diagnosis is separate work; full corrected-source gates
 and native Windows minimum evidence remain required before merge.
+
+
+## Qualified native minimum checks and main reconciliation
+
+Head 63607995 / run 43546102757 passed all three jobs. Verified artifact ZIPs,
+source identities, both native Rust 1.92.0 compiler reports and locked all-target
+source checks. Linux also passed Windows-print adapter metadata checking. Stable
+Linux runtime bytes equal the existing main qualification. Actual native notice
+inventories match Linux 349 / Windows 255 components; all 648 / 485 notice refs
+were rehashed. Windows minimum-check aggregate committed-memory peak was
+1,254,400,000 bytes under the observed 2,147,483,648-byte Job Object limit; this
+is not RSS or a whole-app memory budget. Full identities/reports are in
+[T19-minimum-rust-qualified-63607995.json](T19-minimum-rust-qualified-63607995.json).
+
+Reconciled documentation main 3518aedf in a normal two-parent merge. Only
+CHANGELOG insertion conflicted; retained both focused entries. App source,
+Cargo configuration/dependencies and runtime pins remain unchanged. Strengthen
+the checker to select the native target explicitly in both Cargo argv and its
+environment, so an inherited cross-target setting cannot change the claimed
+scope. Existing injected-runner test now supplies a conflicting target and checks
+that it is replaced. No incorrect target was observed in the qualified run.
+
+Current merged/follow-up source must repeat all applicable hosted gates. The
+prior Windows lock failure remains retained and under independent diagnosis;
+a later passing run is not a root-cause verdict. No minimum-compiler release
+binary, physical/native operator acceptance or experienced lifecycle/engine
+approval follows from these source checks.

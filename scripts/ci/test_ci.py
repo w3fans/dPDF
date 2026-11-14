@@ -90,12 +90,16 @@ class Contracts(unittest.TestCase):
                 self.assertEqual(env['RUSTC_WRAPPER'], '')
                 self.assertEqual(env['RUSTC_WORKSPACE_WRAPPER'], '')
                 host = 'x86_64-pc-windows-msvc' if os.name == 'nt' else 'x86_64-unknown-linux-gnu'
+                self.assertEqual(env['CARGO_BUILD_TARGET'], host)
+                if 'check' in command:
+                    self.assertEqual(command[command.index('--target') + 1], host)
                 log.write_text('rustc 1.92.0 (fixture)\nhost: ' + host + '\n')
                 return 42 if 'check' in command else 0
             with patch.object(check_minimum_rust, 'git', side_effect=lambda source, *args: 'requested' if args[0] == 'rev-parse' else ''), \
                     patch.object(check_minimum_rust, 'native_admission'), \
                     patch.object(check_minimum_rust.shutil, 'which', side_effect=lambda name: name), \
-                    patch.dict(os.environ, {'RUSTC': 'newer-compiler', 'RUSTC_WRAPPER': 'wrapper'}):
+                    patch.dict(os.environ, {'RUSTC': 'newer-compiler', 'RUSTC_WRAPPER': 'wrapper',
+                                            'CARGO_BUILD_TARGET': 'different-cross-target'}):
                 report = check_minimum_rust.check(source, 'requested', root / 'report', runner)
             self.assertEqual(report['status'], 'FAIL')
             self.assertEqual(report['checks'][-1]['exit_code'], 42)

@@ -5,6 +5,9 @@
 - Check the declared minimum Rust compiler on hosted Linux and native MSVC,
   retaining source-check logs separately from qualified stable runtime artifacts.
 
+- Correct the vendored Winit manifest provenance note and retain dated,
+  source-scoped dependency-advisory evidence for the unmerged engine candidate.
+
 - Reconcile implementation and platform evidence, retain the dated implementation plan and progress receipts, and document remaining review and acceptance gates.
 
 - Update the locked pulldown-cmark parser to 0.13.6 for the nested-wikilink parsing fix, preserving dependency requirements and MIT notice bytes.
