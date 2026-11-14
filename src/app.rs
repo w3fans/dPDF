@@ -17,7 +17,7 @@ use std::{
     collections::{HashMap, HashSet, VecDeque},
     path::PathBuf,
     rc::Rc,
-    sync::{atomic::Ordering, mpsc},
+    sync::atomic::Ordering,
     time::{Duration, Instant},
 };
 
@@ -95,6 +95,7 @@ impl ReviewState {
 struct Tab {
     review: Option<ReviewState>,
     review_requested: bool,
+    review_generation: u64,
     review_ready: bool,
     review_error: Option<String>,
     recovery: RecoveryState,
@@ -163,8 +164,7 @@ pub struct Application {
     preferences_path: Option<PathBuf>,
     preferences_warning: Option<String>,
     preferences_changed: Option<Instant>,
-    printer_results: mpsc::Receiver<Result<Vec<String>, String>>,
-    printer_sender: mpsc::SyncSender<Result<Vec<String>, String>>,
+    printer_jobs: anyhow::Result<crate::background_jobs::Jobs<(), Vec<String>>>,
     printer_names: Vec<String>,
     printer_loading: bool,
     print_pending: bool,
@@ -402,9 +402,21 @@ impl Application {
         let Some(id) = self.tabs.get(self.active).map(|t| t.info.id) else {
             return;
         };
-        if self.command(ui, Command::LoadReview(id)) {
-            let tab = &mut self.tabs[self.active];
+        self.request_review(ui, id);
+    }
+    fn request_review(&mut self, ui: &Workspace, id: DocumentId) {
+        let Some(index) = self.tabs.iter().position(|tab| tab.info.id == id) else {
+            return;
+        };
+        let Some(generation) = self.tabs[index].review_generation.checked_add(1) else {
+            ui.set_status("Review request identity exhausted".into());
+            return;
+        };
+        if self.command(ui, Command::LoadReview(id, generation)) {
+            let tab = &mut self.tabs[index];
+            tab.review_generation = generation;
             tab.review_requested = true;
+            tab.review_ready = false;
             tab.review_error = None;
             self.review_controls(ui);
         }
@@ -1013,7 +1025,10 @@ impl Application {
                 )
             }
         };
-        let (printer_sender, printer_results) = mpsc::sync_channel(1);
+        let printer_jobs = crate::background_jobs::Jobs::new(
+            crate::background_jobs::Cancellation::default(),
+            |(), cancel| platform::discover_printers(Some(cancel)),
+        );
         let recovery_on = enable_recovery && preferences.recovery_enabled;
         Self {
             worker: pdf::start(),
@@ -1042,8 +1057,7 @@ impl Application {
             preferences_path,
             preferences_warning,
             preferences_changed: None,
-            printer_results,
-            printer_sender,
+            printer_jobs,
             printer_names: vec![],
             printer_loading: false,
             print_pending: false,
@@ -1105,13 +1119,18 @@ impl Application {
         if self.printer_loading {
             return;
         }
-        self.printer_loading = true;
-        ui.set_printer_loading(true);
-        let sender = self.printer_sender.clone();
-        std::thread::spawn(move || {
-            let _ =
-                sender.send(platform::discover_printers().map_err(|error| format!("{error:#}")));
-        });
+        let result = self
+            .printer_jobs
+            .as_mut()
+            .map_err(|error| anyhow::anyhow!("{error:#}"))
+            .and_then(|jobs| jobs.submit(0, ()));
+        match result {
+            Ok(_) => {
+                self.printer_loading = true;
+                ui.set_printer_loading(true);
+            }
+            Err(error) => ui.set_printer_note(format!("Find printers: {error:#}").into()),
+        }
     }
 
     fn printer_choices(&self, ui: &Workspace) {
@@ -1139,7 +1158,7 @@ impl Application {
     }
 
     fn command(&self, ui: &Workspace, command: Command) -> bool {
-        match self.worker.commands.try_send(command) {
+        match self.worker.try_send(command) {
             Ok(()) => true,
             Err(error) => {
                 ui.set_status(format!("PDF worker busy or unavailable: {error}").into());
@@ -2107,17 +2126,12 @@ impl Application {
             ui.set_status(format!("Mark placed. Cannot record last-used time: {error}").into());
         }
         self.recovery_tick(ui);
-        if let Some(tab) = self.tabs.get_mut(self.active)
+        if let Some(tab) = self.tabs.get(self.active)
             && self.review_auto
             && !tab.review_requested
             && !self.frames.is_empty()
-            && self
-                .worker
-                .commands
-                .try_send(Command::LoadReview(tab.info.id))
-                .is_ok()
         {
-            tab.review_requested = true;
+            self.request_review(ui, tab.info.id);
         }
         if let Some(studio) = &self.mark_studio {
             studio.set_document(self.tabs.get(self.active).map(|t| t.info.id));
@@ -2146,7 +2160,8 @@ impl Application {
         } else if self.arrangement.take().is_some() {
             self.rebuild_sidebar(ui);
         }
-        if let Ok(result) = self.printer_results.try_recv() {
+        if let Some(reply) = self.printer_jobs.as_ref().ok().and_then(|jobs| jobs.poll()) {
+            let result = reply.result;
             self.printer_loading = false;
             ui.set_printer_loading(false);
             match result {
@@ -2188,9 +2203,21 @@ impl Application {
                         }
                     }
                 }
-                Event::PageUnitsLoaded(id, result) => self.page_units_loaded(ui, id, result),
-                Event::ReviewLoaded(id, result) => {
-                    if let Some(tab) = self.tabs.iter_mut().find(|t| t.info.id == id) {
+                Event::PageUnitsLoaded(id, generation, result) => {
+                    if self
+                        .tabs
+                        .iter()
+                        .any(|t| t.info.id == id && t.review_generation == generation)
+                    {
+                        self.page_units_loaded(ui, id, result);
+                    }
+                }
+                Event::ReviewLoaded(id, generation, result) => {
+                    if let Some(tab) = self
+                        .tabs
+                        .iter_mut()
+                        .find(|t| t.info.id == id && t.review_generation == generation)
+                    {
                         tab.review_ready = result.is_ok();
                         tab.review_error = result.as_ref().err().cloned();
                         match result {
@@ -2323,6 +2350,7 @@ impl Application {
                             ReviewState::new(model, crate::review::Review::default(), false, true)
                         }),
                         review_requested: false,
+                        review_generation: 0,
                         review_ready: false,
                         review_error: None,
                         recovery: recovery_state,
@@ -3211,6 +3239,15 @@ fn run_window(paths: Vec<PathBuf>, smoke: bool) -> Result<(), slint::PlatformErr
     ui.set_native_printing(cfg!(any(target_os = "linux", target_os = "windows")) && !smoke);
     ui.set_app_version(env!("CARGO_PKG_VERSION").into());
     let smoke_preferences = std::env::var_os("DPDF_SMOKE_PREFERENCES").is_some();
+    if smoke
+        && std::env::var_os("DPDF_SMOKE_HELPER").is_some()
+        && (std::env::var_os("DPDF_CONFIG_DIR").is_none()
+            || std::env::var_os("DPDF_DATA_DIR").is_none())
+    {
+        return Err(slint::PlatformError::Other(
+            "Helper diagnostic requires isolated config and data directories".into(),
+        ));
+    }
     if smoke && smoke_preferences && std::env::var_os("DPDF_CONFIG_DIR").is_none() {
         return Err(slint::PlatformError::Other(
             "Preference smoke test requires an explicit DPDF_CONFIG_DIR".into(),
@@ -3237,6 +3274,7 @@ fn run_window(paths: Vec<PathBuf>, smoke: bool) -> Result<(), slint::PlatformErr
         !smoke || std::env::var_os("DPDF_SMOKE_RECOVERY").is_some(),
         !smoke
             || std::env::var_os("DPDF_SMOKE_REVIEW").is_some()
+            || std::env::var_os("DPDF_SMOKE_HELPER").is_some()
             || std::env::var_os("DPDF_SMOKE_PHYSICAL").is_some(),
     )));
     {

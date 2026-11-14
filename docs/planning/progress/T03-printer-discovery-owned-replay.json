@@ -1,0 +1,21 @@
+{
+  "status": "PASS: generated native discovery cancelled and reaped on normal exit",
+  "helper_reaped": true,
+  "source_commit": "896fec1018f5452cbe888195aa70de238032430b",
+  "binary_sha256": "a8fb4bb480a7c8d8c40168f51cfd967c099eb7ec6ca3ded2018d3597a0c29e7a",
+  "parent_exit_code": 0,
+  "close_elapsed_seconds": 0.018158028018660843,
+  "helper": {
+    "pid": 3150253,
+    "start": "65934012",
+    "pgrp": 3150253
+  },
+  "helper_alive_after_parent_exit": false,
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "source_unchanged": true,
+  "submission": false,
+  "pr_head": "e71a67268cdf98c9aaa42916531b0c7fe5be0a02",
+  "workflow_run": 43532813603,
+  "artifact_id": 14088791581,
+  "artifact_zip_sha256": "28588a429dda5a9e4c94959f611c9e7834114012c67ecbd3979fdfe38d8553ab"
+}

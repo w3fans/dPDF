@@ -1,0 +1,15 @@
+{
+  "status": "REPRODUCED",
+  "source_commit": "a098af80790ffa465e147be42669671d5e5b79c4",
+  "binary_sha256": "66400a88b1cabf0043914590d6f74ff6a6fde112bc15eb239212f6d599bc6145",
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "parent_exit_code": 0,
+  "normal_WM_DELETE_WINDOW": true,
+  "native_child_pid": 3131780,
+  "native_child_start": "65648269",
+  "native_dialog_alive_after_parent_exit": true,
+  "source_unchanged": true,
+  "GTK_PRINT_BACKENDS": "file",
+  "physical_submission": false,
+  "fixture_cleanup": "Closed native dialog using WM_DELETE_WINDOW and waited through fixture subreaper"
+}

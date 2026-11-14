@@ -17,6 +17,24 @@ input and owner acceptance remain open. Requirement IDs and wording are in
 [PRODUCT_SPEC.md](PRODUCT_SPEC.md); remaining work maps to the
 [implementation-plan coverage ledger](planning/IMPLEMENTATION-PLAN.md#requirement-coverage-ledger).
 
+## Unmerged PDF/print helper candidate (14 November 2026)
+
+Drafts [#10](https://github.com/w3fans/dPDF/pull/10),
+[#16](https://github.com/w3fans/dPDF/pull/16) and
+[#17](https://github.com/w3fans/dPDF/pull/17) supply source-bound lifecycle evidence
+for page assembly R-PLAT-4/R-PAGE-1/4/5/6, overlay saves and native/quick printing
+R-PRN-1/2/3/5/6. Final functional head e71a6726 passed all hosted jobs in run
+43532813603 and eighteen held-helper window cases. Exact-source native Linux
+replays cover staged export responsiveness, immutable print handoff, normal
+shutdown, discovery cancellation, source/scratch preservation and no retry after
+ambiguous submission. [Progress receipt](planning/progress/T03-print-ownership-2026-11-14.md)
+retains exact hashes, failures, inherited-group policy and nested-reaping scope.
+
+These drafts remain unmerged pending experienced lifecycle review. They do not
+promote any row below to platform qualified or user accepted. In particular
+R-PRN-5/6 physical/Windows-driver gates, package/operator acceptance and T05's
+aggregate memory/performance work remain open. Production baking is disabled.
+
 ## Status vocabulary
 
 | State | Meaning |
@@ -36,8 +54,8 @@ Evidence columns:
   are recorded in RELEASE-STATUS. Private-X11 suites do not qualify compositor
   interaction or physical paper output.
 - **Linux CI:** public PRs retain independent hosted validation; private builds
-  use controlled adapters. This development workstation must use the approved
-  remote wrapper for Rust compilation. Skipped jobs never count as PASS; see
+  use controlled adapters. This development workstation uses approved public hosted PR CI for Rust
+  compilation; no local Rust compilation is permitted. Skipped jobs never count as PASS; see
   [BUILD-INFRASTRUCTURE.md](BUILD-INFRASTRUCTURE.md).
 - **Hosted Win:** v0.1.54 native hosted validation and MSI/portable qualification
   are recorded in RELEASE-STATUS. Earlier check marks retain their original

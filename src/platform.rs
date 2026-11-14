@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, bail};
-use std::{path::Path, process::Command};
+use std::{path::Path, process::Command, sync::atomic::AtomicBool};
 
 /// Called only for fixed public About links after the user activates a button.
 pub fn open_url(url: &str) -> Result<()> {
@@ -153,13 +153,14 @@ pub fn validate_range(range: &str, page_count: usize) -> Result<String> {
     Ok(normalized.join(","))
 }
 
-pub fn discover_printers() -> Result<Vec<String>> {
+pub fn discover_printers(cancel: Option<&AtomicBool>) -> Result<Vec<String>> {
     #[cfg(target_os = "linux")]
     {
-        discover_cups_printers(Path::new("lpstat"))
+        discover_cups_printers(Path::new("lpstat"), cancel)
     }
     #[cfg(not(target_os = "linux"))]
     {
+        let _ = cancel;
         bail!(
             "Printer discovery is not implemented on this platform; use the default or enter a printer name"
         )
@@ -167,11 +168,12 @@ pub fn discover_printers() -> Result<Vec<String>> {
 }
 
 #[cfg(target_os = "linux")]
-fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
-    let output = cups_output(
+fn discover_cups_printers(executable: &Path, cancel: Option<&AtomicBool>) -> Result<Vec<String>> {
+    let output = cups_output_cancellable(
         Command::new(executable).arg("-e"),
         std::time::Duration::from_secs(5),
         false,
+        cancel,
     )?;
     if !output.status.success() {
         bail!(
@@ -194,11 +196,21 @@ fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
     Ok(names)
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", test))]
 fn cups_output(
     command: &mut Command,
     timeout: std::time::Duration,
     submission: bool,
+) -> Result<std::process::Output> {
+    cups_output_cancellable(command, timeout, submission, None)
+}
+
+#[cfg(target_os = "linux")]
+fn cups_output_cancellable(
+    command: &mut Command,
+    timeout: std::time::Duration,
+    submission: bool,
+    cancel: Option<&AtomicBool>,
 ) -> Result<std::process::Output> {
     crate::helper_process::run(
         command,
@@ -208,7 +220,7 @@ fn cups_output(
             stdout: 64 * 1024,
             stderr: 64 * 1024,
         },
-        None,
+        cancel,
     )
     .map_err(|error| {
         if submission {
@@ -228,17 +240,37 @@ fn submit_cups(
     range: &str,
     printer: &str,
     fit: bool,
+    cancel: Option<&AtomicBool>,
 ) -> Result<String> {
-    submit_cups_with_command(&mut Command::new(executable), path, range, printer, fit)
+    submit_cups_with_command_cancellable(
+        &mut Command::new(executable),
+        path,
+        range,
+        printer,
+        fit,
+        cancel,
+    )
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", test))]
 fn submit_cups_with_command(
     command: &mut Command,
     path: &Path,
     range: &str,
     printer: &str,
     fit: bool,
+) -> Result<String> {
+    submit_cups_with_command_cancellable(command, path, range, printer, fit, None)
+}
+
+#[cfg(target_os = "linux")]
+fn submit_cups_with_command_cancellable(
+    command: &mut Command,
+    path: &Path,
+    range: &str,
+    printer: &str,
+    fit: bool,
+    cancel: Option<&AtomicBool>,
 ) -> Result<String> {
     if !printer.trim().is_empty() {
         command.args(["-d", printer.trim()]);
@@ -254,10 +286,11 @@ fn submit_cups_with_command(
             "print-scaling=none"
         },
     ]);
-    let output = cups_output(
+    let output = cups_output_cancellable(
         command.arg("--").arg(path),
         std::time::Duration::from_secs(30),
         true,
+        cancel,
     )?;
     if !output.status.success() {
         bail!(
@@ -272,10 +305,16 @@ fn submit_cups_with_command(
     Ok(String::from_utf8_lossy(&output.stdout).trim().to_owned())
 }
 
-pub fn print_pdf(path: &Path, range: &str, printer: &str, fit: bool) -> Result<String> {
+pub fn print_pdf(
+    path: &Path,
+    range: &str,
+    printer: &str,
+    fit: bool,
+    cancel: Option<&AtomicBool>,
+) -> Result<String> {
     #[cfg(target_os = "linux")]
     {
-        submit_cups(Path::new("lp"), path, range, printer, fit)
+        submit_cups(Path::new("lp"), path, range, printer, fit, cancel)
     }
     #[cfg(target_os = "windows")]
     {
@@ -303,7 +342,7 @@ pub fn print_pdf(path: &Path, range: &str, printer: &str, fit: bool) -> Result<S
                 stdout: 64 * 1024,
                 stderr: 64 * 1024,
             },
-            None,
+            cancel,
         )
         .map_err(|error| anyhow::anyhow!("Windows print helper did not confirm submission: {error}. The job may already be queued; check the print queue before submitting again"))?;
         if !output.status.success() {
@@ -319,7 +358,7 @@ pub fn print_pdf(path: &Path, range: &str, printer: &str, fit: bool) -> Result<S
     }
     #[cfg(not(any(target_os = "linux", target_os = "windows")))]
     {
-        let _ = (path, range, printer, fit);
+        let _ = (path, range, printer, fit, cancel);
         bail!("Printing is supported on Linux and Windows only")
     }
 }
@@ -332,37 +371,28 @@ pub fn native_print(
     range: &str,
     printer: &str,
     fit: bool,
+    cancel: &AtomicBool,
 ) -> Result<String> {
-    use std::{io::Write, process::Stdio};
     if bytes.len() > 256 * 1024 * 1024 {
         bail!(
             "Native printing supports PDF snapshots up to 256 MiB; use Quick Print for this file"
         );
     }
-    let mut child = Command::new(std::env::current_exe()?)
-        // Native host printing keeps the chosen output URI available for the
-        // source-preservation check before GTK submits a print-to-file job.
-        .env("GTK_USE_PORTAL", "0")
-        .arg("--native-print")
-        .arg(source)
-        .arg(current.to_string())
-        .arg(range)
-        .arg(if fit { "fit" } else { "actual" })
-        .arg(printer)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .context("Start native print dialog")?;
-    let write = child
-        .stdin
-        .take()
-        .context("Open native print input")?
-        .write_all(bytes);
-    let output = child.wait_with_output()?;
+    // This owner retains scratch across child/group/job cleanup, including a
+    // forced abort of a nested native-host helper. No private temp files detach.
+    let scratch = tempfile::tempdir()?;
+    let output = crate::helper_process::run_dialog(
+        Command::new(std::env::current_exe()?)
+            .env("GTK_USE_PORTAL", "0")
+            .env("TMPDIR", scratch.path()).env("TMP", scratch.path()).env("TEMP", scratch.path())
+            .arg("--native-print").arg(source).arg(current.to_string()).arg(range)
+            .arg(if fit { "fit" } else { "actual" }).arg(printer),
+        bytes,
+        cancel,
+    ).map_err(|error| anyhow::anyhow!("Native printing did not confirm completion: {error}. The job may already be queued; check the print queue before submitting again"))?;
     if !output.status.success() {
         bail!(
-            "Native printing failed: {}",
+            "Native printing did not confirm completion: {}. The job may already be queued; check the print queue before submitting again",
             String::from_utf8_lossy(&output.stderr)
                 .chars()
                 .take(2000)
@@ -370,13 +400,12 @@ pub fn native_print(
                 .trim()
         );
     }
-    write.context("Transfer the opened PDF snapshot to native printing")?;
     let result: serde_json::Value =
-        serde_json::from_slice(&output.stdout).context("Read native printing result")?;
+        serde_json::from_slice(&output.stdout).context("Native printing returned an invalid result; the job may already be queued, check the print queue before submitting again")?;
     match result["status"].as_str() {
         Some("cancelled") => Ok("Printing cancelled".into()),
         Some("submitted") => Ok("Sent to the native print system".into()),
-        _ => bail!("Unknown native printing result"),
+        _ => bail!("Unknown native printing result; check the print queue before submitting again"),
     }
 }
 
@@ -559,7 +588,10 @@ mod tests {
         )
         .unwrap();
         std::fs::set_permissions(&mock, std::fs::Permissions::from_mode(0o700)).unwrap();
-        assert_eq!(discover_cups_printers(&mock).unwrap(), vec!["East", "West"]);
+        assert_eq!(
+            discover_cups_printers(&mock, None).unwrap(),
+            vec!["East", "West"]
+        );
     }
 
     #[test]
@@ -569,5 +601,44 @@ mod tests {
         for invalid in ["0", "11", "3-1", "1-", "-d evil", "1,,2", "1-2-3"] {
             assert!(validate_range(invalid, 10).is_err(), "{invalid}");
         }
+    }
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn cancelled_submission_is_owned_and_reports_ambiguity_without_retry() {
+        use std::{
+            sync::atomic::Ordering,
+            thread,
+            time::{Duration, Instant},
+        };
+        let folder = tempfile::tempdir().unwrap();
+        let attempts = folder.path().join("attempts");
+        let cancel = AtomicBool::new(false);
+        let start = Instant::now();
+        thread::scope(|scope| {
+            scope.spawn(|| {
+                let until = Instant::now() + Duration::from_secs(2);
+                while !attempts.exists() && Instant::now() < until {
+                    thread::sleep(Duration::from_millis(5));
+                }
+                cancel.store(true, Ordering::Release);
+            });
+            let error = cups_output_cancellable(
+                Command::new("sh")
+                    .args(["-c", "echo submitted >> \"$1\"; sleep 30", "fixture"])
+                    .arg(&attempts),
+                Duration::from_secs(30),
+                true,
+                Some(&cancel),
+            )
+            .unwrap_err()
+            .to_string();
+            assert!(
+                error.contains("cancelled")
+                    && error.contains("may already be queued")
+                    && error.contains("check the print queue")
+            );
+        });
+        assert!(start.elapsed() < Duration::from_secs(3));
+        assert_eq!(std::fs::read_to_string(attempts).unwrap(), "submitted\n");
     }
 }
