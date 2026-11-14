@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Release recovery-store ownership explicitly after cleanup so lingering
+  duplicate or inherited handles cannot retain the ended owner's lock.
+
+- Retain bounded, value-redacted evidence when Windows shared registration
+  cleanup assertions fail, preserving strict restoration and default checks.
+
 - Verify generated mark-library data survives MSI installation/uninstallation and
   reloads through the exact candidate executable; retain native toolchain receipts.
 

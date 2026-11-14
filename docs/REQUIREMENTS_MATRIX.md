@@ -208,3 +208,17 @@ acceptance or experienced review gates. Native minimum-compiler source checks me
 after final source 87e12390 passed all jobs in run 43548625649; actual Rust 1.92.0
 and explicit GNU/MSVC targets were verified. This qualifies source compatibility,
 not a release binary or runtime/operator acceptance on the minimum compiler.
+
+
+The [Windows registration cleanup diagnostic](planning/progress/T19-registration-cleanup-diagnostics-2026-11-14.md)
+retains an exact-source native failure and adds bounded, value-redacted snapshot
+evidence. The cause remains unknown; existing strict restoration/default checks
+and production registration behavior are unchanged. New-source native gates
+remain pending, and no broader installed/default/operator acceptance is inferred.
+
+
+The [recovery-lock handoff fix](planning/progress/T03-recovery-lock-handoff-2026-11-14.md)
+retains a native failure and deterministic inherited-descriptor reproduction.
+An explicit owning lock guard releases after store cleanup, with a checkpoint/
+exclusion regression. Exact-source native CI remains pending; no broader
+recovery/lifecycle completion or unrelated-failure diagnosis is claimed.
