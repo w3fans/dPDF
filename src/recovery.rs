@@ -302,13 +302,22 @@ pub enum Reply {
     Failed(String),
     Unavailable(String),
 }
+struct StoreLock(File);
+impl Drop for StoreLock {
+    fn drop(&mut self) {
+        // Closing only this handle can leave an inherited/duplicated open-file
+        // description holding the lock after Store ownership has ended.
+        let _ = self.0.unlock();
+    }
+}
 struct Store {
     root: PathBuf,
-    _lock: File,
     nonce: tempfile::TempDir,
     owned: HashMap<DocumentId, PathBuf>,
     candidates: HashSet<PathBuf>,
     retired: HashSet<PathBuf>,
+    // Fields drop in declaration order: finish nonce/data cleanup before unlock.
+    _lock: StoreLock,
 }
 impl Store {
     fn open(root: &Path) -> Result<(Self, Vec<Candidate>)> {
@@ -327,6 +336,8 @@ impl Store {
         lock.try_lock().map_err(|e| {
             anyhow::anyhow!("Recovery is unavailable while another dPDF instance owns it: {e}")
         })?;
+        // Own successful acquisition immediately, including initialization errors.
+        let lock = StoreLock(lock);
         // Holding the lock, empty nonce folders can only be left by interrupted instances.
         for entry in std::fs::read_dir(root)? {
             let entry = entry?;
@@ -375,11 +386,11 @@ impl Store {
         Ok((
             Self {
                 root: root.into(),
-                _lock: lock,
                 nonce,
                 owned: HashMap::new(),
                 candidates: known,
                 retired: HashSet::new(),
+                _lock: lock,
             },
             candidates,
         ))
@@ -698,6 +709,31 @@ mod tests {
         assert!(store.owned[&2].exists());
         store.remove(2).unwrap();
         assert!(!store.owned.contains_key(&2));
+    }
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn store_handoff_releases_lingering_duplicate_handle() {
+        let dir = tempfile::tempdir().unwrap();
+        let (mut store, _) = Store::open(dir.path()).unwrap();
+        store.save(1, &sample(), None).unwrap();
+        let checkpoint = store.owned[&1].clone();
+        let original = std::fs::read(&checkpoint).unwrap();
+        // A fork before exec can retain the same open-file description, even
+        // with close-on-exec set. A duplicate models that lifetime without a
+        // timing race or running fork in this multithreaded test harness.
+        let lingering = store._lock.0.try_clone().unwrap();
+        assert!(Store::open(dir.path()).is_err());
+        drop(store);
+        let (next, candidates) = Store::open(dir.path())
+            .expect("Store destruction must release ownership while a duplicate handle remains");
+        assert_eq!(candidates.len(), 1);
+        assert_eq!(std::fs::read(&checkpoint).unwrap(), original);
+        assert!(Store::open(dir.path()).is_err());
+        drop(lingering);
+        // Closing the old duplicate must not release the new owner's lock.
+        assert!(Store::open(dir.path()).is_err());
+        drop(next);
+        assert!(Store::open(dir.path()).is_ok());
     }
     #[test]
     fn clearing_removes_every_draft_but_respects_the_owning_instance() {
