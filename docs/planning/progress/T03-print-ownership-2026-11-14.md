@@ -161,3 +161,10 @@ normally and require the child gone/reaped. The original native panel-open/close
 reproduction must also be replayed on the new artifact. Earlier affa712c passes
 qualify only its seventeen-case immutable-print scope; the discovery follow-up
 requires new full gates and experienced review. No release or production baking.
+
+
+First discovery head aea1df69 / tree 9689a881 failed Linux compilation in run
+43532394665: the existing focus diagnostic inherited mpsc from Application's
+parent import, which was removed with the obsolete printer channel. Added an
+explicit std::sync::mpsc import to the smoke module. No product behavior or gate
+weakened; corrected source requires the full rerun.
