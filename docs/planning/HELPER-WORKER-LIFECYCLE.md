@@ -1,10 +1,10 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: recovery candidate 2d75b74b passed all jobs in run 43506767494 and
-native replay; see progress/T03-recovery-2026-11-13.md. The current increment
-also defers early protected print/export decryption. Its compiled/runtime
-qualification is pending. Experienced lifecycle review remains required before
-merge. This does not qualify all helper callers or production baking.
+Status: draft stacked image/page-preparation increment integrating parent close
+fix a87095b9. Qualification of this combined source and experienced lifecycle
+review are PENDING. Earlier parent overlay head 10b443f4 and image head dfa5a999
+passed their own hosted gates; their evidence does not qualify this new head.
+Production baking remains disabled.
 
 ## Reproduced problem
 
@@ -65,8 +65,8 @@ to finish shutdown. The candidate must remain a draft until that gate is satisfi
 
 This does not promise cleanup after SIGKILL, native-engine preemption, cancellation
 of user-owned print dialogs, or supervision of every existing detached export/print
-thread. Overlay/image metadata and detached export/print ownership still require
-subsequent migration. Native user dialogs retain their existing separate policy.
+thread. Image-page metadata and detached page-export/print ownership still require
+subsequent migration. The current overlay migration is specified below. Native user dialogs retain their existing separate policy.
 
 ## Required evidence
 
@@ -169,3 +169,220 @@ print threads and overlay/image metadata are still separate unfinished work.
 The required reviewer must assess this command retention/resumption, shared
 admission bound, completion routing, failure event and close/shutdown policy on
 the actual reviewed head. Prior green CI does not waive that review gate.
+
+
+## Overlay preflight and staged publication increment
+
+A recovered generated mark and native Ctrl+Shift+S through a private GTK portal
+reproduced another reader stall on candidate 2d75b74b: page status advanced to 25
+while content/thumbnail stayed blank until overlay metadata was released. The
+separate output then passed qpdf validation, the source stayed unchanged and the
+helper was reaped. See progress/T03-overlay-stall-reproduction.json.
+
+Overlay export now has three phases under the same two admission leases:
+
+1. Owned immutable metadata inspection runs on the helper worker. Original native
+   documents remain on the PDF worker. Review-only export skips overlay unit
+   inspection and retains its independent validation policy.
+2. The PDF worker converts validated units and native geometry into owned edited
+   page bytes. It reuses the original lease for the final save. No subprocess runs
+   in this phase; native engine creation/destruction stays on its sole owner.
+3. Byte-only serialized-unit verification, assembly, bookmark repair and review
+   export run in the helper pool with cancellation propagated through every helper
+   call. The helper writes only to an owned sibling staging file; it never replaces
+   the user's destination. Mixed review export reads the validated marked snapshot
+   in cancellable chunks, with fallible reservation and a fixed observed file size.
+
+The final completion carries a TempPath, destination, protected input paths and
+page count. The document-owning worker checks the request/document again, rechecks
+output aliases and atomically publishes. Tab close and publication are serialized
+on this worker: if close is processed first, the pending request is removed and
+the late TempPath is deleted without replacing the destination. If publication is
+processed first, its success precedes close. Checking an AtomicBool only before a
+helper-thread rename would leave an unchecked close/publication race; that is why
+publication returns to the owner. Normal shutdown cancels helper work and drops
+unconsumed staged replies. Cancellation does not promise rollback of an atomic
+publication that has already begun.
+
+Admission failure and helper/native preparation errors produce terminal export
+failures. Close cancels both inspected and saving phases and clears UI busy state.
+Old generation replies cannot be routed into another operation or closed tab.
+This replaces detached mark/workspace export threads; image/page assembly and
+print threads remain separate work. Native image/mark object creation still
+occupies the PDF worker and existing image/placement limits remain unchanged.
+The two-lease count is not a measured whole-app RSS budget; T05 remains open.
+
+New generated window cases hold first overlay metadata, non-default serialized
+page-unit validation, final assembly and post-overlay review metadata. They require
+page 25 to render, close/shutdown to reap the child, no published/changed existing
+destination and no sibling staging leftovers. Pure staging tests cover dropped
+replies, an alias swapped in before publication, and successful publication.
+Existing page-unit/overlay/review/alias/password/recovery and native Windows
+hosted gates remain required. Current-source CI and replay are PENDING.
+
+Experienced review must cover lease continuation, native handle ownership,
+publication ordering, alias races, cancellation of every helper, TempPath teardown
+and the intentionally unfinished image/page-export/native-dialog ownership paths.
+
+
+## Sequential page-input and image preparation increment
+
+Native replacement of page 1 from a fixture photo in a generated 50-page,
+UserUnit=2 document reproduced a blank page 25 until target-unit metadata returned.
+The native file/save dialogs used a private GTK portal, the separate output then
+validated, the source stayed unchanged and the helper was reaped. See
+progress/T03-image-stall-reproduction.json. This is separate from overlay export.
+
+The page operation retains one admission lease across all inputs and phases.
+The PDF worker first reduces target page geometry to scalar values. The helper
+worker reads one immutable input snapshot, lazily validates replacement units,
+and decodes/orients/resizes/encodes one image. A byte/pixel-only completion returns
+to the PDF worker for native image-object construction and serialization. Those
+native documents are destroyed there before returning raw bytes to the helper.
+The helper finalizes UserUnit and continues with the next input using the same
+lease. It never accumulates decoded RGBA for every selected image. PDF input
+snapshots and generated PDF bytes accumulate as in the existing page workflow;
+this is not a complete measured aggregate RSS bound (T05 remains open).
+
+Existing PNG/JPEG compressed/decoded/resize limits and original JPEG preservation
+are retained. Input snapshots use cancellable chunks and fallible reservation;
+regular files are required and size changes during reading are refused. OS file
+I/O and image-codec calls are not preempted inside a call; cancellation is checked
+between chunks/phases. No filesystem-latency guarantee is inferred from qpdf's
+process deadlines. Source paths stay attached for source/output alias checks.
+Selected protected secondary sources still need T07's separate prompt queue.
+
+All page operations, including no-image extraction, finish in the owned pool with
+cancellable assembly, metadata/bookmark checks and private sibling staging.
+Close cancels preparation/finalization and removes pending identity; late pixel
+or staged replies are discarded. Only a live matching document owner can publish.
+The existing detached page-export thread is removed. Standalone CLI and GUI use
+the same image preparation/native construction/unit APIs; CLI coordinates them in
+its own process before UI creation. No PDFium initialization/handle crosses into
+the helper pool.
+
+Five additional generated window cases hold target-unit inspection, image unit
+rewrite, image assembly and no-image assembly; another cancels a mixed JPEG/PNG/PDF
+merge and retries after reopening. They require reader page 25 while stalled,
+normal shutdown/close cleanup, unchanged sources/existing destination, no staging
+leftovers, and a validated 55-page retry output. Original native reproduction must
+also be replayed on the built candidate. Full debug/release/Clippy, page/alias/unit/
+password/recovery and native Windows gates remain required. Print preparation,
+quick-print and native-dialog ownership/cancellation remain separate unfinished
+T03 work. The established experienced lifecycle review gate still applies.
+
+## Close admission and publication claim follow-up
+
+Backend serialization alone does not prove cancellation when the UI accepts a
+close: helper replies are polled before queued commands. A deterministic pure
+worker regression reproduced that an admitted Close left a ready request valid
+until owner cleanup (run 43523509748 on 1985833a). No actual output overwrite is
+claimed from that data-level test; the ready-result gate remained open.
+
+The proposed follow-up centralizes UI admission in Worker::try_send. Close uses
+a short registry lock around nonblocking queue admission, then marks the ID closed
+and cancels existing request tokens before returning success to the UI. Rejected
+admission leaves the still-open document usable. Registration rejects a marked ID,
+and its provisional lease is released. The owner removes the marker only after
+processing Close behind preceding FIFO commands and removing its native state.
+No registry lock is held while sending replies, joining workers, creating native
+objects or publishing files.
+
+Tokens transition atomically from running to cancelled or publishing. Publication
+must claim the latter state after identity/document checks; a close that wins
+first prevents it. A claim that wins before close acceptance is the commit point
+and may finish; cancellation does not roll it back. Children use the existing
+separate atomic cancellation flag, and cancelled queued work is not executed.
+Closed IDs remain only until owner cleanup. Cancelled ready export replies report
+a terminal failure even if they arrive before backend Close, clearing busy state.
+
+This strengthens the earlier backend-order-only description. The follow-up's
+hosted/runtime gates are PENDING. This dependent page/image implementation integrates the same admission and
+publication policy; its cancelled ready replies also send a terminal error. Experienced review must assess
+both orderings, delayed registration, lease release, marker reclamation and no
+mutex held across work that needs a UI callback or native owner to complete.
+
+
+## Accepted main reconciliation for lifecycle review (14 November)
+
+This #10 review candidate now includes accepted main 68910141, retaining
+qualified a87095b9 as a normal merge parent. Only changelog insertion conflicted;
+both the lifecycle entry and all accepted maintenance entries are preserved.
+Every prior lifecycle source blob is byte-identical; the sole src change from
+main is the separately qualified test-only mark timing instrumentation. Cargo
+manifest/lock, UI crate manifest and workspace UI bytes are unchanged.
+
+New main supplies the declared Rust 1.92 native source checks, bounded mark
+diagnostics and complete portable/MSI checks. Their presence does not qualify
+this combined lifecycle source. Current-source hosted gates and original native
+responsive/close replay must be repeated. Experienced lifecycle review remains
+PENDING; no review, manual platform acceptance or production baking GO is inferred.
+
+
+### Fresh main reconciliation: release fixture failure
+
+Source 15983766 in run 43558979273 failed Linux release unit tests: 92 passed,
+one failed, at the generated decryption helper's startup handshake. Debug tests,
+both Clippy checks and the Linux native Rust 1.92 source check passed. Later
+release/runtime gates were skipped and are not qualified. The retained first
+failure receipt is [here](progress/T03-decryption-stall-first-failure.json).
+The artifact contains minimum-compiler reports only; the failed release test's
+assertion is retained from the source-bound job log.
+
+The cause remains UNKNOWN. The old fixture consumed an early completion/error
+then discarded it before asserting the handshake. The diagnostic follow-up
+preserves that result and reports only a byte count or sanitized helper error.
+All startup, stall, fallback and completion bounds and all existing assertions
+remain unchanged. There is no production decryption/process supervision change
+and no claim of a fixed timing failure. Fresh hosted checks remain required;
+experienced lifecycle review is still required before merge.
+
+
+### Strict registration diagnostics on the failed lifecycle candidate
+
+Historical 79ae2894 passed Linux/policy, both actual native minimum compilers
+and the exact Linux original overlay responsiveness replay. Its Windows
+stable report has eighteen passes and one user-registration failure at the
+final RegisteredApplications shared snapshot comparison. That cause remains
+UNKNOWN, with exact failed artifact and suite log retained in the inherited
+T19 registration diagnostic receipt. A passing independent run is not a fix.
+
+This follow-up normally merges accepted main 414a040f, which contains qualified
+strict, bounded, names/value-hashed registration diagnostics from PR #24. Only
+changelog insertion conflicted; both entries remain. Every lifecycle source,
+manifest/lock, UI and production registration byte remains unchanged except one
+test-only error-chain formatting expression: the generated decryption fixture
+now retains underlying causes rather than only the outer anyhow context.
+Production bytes, every assertion and startup/stall/completion deadline remain
+unchanged; neither retained failure has an identified production fix.
+
+Fresh source-bound hosted gates remain PENDING on this combined source. Keep
+draft for experienced lifecycle review. Passed #16/#17 and independent engine
+#18 need no new qualification solely for this test-only diagnostic increment;
+combine their affected gates when production/dependency source changes or review
+requires it. Their existing manual/review/Fedora gates remain mandatory. No
+release/version/tag, resource-cap, runtime pin or production baking change.
+
+Local combined-source checks pass: fifteen suites, 127 tests (123 passed/four
+existing platform skips), formatting and whitespace. No local Rust compilation.
+
+
+### Qualified recovery lock fix integration
+
+Normally merge accepted main 30767936, retaining the prior candidate. The exact
+qualified main recovery guard/regression delta is the only Rust production
+change; all other source, manifests/lock and UI bytes remain unchanged. Only
+changelog insertion conflicted and both entries are retained. Main's focused
+fix passed every gate on a68ebe6b: new duplicate-handle regression and original
+handoff in both Linux profiles, plus Windows portable handoff and both native
+minimum compilers. The original transient descriptors were not captured, so
+attribution remains inferred; unrelated historical failures are not diagnosed.
+
+Fresh combined-source hosted/native/minimum-compiler and affected runtime gates
+remain PENDING. No new ownership/engine implementation is promoted by this
+integration. Existing experienced lifecycle/engine review, actual Fedora source
+build and manual/operator gates remain REQUIRED; keep draft. No version/tag/
+release, resource-cap/private build route, runtime pin or production baking change.
+
+Local recovery-integration checks pass: fifteen suites, 127 tests: 123 pass/four existing platform skips.
+Formatting/whitespace pass; no local Rust/C++ compilation. Hosted gates pending.

@@ -37,81 +37,198 @@ fn fit(image: (u32, u32), paper: (f32, f32)) -> Result<(f32, f32, f32, f32)> {
     ))
 }
 
-fn image_pdf(pdfium: &Pdfium, bytes: &[u8], paper: (f32, f32), unit: f64) -> Result<Vec<u8>> {
-    let physical = [f64::from(paper.0) * unit, f64::from(paper.1) * unit];
-    if !physical
-        .iter()
-        .all(|v| v.is_finite() && *v > 0.0 && *v <= 14_400.0)
-    {
-        bail!("Unsupported physical image-page dimensions");
+/// Native geometry reduced to values before leaving the PDF owner.
+pub(crate) struct Target {
+    paper: (f32, f32),
+    replacement: Option<usize>,
+    pages: usize,
+}
+impl Target {
+    pub(crate) fn new(
+        primary: &PdfDocument<'_>,
+        operation: &PageOperation,
+        has_inputs: bool,
+    ) -> Result<Self> {
+        let pages = primary.pages().len() as usize;
+        let mut target = Self {
+            paper: (
+                PdfPagePaperSize::a4().width().value,
+                PdfPagePaperSize::a4().height().value,
+            ),
+            replacement: None,
+            pages,
+        };
+        if operation.kind == OperationKind::Replace && has_inputs {
+            let selected = parse_selection(&operation.pages, pages)?;
+            if selected.len() != 1 {
+                bail!("Choose one target page to replace");
+            }
+            let page = primary.pages().get(selected[0] as i32)?;
+            target.paper = (page.width().value, page.height().value);
+            target.replacement = Some(selected[0]);
+        }
+        Ok(target)
     }
-    let (mut image, orientation, format) = decode(bytes)?;
-    let (width, height, x, y) = fit((image.width(), image.height()), paper)?;
-    let max_width = (f64::from(width) * unit * 300.0 / 72.0)
-        .ceil()
-        .clamp(1.0, 4096.0) as u32;
-    let max_height = (f64::from(height) * unit * 300.0 / 72.0)
-        .ceil()
-        .clamp(1.0, 4096.0) as u32;
-    let resized = image.width() > max_width || image.height() > max_height;
-    if resized {
-        image = image.resize(max_width, max_height, image::imageops::FilterType::Lanczos3);
+    pub(crate) fn unit(
+        &self,
+        original: &SourceSnapshot,
+        cancel: Option<&std::sync::atomic::AtomicBool>,
+    ) -> Result<f64> {
+        let Some(target) = self.replacement else {
+            return Ok(1.0);
+        };
+        let metadata = crate::assembly::inspect_snapshot_cancellable(&original.bytes, cancel)?;
+        let values = crate::pdf_units::from_metadata(&metadata, self.pages)?;
+        values
+            .get(target)
+            .copied()
+            .context("Missing replacement page unit")
     }
-    let mut document = pdfium.create_new_pdf()?;
-    {
-        let mut page = document
-            .pages_mut()
-            .create_page_at_end(PdfPagePaperSize::new_custom(
-                PdfPoints::new(paper.0),
-                PdfPoints::new(paper.1),
-            ))?;
-        let mut object = if format == ImageFormat::Jpeg {
+    pub(crate) fn prepare(
+        &self,
+        bytes: Vec<u8>,
+        unit: f64,
+        cancel: Option<&std::sync::atomic::AtomicBool>,
+    ) -> Result<PreparedImage> {
+        crate::background_jobs::check_cancelled(cancel)?;
+        let physical = [
+            f64::from(self.paper.0) * unit,
+            f64::from(self.paper.1) * unit,
+        ];
+        if !physical
+            .iter()
+            .all(|v| v.is_finite() && *v > 0.0 && *v <= 14_400.0)
+        {
+            bail!("Unsupported physical image-page dimensions");
+        }
+        let (mut image, orientation, format) = decode(&bytes)?;
+        crate::background_jobs::check_cancelled(cancel)?;
+        let (width, height, x, y) = fit((image.width(), image.height()), self.paper)?;
+        let max_width = (f64::from(width) * unit * 300.0 / 72.0)
+            .ceil()
+            .clamp(1.0, 4096.0) as u32;
+        let max_height = (f64::from(height) * unit * 300.0 / 72.0)
+            .ceil()
+            .clamp(1.0, 4096.0) as u32;
+        let resized = image.width() > max_width || image.height() > max_height;
+        if resized {
+            image = image.resize(max_width, max_height, image::imageops::FilterType::Lanczos3);
+        }
+        crate::background_jobs::check_cancelled(cancel)?;
+        let pixels = if format == ImageFormat::Jpeg {
             if orientation == Orientation::NoTransforms && !resized {
-                // Preserve original DCT data when no pixel transformation is required.
-                PdfPageImageObject::new_from_jpeg_reader(&document, Cursor::new(bytes))?
+                Pixels::Jpeg(bytes) // Preserve original DCT data without a pixel transformation.
             } else {
                 let mut jpeg = Vec::new();
                 image::codecs::jpeg::JpegEncoder::new_with_quality(&mut jpeg, 92)
                     .encode_image(&image.to_rgb8())?;
-                PdfPageImageObject::new_from_jpeg_reader(&document, Cursor::new(jpeg))?
+                Pixels::Jpeg(jpeg)
             }
         } else {
-            PdfPageImageObject::new(&document, &DynamicImage::ImageRgba8(image.to_rgba8()))?
+            Pixels::Rgba(image.to_rgba8())
         };
-        object.scale(width, height)?;
-        object.translate(PdfPoints::new(x), PdfPoints::new(y))?;
-        page.objects_mut().add_image_object(object)?;
+        crate::background_jobs::check_cancelled(cancel)?;
+        Ok(PreparedImage {
+            paper: self.paper,
+            geometry: (width, height, x, y),
+            unit,
+            pixels,
+        })
     }
-    crate::pdf_units::set_image_page_unit(
-        document
-            .save_to_bytes()
-            .context("Create PDF page from image")?,
-        unit,
-    )
 }
 
-fn read_source(path: &Path) -> Result<(Vec<u8>, bool)> {
+enum Pixels {
+    Jpeg(Vec<u8>),
+    Rgba(image::RgbaImage),
+}
+pub(crate) struct PreparedImage {
+    paper: (f32, f32),
+    geometry: (f32, f32, f32, f32),
+    unit: f64,
+    pixels: Pixels,
+}
+impl PreparedImage {
+    /// Native object construction only; no file reads, image decoding or helpers.
+    pub(crate) fn create(self, pdfium: &Pdfium) -> Result<(Vec<u8>, f64)> {
+        let mut document = pdfium.create_new_pdf()?;
+        {
+            let mut page =
+                document
+                    .pages_mut()
+                    .create_page_at_end(PdfPagePaperSize::new_custom(
+                        PdfPoints::new(self.paper.0),
+                        PdfPoints::new(self.paper.1),
+                    ))?;
+            let mut object = match self.pixels {
+                Pixels::Jpeg(jpeg) => {
+                    PdfPageImageObject::new_from_jpeg_reader(&document, Cursor::new(jpeg))?
+                }
+                Pixels::Rgba(image) => {
+                    PdfPageImageObject::new(&document, &DynamicImage::ImageRgba8(image))?
+                }
+            };
+            let (width, height, x, y) = self.geometry;
+            object.scale(width, height)?;
+            object.translate(PdfPoints::new(x), PdfPoints::new(y))?;
+            page.objects_mut().add_image_object(object)?;
+        }
+        Ok((
+            document
+                .save_to_bytes()
+                .context("Create PDF page from image")?,
+            self.unit,
+        ))
+    }
+}
+
+pub(crate) fn read_source(
+    path: &Path,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<(Vec<u8>, bool)> {
+    crate::background_jobs::check_cancelled(cancel)?;
+    let metadata = std::fs::metadata(path).with_context(|| format!("Read {}", path.display()))?;
+    if !metadata.is_file() {
+        bail!("Page input must be a regular file");
+    }
     let mut file = std::fs::File::open(path).with_context(|| format!("Read {}", path.display()))?;
+    let length = file.metadata()?.len();
     let mut header = [0; 16];
     let count = file.read(&mut header)?;
     let image = matches!(
         image::guess_format(&header[..count]),
         Ok(ImageFormat::Png | ImageFormat::Jpeg)
     );
+    if image && length > MAX_INPUT {
+        bail!("Page image exceeds 64 MiB; resize it first");
+    }
     let mut bytes = header[..count].to_vec();
-    if image {
-        file.take(MAX_INPUT + 1).read_to_end(&mut bytes)?;
-        if bytes.len() as u64 > MAX_INPUT {
-            bail!("Page image exceeds 64 MiB; resize it first");
+    loop {
+        crate::background_jobs::check_cancelled(cancel)?;
+        let mut chunk = [0; 64 * 1024];
+        let count = file.read(&mut chunk)?;
+        if count == 0 {
+            break;
         }
-    } else {
-        file.read_to_end(&mut bytes)?;
+        let new_length = bytes
+            .len()
+            .checked_add(count)
+            .context("Page input size overflow")?;
+        if new_length as u64 > length {
+            bail!("Page input changed while reading");
+        }
+        bytes
+            .try_reserve(count)
+            .context("Reserve page input snapshot memory")?;
+        bytes.extend_from_slice(&chunk[..count]);
+    }
+    if bytes.len() as u64 != length {
+        bail!("Page input changed while reading");
     }
     Ok((bytes, image))
 }
 
-/// Called on the existing PDF worker, or by the standalone CLI before creating a UI.
-/// The original image path remains attached to its PDF snapshot to prevent source overwrites.
+/// Standalone CLI path; the GUI uses the same phases across its owned workers.
+/// The original image path remains attached to its PDF snapshot for alias protection.
 pub fn prepare(
     pdfium: &Pdfium,
     primary: &PdfDocument<'_>,
@@ -119,43 +236,23 @@ pub fn prepare(
     operation: &PageOperation,
     paths: &[PathBuf],
 ) -> Result<Vec<SourceSnapshot>> {
-    let mut paper = (
-        PdfPagePaperSize::a4().width().value,
-        PdfPagePaperSize::a4().height().value,
-    );
-    let mut target = None;
-    let mut units = None;
-    if operation.kind == OperationKind::Replace && !paths.is_empty() {
-        let selected = parse_selection(&operation.pages, primary.pages().len() as usize)?;
-        if selected.len() != 1 {
-            bail!("Choose one target page to replace");
-        }
-        let page = primary.pages().get(selected[0] as i32)?;
-        paper = (page.width().value, page.height().value);
-        target = Some(selected[0]);
-    }
+    let target = Target::new(primary, operation, !paths.is_empty())?;
+    let mut unit = None;
     paths
         .iter()
         .map(|path| {
-            let (bytes, image) = read_source(path)?;
+            let (bytes, image) = read_source(path, None)?;
             let bytes = if image {
-                let unit = if let Some(target) = target {
-                    if units.is_none() {
-                        let values = crate::pdf_units::load(original.bytes.as_slice())?;
-                        if values.len() != primary.pages().len() as usize {
-                            bail!("Replacement page metadata differs from the opened snapshot");
-                        }
-                        units = Some(values);
+                let value = match unit {
+                    Some(unit) => unit,
+                    None => {
+                        let value = target.unit(original, None)?;
+                        unit = Some(value);
+                        value
                     }
-                    units
-                        .as_ref()
-                        .and_then(|values| values.get(target))
-                        .copied()
-                        .context("Missing replacement page unit")?
-                } else {
-                    1.0
                 };
-                image_pdf(pdfium, &bytes, paper, unit)
+                let (bytes, unit) = target.prepare(bytes, value, None)?.create(pdfium)?;
+                crate::pdf_units::set_image_page_unit(bytes, unit)
                     .with_context(|| format!("Import page image {}", path.display()))?
             } else {
                 bytes

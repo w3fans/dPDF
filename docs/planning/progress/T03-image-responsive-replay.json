@@ -1,0 +1,23 @@
+{
+  "status": "PASS for source-bound Linux replay; final Windows gate separate",
+  "source_commit": "f52d2828056ca683dc1bc3525a1d72383170653f",
+  "binary_sha256": "e6e177c4599d31f2a32a3dd917910f23e3d06f543d5fa633c8e32a06a523219c",
+  "source_sha256": "7ebdf13511c911f92194f74a65ff6037ce98773bf45c13582530ca3ec0e7358a",
+  "output_sha256": "2cedc3b6d57e6448a523e5e08b8b12d3a379b7a390f15757975f70e5a068b720",
+  "helper": {
+    "pid": 3119125,
+    "start": "65389942"
+  },
+  "helper_reaped": true,
+  "source_unchanged": true,
+  "private_portal": true,
+  "pending_viewport_ocr": "dPDF sample contract - page 25\n\nReview clause 25: payment due within 30 days.\n\nSearch for payment; navigate by thumbnail or bookmark.",
+  "crop": [
+    216,
+    218,
+    1164,
+    770
+  ],
+  "aligned_pixels_equal": true,
+  "scope": "Original native photo replacement/page-25 sequence; target-unit metadata held, reader renders before release; output qpdf-valid, source unchanged and child reaped"
+}

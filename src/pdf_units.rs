@@ -1,6 +1,6 @@
 //! Physical page-unit preflight, independent of visual marks and review remarks.
 use crate::assembly::{
-    SourceSnapshot, inspect_metadata, inspect_snapshot, path_string, qpdf_executable,
+    SourceSnapshot, inspect_metadata_cancellable, inspect_snapshot, path_string, qpdf_executable,
 };
 use anyhow::{Context, Result, bail, ensure};
 use serde_json::{Map, Value};
@@ -81,6 +81,15 @@ pub fn mark_units(source: &SourceSnapshot, expected_pages: usize) -> Result<Vec<
 
 /// Retain a replacement page's coordinate units without regenerating its image streams.
 pub fn set_image_page_unit(bytes: Vec<u8>, unit: f64) -> Result<Vec<u8>> {
+    set_image_page_unit_cancellable(bytes, unit, None)
+}
+
+pub(crate) fn set_image_page_unit_cancellable(
+    bytes: Vec<u8>,
+    unit: f64,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<Vec<u8>> {
+    crate::background_jobs::check_cancelled(cancel)?;
     ensure!(unit.is_finite() && unit > 0.0, "Invalid image page unit");
     if unit == 1.0 {
         return Ok(bytes);
@@ -92,7 +101,7 @@ pub fn set_image_page_unit(bytes: Vec<u8>, unit: f64) -> Result<Vec<u8>> {
     let patch = directory.path().join("units.json");
     let output = directory.path().join("scaled.pdf");
     std::fs::write(&input, bytes)?;
-    let document = inspect_metadata(&input)?;
+    let document = inspect_metadata_cancellable(&input, cancel)?;
     ensure!(
         document["pages"].as_array().map(Vec::len) == Some(1),
         "Image unit update needs exactly one page"
@@ -112,7 +121,7 @@ pub fn set_image_page_unit(bytes: Vec<u8>, unit: f64) -> Result<Vec<u8>> {
         &patch,
         serde_json::to_vec(&serde_json::json!({"qpdf":[{"jsonversion":2},updates]}))?,
     )?;
-    crate::assembly::run_qpdf(
+    crate::assembly::run_qpdf_cancellable(
         Command::new(qpdf_executable())
             .arg(path_string(&input)?.as_ref())
             .arg(format!("--update-from-json={}", path_string(&patch)?))
@@ -120,11 +129,13 @@ pub fn set_image_page_unit(bytes: Vec<u8>, unit: f64) -> Result<Vec<u8>> {
             .arg("--object-streams=preserve")
             .arg(path_string(&output)?.as_ref()),
         "Preserve image page units",
+        cancel,
     )?;
     ensure!(
-        from_metadata(&inspect_metadata(&output)?, 1)? == [unit],
+        from_metadata(&inspect_metadata_cancellable(&output, cancel)?, 1)? == [unit],
         "Image page units did not survive output"
     );
+    crate::background_jobs::check_cancelled(cancel)?;
     std::fs::read(&output).context("Read scaled image page")
 }
 
