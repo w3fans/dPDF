@@ -67,3 +67,20 @@ Sixteen local source suites pass: 129 tests, 125 passed/four existing platform
 skips, including all five source-collector cases. Formatting, metadata, local
 links/JSON/whitespace checks pass; no local Rust or C++ compilation. New native
 minimum-compiler and ordinary hosted/runtime evidence remain PENDING.
+
+
+## Final accepted-main conflict resolution for review
+
+Readiness check found this candidate conflicted against accepted main 414a040f.
+Normally merge that main into qualified 3f52fdda. Only changelog insertion
+conflicted; retain both entries. Every Rust source, manifest/lock and UI byte is
+unchanged, as are binding/runtime/source-collector/package inputs. Main adds the
+qualified strict registration diagnostics and three source-safe contracts.
+Fresh exact-source hosted/native/minimum-compiler gates remain PENDING. Prior
+63-case/JPEG/three-scale compatibility evidence remains source-bound; do not
+relabel it as a new run. Experienced engine review, actual Fedora GN/full C++
+source-build/package/operator evidence remain REQUIRED. Keep draft. No new
+build route, source bundle, release/version/tag or production baking change.
+
+Local final-integration checks pass: sixteen suites, 132 tests: 128 pass/four existing skips. Formatting
+and whitespace pass; no local Rust/C++ compilation. Hosted gates remain pending.
