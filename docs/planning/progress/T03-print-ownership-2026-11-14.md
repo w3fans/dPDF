@@ -1,6 +1,7 @@
 # T03 native print shutdown ownership
 
-Status: REPRODUCED; implementation and experienced lifecycle review pending.
+Status: REVIEW; functional candidate e71a6726 passed scoped hosted/native checks;
+experienced lifecycle review remains required. Historical increments follow.
 
 Generated 50-page PDF, qualified overlay source 10b443f4 / tested merge
 7b074362e57dc04bc84477f59149769f56a6ede5, executable SHA-256
@@ -168,3 +169,49 @@ First discovery head aea1df69 / tree 9689a881 failed Linux compilation in run
 parent import, which was removed with the obsolete printer channel. Added an
 explicit std::sync::mpsc import to the smoke module. No product behavior or gate
 weakened; corrected source requires the full rerun.
+
+
+## Qualified discovery follow-up and final native replay
+
+Head e71a67268cdf98c9aaa42916531b0c7fe5be0a02, tree
+dc9c1724b1ceecdb59297163dfa76e6dfd87b955, passed ALL jobs in run 43532813603:
+Linux 132254440576, Windows 132254441086, policy 132254441338. All eighteen
+helper-window cases, both debug/release unit profiles, both Clippy modes and
+native PDF/geometry/interop/printing/window gates passed. Linux artifact
+14088791581 ZIP SHA-256
+28588a429dda5a9e4c94959f611c9e7834114012c67ecbd3979fdfe38d8553ab;
+tested merge 896fec1018f5452cbe888195aa70de238032430b, executable SHA-256
+a8fb4bb480a7c8d8c40168f51cfd967c099eb7ec6ca3ded2018d3597a0c29e7a.
+Windows artifact 14088836134 ZIP SHA-256
+3d4ab0bda58046619c430f9627831b7db94abc36e523b843c344a401279b7e51;
+source e71a6726, executable SHA-256
+d61641c4d80bceb71a7a53094b24f6928c28f56a5c7db80b51bcb8700c2322ce.
+Native inventory objects match retained Linux 349 / Windows 255 components;
+all 648 / 485 notice references verify.
+
+The original native panel-open discovery reproduction now exits normally in
+0.018 seconds with the held lpstat child cancelled and reaped by the product.
+Repeated all three native print scenarios on this exact artifact: normal exit
+reaps its dialog, tab close preserves the handed-off action until user cancel,
+and held actual-size qpdf stays in the native group and is no longer live after
+shutdown. Sources unchanged, print private scratch empty, GTK file-only backend,
+no submission. See T03-printer-discovery-owned-replay.json and three
+T03-discovery-print-owned-*-replay.json files. Nested orphan adoption/reaping was
+performed by the fixture subreaper; direct GUI grandchild waitpid is not claimed.
+
+The PDF/print noninteractive helper increment is ready for experienced review,
+not merge on CI alone. #10, #16 and #17 remain draft with their dependency order.
+Physical printers, real Wayland/native Windows desktop, installed package and
+owner acceptance remain separate. Browser/file-manager applications are explicit
+user-owned launches, not qualified by these helper-process tests; studio/image
+filesystem/memory work remains within T05/T10 scope. Unsupported OS fallback
+subprocess paths are outside the Fedora/Windows qualification. T03 is REVIEW,
+not DONE. No release/version/tag or production baking.
+
+
+Replayed the original native overlay and photo-replacement operations once more
+on the final e71a6726 artifact because Application's worker ownership changed.
+Both rendered page 25 while their qpdf call remained held; output validated,
+source unchanged, helpers reaped and aligned content differed by zero pixels.
+See T03-e71-overlay-responsive-replay.json and T03-e71-image-responsive-replay.json.
+The overlay comparison explicitly accounts for its collapsed 80px editing strip.

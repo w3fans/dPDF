@@ -1,10 +1,11 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: draft stacked image/page-preparation increment integrating parent close
-fix a87095b9. Qualification of this combined source and experienced lifecycle
-review are PENDING. Earlier parent overlay head 10b443f4 and image head dfa5a999
-passed their own hosted gates; their evidence does not qualify this new head.
-Production baking remains disabled.
+Status: REVIEW draft. Final functional head e71a6726 passed all hosted gates,
+eighteen helper-window cases and scoped native X11 print/discovery replays.
+Experienced lifecycle review remains required for drafts #10/#16/#17 before
+merge. Historical increments and their failures are retained below. Actual
+Wayland/native Windows desktop/physical output and operator acceptance remain
+separate. Production baking stays disabled.
 
 ## Reproduced problem
 
