@@ -185,3 +185,26 @@ Windows code signing remains a separate unqualified item; inspect the actual
 candidate signature before describing it as signed. No certificate purchase,
 credential provisioning or change to machine security settings is authorized by
 this procedure. Recovery data remains private and must not enter public logs.
+
+
+## Dated independent candidate evidence — 14 November 2026
+
+The independent engine update [draft #18](https://github.com/w3fans/dPDF/pull/18)
+passed hosted gates on 5456aa4f (run 43540973212), with scoped old/new comparisons
+and a reproducible corrected source bundle. It is not merged and does not change
+the current main pins in the table above. Fedora buildroot/source qualification,
+installed package/operator acceptance and experienced engine review remain open.
+
+A [fresh package/version lookup](planning/progress/T19-engine-8125-advisory-refresh-2026-11-14.md)
+binds that exact candidate lock, target inventories and query/response identities:
+552 registry entries plus one vendored Winit upstream-version lookup, 553 total.
+Six INFO Unmaintained matches remain; no suppressions or whole-app clearance.
+The updated binding/parser have no matches in this dated lookup. Native components,
+downstream patch safety, unknown defects and legal/distribution review remain
+outside it. Historical rows above retain their original source identities.
+
+Also verified the recorded Winit archive against the entire vendored copy.
+DPDF_PATCH now correctly records the normalized manifest's two feature additions;
+LICENSE, original manifest and platform source outside Wayland match upstream.
+[Provenance](planning/progress/T19-winit-patch-provenance-2026-11-14.json) is not
+native protocol or security qualification. No component or licensing choice changes.
