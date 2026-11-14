@@ -215,3 +215,33 @@ Both rendered page 25 while their qpdf call remained held; output validated,
 source unchanged, helpers reaped and aligned content differed by zero pixels.
 See T03-e71-overlay-responsive-replay.json and T03-e71-image-responsive-replay.json.
 The overlay comparison explicitly accounts for its collapsed 80px editing strip.
+
+
+## Accepted main and current parents reconciliation (14 November)
+
+Fresh isolated checkout /tmp/dpdf-review-main-17 retains review head e3b452e5
+and normally merges refreshed page-input parent 5376a5f3, including lifecycle
+79ae2894 and accepted main 68910141. Original dirty print/image worktrees and
+their unpublished receipts are preserved. Two documentation append conflicts
+were resolved retaining both source-bound historical qualification and parent
+reconciliation/failure evidence.
+
+All print/discovery/lifecycle implementation, manifest/lock and UI bytes are
+unchanged. Only inherited test diagnostics differ under src: accepted-main
+marks.rs with cfg(test) statements and decryption test diagnostics; production
+decryption code is byte-identical. Historical e3b452e5 passed run 43534524254;
+the e71a6726 functional runtime and its original native replays remain historical
+evidence, not qualification for this new source.
+
+Parent 15983766's release decryption-helper startup failure remains unexplained
+and retained; 79ae2894 only preserves early completion/error diagnostics without
+relaxing assertions or deadlines. Fresh hosted native checks, both Rust 1.92
+source checks, eighteen held-helper windows and original print/discovery/image/
+overlay replays remain PENDING. Experienced lifecycle review is REQUIRED for
+#10/#16/#17. Keep draft; do not merge on green CI alone. Physical/manual and
+owner acceptance remain open. No release/version/tag/runtime pin or production
+secure-baking change.
+
+The reconciled checkout passes fifteen source suites (124 tests: 120 pass, four
+existing platform skips), formatting and whitespace checks. No local Rust
+compilation; fresh source-bound hosted/runtime qualification remains pending.

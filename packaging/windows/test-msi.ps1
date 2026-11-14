@@ -7,10 +7,23 @@ param(
     [Parameter(Mandatory=$true)][string]$Fixture,
     [Parameter(Mandatory=$true)][string]$WorkDirectory,
     [string]$PreviousMsi,
-    [string]$PreviousVersion
+    [string]$PreviousVersion,
+    [string]$SeedBinary,
+    [string]$SeedImage
 )
 $ErrorActionPreference = 'Stop'
+$seedBinaryPath = $null
 if ([bool]$PreviousMsi -ne [bool]$PreviousVersion) { throw 'Supply PreviousMsi and PreviousVersion together' }
+if ([bool]$SeedBinary -ne [bool]$SeedImage) { throw 'Supply SeedBinary and SeedImage together' }
+if ($SeedBinary) {
+    $seedBinaryPath = [IO.Path]::GetFullPath($SeedBinary)
+    $seedImagePath = [IO.Path]::GetFullPath($SeedImage)
+    foreach ($inputPath in @($seedBinaryPath, $seedImagePath)) {
+        if (!(Test-Path -LiteralPath $inputPath -PathType Leaf)) { throw 'Mark fixture input is missing' }
+    }
+    $seedBinaryHash = (Get-FileHash -LiteralPath $seedBinaryPath -Algorithm SHA256).Hash
+    $seedImageHash = (Get-FileHash -LiteralPath $seedImagePath -Algorithm SHA256).Hash
+}
 if ($Version -notmatch '^\d+\.\d+\.\d+$') { throw 'Version must be MAJOR.MINOR.PATCH' }
 if ($PreviousMsi) {
     if ($PreviousVersion -notmatch '^\d+\.\d+\.\d+$' -or [version]$PreviousVersion -ge [version]$Version) {
@@ -93,10 +106,56 @@ function Assert-Retention {
     }
 }
 Add-RetentionFixture (Join-Path $env:APPDATA 'dPDF\preferences.json') '{"schema_version":1,"dark_theme":true,"recovery_enabled":false}'
-# These are retention sentinels, not valid mark/recovery schemas. Reopening actual
-# saved assets/drafts is covered separately by the native application corpora.
+# Sentinels cover byte retention. The optional fixture below additionally reloads
+# a valid mark model; recovery drafts and GUI behavior remain separate corpora.
 Add-RetentionFixture (Join-Path $env:LOCALAPPDATA 'dPDF\marks\installer-retention.txt') 'generated mark-library retention sentinel'
 Add-RetentionFixture (Join-Path $env:LOCALAPPDATA 'dPDF\recovery\installer-retention.txt') 'generated recovery retention sentinel'
+
+$expectedMarkList = $null
+function Get-MarkListState([string]$Binary) {
+    Assert (((Get-FileHash -LiteralPath $Binary -Algorithm SHA256).Hash) -ceq $seedBinaryHash) 'Mark reload binary differs from the candidate seed executable'
+    $output = (& $Binary --marks list | Out-String)
+    Assert ($LASTEXITCODE -eq 0) 'Candidate could not reload the generated mark library'
+    $assets = @($output | ConvertFrom-Json)
+    Assert ($assets.Count -eq 1) 'Expected exactly one generated mark asset'
+    Assert ($assets[0].schema_version -eq 1 -and $assets[0].id -ceq $seedAsset.id -and $assets[0].name -ceq 'Installer retention fixture' -and $assets[0].kind -ceq 'stamp') 'Generated mark metadata did not reload'
+    return (ConvertTo-Json -InputObject $assets -Depth 12 -Compress)
+}
+function Assert-MarkReload([string]$Binary) {
+    if ($SeedBinary) {
+        Assert ((Get-MarkListState $Binary) -ceq $expectedMarkList) 'Installer changed the reloaded mark model'
+        Assert-Retention
+    }
+}
+if ($SeedBinary) {
+    # Use the real data roots already proven absent above. CLI overrides must
+    # not redirect this check to a separate library from the installed app.
+    $env:DPDF_DATA_DIR = $null; $env:DPDF_CONFIG_DIR = $null
+    $seedVersion = (& $seedBinaryPath --version | Out-String).Trim()
+    Assert ($LASTEXITCODE -eq 0 -and $seedVersion.StartsWith("dPDF $Version ")) 'Seed binary version differs from candidate'
+    $library = Join-Path $env:LOCALAPPDATA 'dPDF\marks'
+    $imported = (& $seedBinaryPath --marks import $seedImagePath 'Installer retention fixture' stamp $library | Out-String)
+    Assert ($LASTEXITCODE -eq 0) 'Cannot seed the generated mark model'
+    $seedAsset = $imported | ConvertFrom-Json
+    Assert ($seedAsset.id -match '^asset-[A-Za-z0-9_-]+$') 'Invalid generated mark fixture identity'
+    $assetFolder = Join-Path $library $seedAsset.id
+    $markHashes = [ordered]@{}
+    foreach ($name in @('metadata.json', 'original', 'cleaned.png', 'thumbnail.png')) {
+        $path = Join-Path $assetFolder $name
+        Assert (Test-Path -LiteralPath $path -PathType Leaf) 'Generated mark model file is missing'
+        $hash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+        $retained[$path] = $hash
+        $markHashes[$name] = $hash.ToLowerInvariant()
+    }
+    Assert ($markHashes['original'] -ceq $seedImageHash.ToLowerInvariant()) 'Seeded original differs from the generated source image'
+    foreach ($name in @('cleaned.png', 'thumbnail.png')) {
+        $decoded = Join-Path $work ('decoded-' + $name)
+        $decodeOutput = (& $seedBinaryPath --marks clean (Join-Path $assetFolder $name) $decoded | Out-String)
+        Assert ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $decoded -PathType Leaf)) 'Generated mark PNG could not be decoded'
+    }
+    $expectedMarkList = Get-MarkListState $seedBinaryPath
+    Assert-Retention
+}
 
 if ($PreviousMsi) {
     Invoke-Msi @('/i', "`"$previous`"") (Join-Path $work 'previous-install.log')
@@ -135,6 +194,7 @@ try {
     Assert ((Get-PdfDefaultState) -ceq $defaultBefore) 'Install changed the existing PDF default association or UserChoice'
     Assert (Test-Path -LiteralPath $link) 'Start Menu shortcut missing'
     Assert-Retention
+    Assert-MarkReload $exe
     if ($PreviousMsi) { Write-Host 'PASS: older installed version upgraded to candidate with generated user-data bytes intact' }
     Write-Host 'PASS: per-user MSI install, launch, PDFium probe, bundled qpdf assembly, Open With registration, Start Menu shortcut; .pdf default unchanged'
 } finally {
@@ -149,6 +209,22 @@ Assert ((Get-PdfDefaultState) -ceq $defaultBefore) 'Uninstall changed the existi
 Write-Host 'PASS: uninstall removed files, registration and shortcut'
 
 Assert-Retention
+Assert-MarkReload $seedBinaryPath
+if ($SeedBinary) {
+    Assert (((Get-FileHash -LiteralPath $seedImagePath -Algorithm SHA256).Hash) -ceq $seedImageHash) 'Mark import changed the generated source image'
+    $receipt = [ordered]@{
+        schema = 1
+        scope = 'generated mark library CLI reload; not recovery, GUI or old-format migration acceptance'
+        candidate_version = $Version
+        binary_sha256 = $seedBinaryHash.ToLowerInvariant()
+        seed_image_sha256 = $seedImageHash.ToLowerInvariant()
+        asset_id = $seedAsset.id
+        retained_files = $markHashes
+        installed_and_post_uninstall_reload = $true
+    }
+    Write-Host ('MSI mark-retention receipt: ' + ($receipt | ConvertTo-Json -Depth 6 -Compress))
+    Write-Host 'PASS: installed candidate and retained staged executable reload the unchanged generated mark library'
+}
 Write-Host 'PASS: install/uninstall retained generated preferences, mark-library and recovery sentinel bytes'
 # Success-only cleanup touches roots that were absent before this fixture.
 foreach ($root in $dataRoots) { Remove-Item -LiteralPath $root -Recurse -Force }

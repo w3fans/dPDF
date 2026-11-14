@@ -29,7 +29,10 @@ other. Product requirements are in [PRODUCT_SPEC.md](PRODUCT_SPEC.md); status is
    | Windows | The existing hosted-lane harness (`scripts/ci/validate_windows.py --lane hosted`) on `windows-latest` for the PR head commit: native MSVC build, tests, Clippy, format and all service corpora. Reports are uploaded as artifacts; nothing is published to `validation/*` branches. |
 
    Each job uploads `report.json`, `README.md` and per-suite logs with the exact
-   commit and executable SHA-256.
+   commit and executable SHA-256. Linux and Windows also retain a separate
+   `minimum-rust/` source-check report: the declared compiler version is checked
+   explicitly with a private target directory. These checks do not replace or
+   relabel the runtime built and tested with stable Rust.
 5. Fix failures on the branch. Merge when every applicable validation passes.
    For private builds, retain the reviewed commit and local build/test receipts;
    a skipped hosted compiler job does not supply that evidence. Source-policy

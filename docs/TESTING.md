@@ -823,6 +823,24 @@ Production registration follows Microsoft's [application registration](https://l
 and [file type registration](https://learn.microsoft.com/en-us/windows/win32/shell/fa-file-types)
 interfaces using the current-user hive.
 
+## Windows portable helper qualification
+
+`check-windows-stage.py --binary ... --pdfium ... --qpdf ...` stages the existing
+native build with both pinned helper distributions and notices. It verifies exact
+executable/DLL bytes, then runs from an unrelated Unicode working directory with
+runtime overrides removed and PATH limited to System32. The host must have no
+qpdf in Windows system search directories. Unicode package/source/output paths
+exercise adjacent PDFium probing and bundled-qpdf extraction of three pages from
+a generated 50-page input.
+
+Removing and then replacing only the temporary bundled qpdf with invalid bytes
+must fail visibly while preserving the original source and pre-existing output.
+The trusted helper is restored before cleanup. The same service/desktop
+`staged-reader` case retains its existing 180-second Job Object deadline and
+resource limits. This is generated portable-runtime qualification; MSI lifecycle,
+installed user data, real default associations and native operator acceptance
+remain separate gates.
+
 ## Windows MSI upgrade and user-data retention
 
 Use the existing `packaging/windows/test-msi.ps1` in a fresh disposable Windows
@@ -833,6 +851,24 @@ The sentinels are not valid saved mark/recovery models; native recovery/studio
 corpora still prove those models reopen. Success removes only fixture-created
 data roots; failure retains them and MSI logs for diagnosis. Do not rerun against
 retained failed-fixture state as though it were a clean account.
+
+The maintained package-preview path also supplies the staged candidate as
+`-SeedBinary` and the generated `scripts/fixtures/page-photo.jpg` as `-SeedImage`.
+These optional manual arguments must be paired. After the existing absent-data
+guards, the test clears data/config overrides and imports one synthetic stamp
+through that binary into the real default mark-library location. It snapshots
+the original, cleaned PNG, thumbnail and metadata hashes, verifies the original
+against the source and decodes both PNGs, then compares CLI model
+reloads before install, through the installed executable, and after uninstall
+through the retained staged executable. Every reload requires the candidate
+binary hash; source image bytes and all retained model files must stay unchanged.
+
+Without paired seed inputs, a manual invocation covers sentinels only. The
+packaging workflow always enables the valid-mark check. This tests the current
+generated mark format and CLI reload, not recovery draft reopening, GUI rendering
+or old-format migration. Major upgrade still requires an existing qualified
+strictly older MSI; a same-version reinstall is insufficient. Version-probe text
+and packaging Job Object memory metrics are retained with workflow artifacts.
 
 For major-upgrade coverage supply both optional parameters with an existing
 qualified older package (no new version allocation or publication):
@@ -908,3 +944,28 @@ Evidence: generated native X11 field/history checks at scales 1/1.5/2, actual
 private GTK-portal Ctrl+S cancel and Ctrl+Shift+S byte-identical save, and the full
 review/viewport/tabs diagnostic suites. Current tab-switch results and exact source
 identities are recorded in planning/progress/T04-tab-input-2026-11-13.md.
+
+
+## Declared minimum Rust source checks
+
+Public Linux and native Windows PR jobs run `scripts/ci/check_minimum_rust.py`
+after the existing stable build/runtime validation. It reads Cargo.toml's
+rust-version, installs that exact patch-zero toolchain through Rustup without
+changing the default or self-updating Rustup, verifies compiler version/native
+host, and runs locked Cargo checks including test targets. Linux also checks the
+Windows print adapter as metadata; native MSVC separately checks its actual target.
+The native Windows runner retains its existing admission, one-job/one-CPU/2-GiB
+Job Object limits. Linux checks use one Cargo job, deadlines and owned process
+group cleanup; this is not a claim of a Linux whole-app memory measurement.
+
+`minimum-rust/report.json`, README and command logs are nested inside the existing
+validation artifacts. Compiler metadata/generated UI files use a disposable target
+directory and are removed after the check, including failure. The stable runtime
+executable and its qualification remain separate. A successful Cargo check proves
+source compilation on that compiler/target, not a release build or execution of
+PDF/desktop/package suites using the minimum compiler.
+
+Run this compiler helper only on approved build infrastructure. Public contract
+tests inject a process runner; they do not compile locally. They reject wrong
+source identity or a newer compiler, retain a failing check's exit/log and verify
+private-target cleanup. A skipped platform test is not native compiler evidence.
