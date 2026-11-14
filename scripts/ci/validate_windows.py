@@ -49,7 +49,7 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
         command += ['--output', str(probe_report)]
     tests.append(('block-probe', command, 1200))
     tests.append(('staged-reader', [python, str(source / 'scripts' / 'check-windows-stage.py'),
-                                    *common, '--pdfium', str(pdfium)], 180))
+                                    *common, '--pdfium', str(pdfium), '--qpdf', str(qpdf)], 180))
     tests.append(('user-registration', [python, str(source / 'scripts' / 'check-windows-registration.py'),
                                         *common, '--pdfium', str(pdfium)], 300))
     if mode == 'desktop':

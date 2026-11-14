@@ -823,6 +823,24 @@ Production registration follows Microsoft's [application registration](https://l
 and [file type registration](https://learn.microsoft.com/en-us/windows/win32/shell/fa-file-types)
 interfaces using the current-user hive.
 
+## Windows portable helper qualification
+
+`check-windows-stage.py --binary ... --pdfium ... --qpdf ...` stages the existing
+native build with both pinned helper distributions and notices. It verifies exact
+executable/DLL bytes, then runs from an unrelated Unicode working directory with
+runtime overrides removed and PATH limited to System32. The host must have no
+qpdf in Windows system search directories. Unicode package/source/output paths
+exercise adjacent PDFium probing and bundled-qpdf extraction of three pages from
+a generated 50-page input.
+
+Removing and then replacing only the temporary bundled qpdf with invalid bytes
+must fail visibly while preserving the original source and pre-existing output.
+The trusted helper is restored before cleanup. The same service/desktop
+`staged-reader` case retains its existing 180-second Job Object deadline and
+resource limits. This is generated portable-runtime qualification; MSI lifecycle,
+installed user data, real default associations and native operator acceptance
+remain separate gates.
+
 ## Windows MSI upgrade and user-data retention
 
 Use the existing `packaging/windows/test-msi.ps1` in a fresh disposable Windows

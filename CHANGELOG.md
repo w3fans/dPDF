@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Check bundled qpdf assembly and missing/invalid-helper preservation in complete
+  Windows portable runtimes under Unicode paths, without runtime overrides.
+
 - Retain both writer timing traces when the concurrent mark-metadata regression
   fails, without changing its assertions or the bounded production lock wait.
 

@@ -165,6 +165,13 @@ Production baking is **disabled**. No row below may be read as production-ready.
 | R-INT-5 view-only / exact Save As | Automated tests passed | `src/pdf.rs` | unit test; byte-identical Save As smoke (v0.1.43); encrypted Save As | ✓ | ✓ | – | – | — |
 | Password-protected PDFs | Automated tests passed | `src/encrypted.rs` | `check-passwords.py` (AES-256/128, retry, queue) | ✓ | ✓ | ✓ v0.1.10 (adapted) | – | Native password entry by hand on Windows |
 
+Portable-helper coverage preparation (14 November): R-PLAT-7's staging check now
+accepts the pinned qpdf input and exercises complete bundled-helper discovery,
+Unicode paths and failed-helper source/destination preservation. The candidate
+requires exact-source native hosted execution; see
+[the T19 receipt](planning/progress/T19-portable-qpdf-2026-11-14.md). This changes
+no installer, native operator or milestone qualification mark above.
+
 ## Milestone summary
 
 | Milestone | State | Open gates |
