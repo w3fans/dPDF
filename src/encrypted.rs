@@ -189,21 +189,32 @@ mod tests {
             thread::sleep(Duration::from_millis(10));
         }
         let started = ready.exists();
-        let stalled = matches!(
-            rx.recv_timeout(Duration::from_millis(250)),
-            Err(mpsc::RecvTimeoutError::Timeout)
-        );
+        let startup_elapsed = startup.elapsed();
+        let observation = rx.recv_timeout(Duration::from_millis(250));
+        let stalled = matches!(&observation, Err(mpsc::RecvTimeoutError::Timeout));
         // Release before assertions so a failed observation still cleans up.
         std::fs::write(&release, b"release").unwrap();
-        let result = rx.recv_timeout(Duration::from_secs(10));
+        // Preserve early completion, especially a spawn/pipe error. A second
+        // receive would discard that evidence and report only Disconnected.
+        let result = match observation {
+            Ok(result) => Ok(result),
+            Err(mpsc::RecvTimeoutError::Timeout) => rx.recv_timeout(Duration::from_secs(10)),
+            Err(error) => Err(error),
+        };
         worker.join().unwrap();
+        // Only byte counts and sanitized errors: never print password or PDF
+        // contents, even when the generated fixture fails before its handshake.
+        let outcome = result
+            .as_ref()
+            .map(|value| value.as_ref().map(|bytes| bytes.len()));
         assert!(
             started,
-            "Generated helper did not reach its controlled stall"
+            "Generated helper did not reach its controlled stall after {startup_elapsed:?}; \
+             stalled={stalled}; completion={outcome:?}"
         );
         assert!(
             stalled,
-            "Decryption unexpectedly completed before fixture release"
+            "Decryption unexpectedly completed before fixture release: {outcome:?}"
         );
         assert_eq!(result.unwrap().unwrap().as_slice(), original);
     }

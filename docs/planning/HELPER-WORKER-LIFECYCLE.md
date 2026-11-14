@@ -301,3 +301,38 @@ hosted/runtime gates are PENDING. This dependent page/image implementation integ
 publication policy; its cancelled ready replies also send a terminal error. Experienced review must assess
 both orderings, delayed registration, lease release, marker reclamation and no
 mutex held across work that needs a UI callback or native owner to complete.
+
+
+## Accepted main reconciliation for lifecycle review (14 November)
+
+This #10 review candidate now includes accepted main 68910141, retaining
+qualified a87095b9 as a normal merge parent. Only changelog insertion conflicted;
+both the lifecycle entry and all accepted maintenance entries are preserved.
+Every prior lifecycle source blob is byte-identical; the sole src change from
+main is the separately qualified test-only mark timing instrumentation. Cargo
+manifest/lock, UI crate manifest and workspace UI bytes are unchanged.
+
+New main supplies the declared Rust 1.92 native source checks, bounded mark
+diagnostics and complete portable/MSI checks. Their presence does not qualify
+this combined lifecycle source. Current-source hosted gates and original native
+responsive/close replay must be repeated. Experienced lifecycle review remains
+PENDING; no review, manual platform acceptance or production baking GO is inferred.
+
+
+### Fresh main reconciliation: release fixture failure
+
+Source 15983766 in run 43558979273 failed Linux release unit tests: 92 passed,
+one failed, at the generated decryption helper's startup handshake. Debug tests,
+both Clippy checks and the Linux native Rust 1.92 source check passed. Later
+release/runtime gates were skipped and are not qualified. The retained first
+failure receipt is [here](progress/T03-decryption-stall-first-failure.json).
+The artifact contains minimum-compiler reports only; the failed release test's
+assertion is retained from the source-bound job log.
+
+The cause remains UNKNOWN. The old fixture consumed an early completion/error
+then discarded it before asserting the handshake. The diagnostic follow-up
+preserves that result and reports only a byte count or sanitized helper error.
+All startup, stall, fallback and completion bounds and all existing assertions
+remain unchanged. There is no production decryption/process supervision change
+and no claim of a fixed timing failure. Fresh hosted checks remain required;
+experienced lifecycle review is still required before merge.

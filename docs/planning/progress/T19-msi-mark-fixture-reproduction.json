@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "scope": "Linux CLI fixture construction only; not native Windows/MSI acceptance",
+  "source_commit": "0182887e3ffb7f0fc3cafc5630afa91032b97116",
+  "pr_head": "db19d38484e5c45e16c089053f14086a88879d82",
+  "binary_sha256": "5f2dd7322325860494d15ddb6cf87c810042f969ef91c374e2f8dfe7af7be0d8",
+  "seed_image_sha256": "31572ce204726029c3521c9794fc501b8943b410f9986e987857336e1af54497",
+  "sentinel_only_list": [],
+  "valid_asset": {
+    "aspect_locked": true,
+    "cleanup": {
+      "black_level": 0,
+      "crop": null,
+      "deskew_degrees": 0.0,
+      "remove_white": true,
+      "white_level": 245
+    },
+    "id": "asset-K3Q07N",
+    "imported_at": 1794627308,
+    "kind": "stamp",
+    "last_used_at": null,
+    "name": "Installer retention fixture",
+    "notes": "",
+    "pixels": [
+      400,
+      200
+    ],
+    "preferred_height_mm": 22.5,
+    "preferred_width_mm": 45.0,
+    "schema_version": 1,
+    "source_format": "Jpeg"
+  },
+  "valid_files": {
+    "asset-K3Q07N/metadata.json": "001a9b7e751f9bcfbc7e13c4d7631433ca794b24f9cc61a13916bac73213ceed",
+    "asset-K3Q07N/thumbnail.png": "635bbf0a05745e3e8095b5dea1a8b30dc9a94a93e776954637a97531e0612913",
+    "asset-K3Q07N/cleaned.png": "95c7652e31389722e8ca77dcc4b20bea02843b51bc1bb42011a46981b8c4dd0f",
+    "asset-K3Q07N/original": "31572ce204726029c3521c9794fc501b8943b410f9986e987857336e1af54497"
+  },
+  "list_keeps_bytes": true,
+  "both_generated_pngs_decoded_with_same_app": true
+}

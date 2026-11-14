@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "source_commit": "847d1c581bf80ce0e66f2d25d9242a4b4b7e3333",
+  "run_id": 43551199504,
+  "status": "PASS for generated fresh MSI lifecycle and sentinel retention on one hosted profile",
+  "jobs": {
+    "build": 132313796300,
+    "report": 132317191895,
+    "publish": 132317192834
+  },
+  "publish_job": "skipped",
+  "build_provenance": {
+    "identity": {
+      "schema": 1,
+      "source_commit": "847d1c581bf80ce0e66f2d25d9242a4b4b7e3333",
+      "target": "x86_64-pc-windows-msvc",
+      "adapter_sha256": "cdf3420a06d13f17bc7201363b59e00df1a4f7e966ae027521e96e6a93fab606",
+      "profile": "release",
+      "compiler_sha256": "341fed434cf52bd9ba5ab2f3507dbd943a2062212028574e529fc3e7e5ecd7a8",
+      "cargo_sha256": "e569e17e69d1abc27efd9ab072a32f4fbad521e3ae1d77a462226786d3d39972",
+      "flags_sha256": "a02f7b7adf2937a71a276f239d8daeb8afc5958a4a67da4d7cc0e2945f5be926"
+    },
+    "binary_sha256": "fa7433527c06107d1a57d63ddce35499d7a46cb5193c232095721e9d779e466a",
+    "artifact_reused": false,
+    "scope": "build_identity_only"
+  },
+  "file_sha256": {
+    "build-provenance.json": "e7bea5b73ed937a2835d1e9cf9ba4e15bd5cbe674f8e688893251fbde0eb16ff",
+    "dPDF-0.1.54-windows-x64-portable.zip": "59dffd7844c229a91782bed0690b5979c6d3fc0f26467cc2a4a96d61e79b66df",
+    "dPDF-0.1.54-windows-x64.msi": "bd1810adfcce8e95a483ced2765c50851394d4173012b8ec6e9c936a1f12e5f8"
+  },
+  "pdfium_sha256": "79d4676b656cfb1abcea88f9ade3b4b0826c5200382db5f4ec72a636c598c118",
+  "qpdf_archive_sha256": "db87077e683630c1217e0e8f9a20a9749d952ab676e881c3689187763a5de25d",
+  "helper_hashes": {
+    "concrt140.dll": "54716f0738af891f283d213b5c8d11b25896bb8ee3097d301eae718560cf974e",
+    "msvcp140.dll": "7c26614e1d733892c2deac7e245ce115504b1d80592dd0a01b08e3e5a55f89ca",
+    "msvcp140_1.dll": "206c931bf90fdad8816de3b5e2ef80b2bcaa9406c89ecc05fe6fddffe251e982",
+    "msvcp140_2.dll": "d50d7883f20d1dc6191768d3746f52dd9cac89c346ffaed5be1f110c2f34a838",
+    "msvcp140_atomic_wait.dll": "3d0cbfaa1bf3eecf5a3f4491d2960ee803cb994f30292c6adc4a07c498f60e2b",
+    "msvcp140_codecvt_ids.dll": "8a65c7596ef2e6938731f5a1058e7e40145b6d97967cc649231a076b9a608d78",
+    "qpdf.exe": "1bdaf878f37eaffea1ea3c30591214c77636a0f2fc7432427516b6e22e36c0ff",
+    "qpdf30.dll": "8812952678de93e0750308a113aa650e9161af466f9770679ea9673adeb61041",
+    "vcruntime140.dll": "d1f4225df2cd877dbf130d5668a021dce3f94118455ff5ec952061c30afc9ce7",
+    "vcruntime140_1.dll": "a7146c08f89fe5b04541ab507cdb59ff7b44534d4ba3c668a426c6450a03434e"
+  },
+  "notice_components": 255,
+  "verified_notice_references": 485,
+  "packaging_log_sha256": "c415b9319ae92ec6738967b56623bcfc14de9a2436b3d8c4a70400ade8cc0bee",
+  "project_notices": {
+    "LICENSE": {
+      "packaged_sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5",
+      "source_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "canonical_lf_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "crlf_pairs": 202
+    },
+    "NOTICE": {
+      "packaged_sha256": "11cffc4c1dabecb7492020d5d878cfeb56bca606ba307296d0bfe153aef06c74",
+      "source_sha256": "127279c5f7c1ce4bc2287a9609cd880bd692ebfe1ec0b3fcbb151a97065fb399",
+      "canonical_lf_sha256": "127279c5f7c1ce4bc2287a9609cd880bd692ebfe1ec0b3fcbb151a97065fb399",
+      "crlf_pairs": 17
+    },
+    "licenses/qpdf/NOTICE.md": {
+      "packaged_sha256": "ce1c6342adcf83c561f42333087969476c42510018a88a3c90d60a698791a94c",
+      "source_sha256": "b207f65a9e5491195ded63b2941199b19a4d30148871f2742c88eae7bfc513a6",
+      "canonical_lf_sha256": "b207f65a9e5491195ded63b2941199b19a4d30148871f2742c88eae7bfc513a6",
+      "crlf_pairs": 42
+    }
+  },
+  "msi_cabinet_entry_matching_attested_executable": "flsGSgu.8Gcp4sV5Xg.dee53c2wZUA",
+  "installed_binary_hash_directly_recorded": false,
+  "unqualified": [
+    "current main or other source commits",
+    "major upgrade",
+    "both explicit default-association starting states",
+    "valid saved-model reloading",
+    "GUI/operator acceptance",
+    "new release publication"
+  ],
+  "adapter_file": "build.ps1",
+  "adapter_windows_checkout_hash_verified": true,
+  "adapter_source_lf_sha256": "2cdc2485bcb5592d9d44706cbd727bebd665d333861b30b6dfbdd2617b832c52",
+  "toolchain_plaintext_logs_retained": false,
+  "artifacts": [
+    {
+      "id": 14097070202,
+      "name": "dpdf-windows-0.1.54",
+      "digest": "sha256:2729a000f58701359238b78e02762d3a60ba3aa0fa9be25952b5f2bf34329d3a",
+      "folder": "package"
+    },
+    {
+      "id": 14096758031,
+      "name": "packaging-diagnostics-43551199504-1",
+      "digest": "sha256:06f2eb892a649a08ff06a214068e8729117ec44ddd5b41001acabec9e2644a94",
+      "folder": "diagnostics"
+    },
+    {
+      "id": 14096532125,
+      "name": "native-847d1c581bf80ce0e66f2d25d9242a4b4b7e3333-1",
+      "digest": "sha256:ea7614940fe36db4d2bd3da5f47a83034ca62afda423d08ab12848bf59b71def",
+      "folder": "native"
+    }
+  ],
+  "tree": "6ade3a36e3c0cdd9e270d6a25e89886baf8cdcdb"
+}

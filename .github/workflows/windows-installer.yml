@@ -100,6 +100,17 @@ jobs:
           New-Item -ItemType Directory -Force -Path $saved | Out-Null
           Copy-Item -LiteralPath $env:DPDF_VERIFIED_BINARY -Destination (Join-Path $saved 'dpdf.exe')
           Copy-Item -LiteralPath "$env:RUNNER_TEMP/dpdf-native-build/build-provenance.json" -Destination $saved
+          # Keep the exact version-probe text behind the provenance hashes.
+          foreach ($name in @('compiler.log', 'cargo.log')) {
+            $probe = Join-Path "$env:RUNNER_TEMP/dpdf-native-build" $name
+            if (Test-Path -LiteralPath $probe -PathType Leaf) {
+              Copy-Item -LiteralPath $probe -Destination $saved
+            }
+          }
+          $recovered = Join-Path $env:RUNNER_TEMP 'recovered-native-report/report.json'
+          if (Test-Path -LiteralPath $recovered -PathType Leaf) {
+            Copy-Item -LiteralPath $recovered -Destination (Join-Path $saved 'validated-hosted-report.json')
+          }
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: native-${{ steps.version.outputs.commit }}-${{ github.run_attempt }}
@@ -123,7 +134,9 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: packaging-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/dpdf-package.log
+          path: |
+            ${{ runner.temp }}/dpdf-package.log
+            ${{ runner.temp }}/dpdf-package.log.memory.json
           if-no-files-found: ignore
           retention-days: 14
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6

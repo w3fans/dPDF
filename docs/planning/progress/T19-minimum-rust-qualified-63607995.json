@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "status": "PASS_ALL_HOSTED_JOBS_AND_NATIVE_MINIMUM_SOURCE_CHECKS; FOLLOWUP_GATES_PENDING",
+  "candidate_head": "63607995ad55e5eb99dde36ea4cbba8df2d4b01e",
+  "tree": "0e6319ecdcdb008b6a1d9283f5ac884337eacd67",
+  "run_id": 43546102757,
+  "jobs": {
+    "policy": 132297678082,
+    "linux": 132297677890,
+    "windows": 132297678052
+  },
+  "unqualified": [
+    "Release binary built or runtime-tested with minimum Rust",
+    "Native desktop/operator/installed package acceptance",
+    "Unmerged lifecycle/engine sources",
+    "Root cause of prior intermittent Windows mark-lock test failure"
+  ],
+  "artifacts": [
+    {
+      "platform": "linux",
+      "id": 14094024258,
+      "zip_sha256": "9b1ade13b417d7332b61e7abc4fb2f4e058fba7a0d033ae5bb1cf1524ba548c2",
+      "source_commit": "ad5385f69825e3164ad35cc9a5f94f660cd270d2",
+      "stable_report_sha256": "3bc3c5e1638bc50af8eae95251e81b21e84597c993f24f92bc56cebc1a53810f",
+      "stable_binary_sha256": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+      "stable_checks": 33,
+      "minimum_report_sha256": "17ae60d1815d87684f3a098a74aafa33681cc535ffedf7bb07731d381a108601",
+      "minimum_report": {
+        "schema": 1,
+        "scope": "native minimum Rust source compatibility",
+        "status": "PASS",
+        "source_commit": "ad5385f69825e3164ad35cc9a5f94f660cd270d2",
+        "platform": "posix",
+        "checks": [
+          {
+            "name": "install",
+            "status": "PASS",
+            "exit_code": 0,
+            "command": [
+              "/home/runner/.cargo/bin/rustup",
+              "toolchain",
+              "install",
+              "1.92.0",
+              "--profile",
+              "minimal",
+              "--no-self-update"
+            ]
+          },
+          {
+            "name": "compiler",
+            "status": "PASS",
+            "exit_code": 0,
+            "command": [
+              "/home/runner/.cargo/bin/rustc",
+              "+1.92.0",
+              "-vV"
+            ]
+          },
+          {
+            "name": "check-all-targets",
+            "status": "PASS",
+            "exit_code": 0,
+            "command": [
+              "/home/runner/.cargo/bin/cargo",
+              "+1.92.0",
+              "check",
+              "--locked",
+              "--all-targets"
+            ]
+          },
+          {
+            "name": "check-windows-print-metadata",
+            "status": "PASS",
+            "exit_code": 0,
+            "command": [
+              "/home/runner/.cargo/bin/cargo",
+              "+1.92.0",
+              "check",
+              "--locked",
+              "--all-targets",
+              "--features",
+              "check-windows-print"
+            ]
+          }
+        ],
+        "started_at": "2026-11-14T02:31:37.826728+00:00",
+        "unqualified": [
+          "release binary built with minimum Rust",
+          "runtime/PDF/desktop/package acceptance on minimum Rust"
+        ],
+        "minimum_toolchain": "1.92.0",
+        "compiler": "rustc 1.92.0 (ded5c06cf 2025-12-08)\nbinary: rustc\ncommit-hash: ded5c06cf21d2b93bffd5d884aa6e96934ee4234\ncommit-date: 2025-12-08\nhost: x86_64-unknown-linux-gnu\nrelease: 1.92.0\nLLVM version: 21.1.3\n",
+        "finished_at": "2026-11-14T02:34:35.197293+00:00"
+      },
+      "packages": 349,
+      "notice_refs": 648,
+      "inventory_equal": true,
+      "windows_memory_reports": []
+    },
+    {
+      "platform": "windows",
+      "id": 14094895410,
+      "zip_sha256": "a6701631b724a1f97b4fd696f7440d025b01ae0abc984f081ca60eb053f8a4ab",
+      "source_commit": "63607995ad55e5eb99dde36ea4cbba8df2d4b01e",
+      "stable_report_sha256": "899c3d6db5c4b790868c3665a41832e77920612f810a09db56a0dcb57fb9987a",
+      "stable_binary_sha256": "9db70e2a5af2d38efce3cf8f43e4630c3dced01df12e401f2f65280ac7aa2721",
+      "stable_checks": 18,
+      "minimum_report_sha256": "a5e32a50809d26a97e5e7724b583f73fb8146ebc26cbdffd6d462dc2e7f5bb03",
+      "minimum_report": {
+        "schema": 1,
+        "scope": "native minimum Rust source compatibility",
+        "status": "PASS",
+        "source_commit": "63607995ad55e5eb99dde36ea4cbba8df2d4b01e",
+        "platform": "nt",
+        "checks": [
+          {
+            "name": "install",
+            "status": "PASS",
+            "exit_code": 0,
+            "command": [
+              "C:\\Users\\runneradmin\\.cargo\\bin\\rustup.EXE",
+              "toolchain",
+              "install",
+              "1.92.0",
+              "--profile",
+              "minimal",
+              "--no-self-update"
+            ]
+          },
+          {
+            "name": "compiler",
+            "status": "PASS",
+            "exit_code": 0,
+            "command": [
+              "C:\\Users\\runneradmin\\.cargo\\bin\\rustc.EXE",
+              "+1.92.0",
+              "-vV"
+            ]
+          },
+          {
+            "name": "check-all-targets",
+            "status": "PASS",
+            "exit_code": 0,
+            "command": [
+              "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.EXE",
+              "+1.92.0",
+              "check",
+              "--locked",
+              "--all-targets"
+            ]
+          }
+        ],
+        "started_at": "2026-11-14T02:33:05.826554+00:00",
+        "unqualified": [
+          "release binary built with minimum Rust",
+          "runtime/PDF/desktop/package acceptance on minimum Rust"
+        ],
+        "minimum_toolchain": "1.92.0",
+        "compiler": "rustc 1.92.0 (ded5c06cf 2025-12-08)\nbinary: rustc\ncommit-hash: ded5c06cf21d2b93bffd5d884aa6e96934ee4234\ncommit-date: 2025-12-08\nhost: x86_64-pc-windows-msvc\nrelease: 1.92.0\nLLVM version: 21.1.3\n",
+        "finished_at": "2026-11-14T02:38:36.881321+00:00"
+      },
+      "packages": 255,
+      "notice_refs": 485,
+      "inventory_equal": true,
+      "windows_memory_reports": [
+        {
+          "file": "install.log.memory.json",
+          "data": {
+            "schema": 1,
+            "status": "observed",
+            "measurement": "Windows job committed memory; not RSS",
+            "job_memory_limit_bytes": 2147483648,
+            "peak_job_memory_bytes": 646000640,
+            "peak_process_memory_bytes": 646000640,
+            "limit_flags": 8704
+          }
+        },
+        {
+          "file": "compiler.log.memory.json",
+          "data": {
+            "schema": 1,
+            "status": "observed",
+            "measurement": "Windows job committed memory; not RSS",
+            "job_memory_limit_bytes": 2147483648,
+            "peak_job_memory_bytes": 6455296,
+            "peak_process_memory_bytes": 3403776,
+            "limit_flags": 8704
+          }
+        },
+        {
+          "file": "check-all-targets.log.memory.json",
+          "data": {
+            "schema": 1,
+            "status": "observed",
+            "measurement": "Windows job committed memory; not RSS",
+            "job_memory_limit_bytes": 2147483648,
+            "peak_job_memory_bytes": 1254400000,
+            "peak_process_memory_bytes": 1110020096,
+            "limit_flags": 8704
+          }
+        }
+      ]
+    }
+  ]
+}
