@@ -182,3 +182,12 @@ jobs passed and [PR #5](https://github.com/w3fans/dPDF/pull/5) merged to main
 `1cf522aeccc1794e5cbad4af42a7a02fd1b05c75`. T01 is complete under its explicit
 exit criteria; authority-side integration retains a separate PENDING status. This tooling receipt does not promote
 any application requirement or transfer historical platform qualification.
+
+
+Dated T19 evidence supplement (14 November): the independent unmerged engine
+candidate and complete scoped advisory lookup are recorded in
+[the receipt](planning/progress/T19-engine-8125-advisory-refresh-2026-11-14.md).
+It also links the verified vendored Winit provenance correction. These records do
+not change main's runtime pins, row qualification marks, manual platform/package
+acceptance or experienced review gates. Minimum-compiler checks are a separate
+unqualified candidate in draft #19.

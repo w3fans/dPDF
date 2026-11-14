@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "source_commit": "1b5f692706812bf9b69be9449ec1486990cfdf65",
+  "upstream_version": "0.30.13",
+  "upstream_revision": "e9809ef54b18499bb4f2cac945719ecc2a61061b",
+  "archive_sha256": "a6755fa58a9f8350bd1e472d4c3fcc25f824ec358933bba33306d0b63df5978d",
+  "upstream_file_count": 217,
+  "vendored_file_count": 219,
+  "license_sha256": "6dc0e068dcf3a5bc8e054205b85b7720e1d49265bbc64bf515d2cf79197df69a",
+  "license_equal": true,
+  "normalized_manifest_equal": false,
+  "original_manifest_equal": true,
+  "differences": [
+    {
+      "path": ".cargo_vcs_info.json",
+      "status": "removed",
+      "upstream_sha256": "b8b2549c91dbf3dc4087197a6be89ab5acb5511c2d1eadc7349c249f646047bb",
+      "local_sha256": null
+    },
+    {
+      "path": "Cargo.toml",
+      "status": "modified",
+      "upstream_sha256": "2aeb741d47b763ee198ca915c330a6bf0b1fc094dd69357e80278b7852289c61",
+      "local_sha256": "69b49269387af34b9043ea2f61f37b2755e5032db73eca006f3d10a1544aa41b"
+    },
+    {
+      "path": "DPDF_PATCH.md",
+      "status": "added",
+      "upstream_sha256": null,
+      "local_sha256": "ac6c6741c45e3055f8efd01211929ce1513679feccd32f4ff1e65716d82a105c"
+    },
+    {
+      "path": "src/platform_impl/linux/wayland/file_drop.rs",
+      "status": "added",
+      "upstream_sha256": null,
+      "local_sha256": "b89b3e821eede2c25692970dacca5852544af07683cc9938d7b610a7e3f77c2d"
+    },
+    {
+      "path": "src/platform_impl/linux/wayland/mod.rs",
+      "status": "modified",
+      "upstream_sha256": "473911ef643fb20ca22dcc9a7eb9c87344b0914b470b019384d7ba1be1e92111",
+      "local_sha256": "dc7766452d9ba0b9fa1e75ed88a548f7bfefa7e55d70ef737fcde9978d42c801"
+    },
+    {
+      "path": "src/platform_impl/linux/wayland/seat/mod.rs",
+      "status": "modified",
+      "upstream_sha256": "70bbd2a8c43a898f4cb2580d38c4f14e478e7331ab65d2e115feb0377fe2fc44",
+      "local_sha256": "74d418ef2260a57e2d3f300c6b7c2939b751c4dfd2d2be261da29932985cbab5"
+    },
+    {
+      "path": "src/platform_impl/linux/wayland/state.rs",
+      "status": "modified",
+      "upstream_sha256": "18beef206a1d0a1cf72ac65b1cefb4984bc204ca0638ecbbe2cb2c8d316422c9",
+      "local_sha256": "c69bfc6fb2b9d881726366ab17861e3469db207d5ebc81ebaa1d1a7ad952b08f"
+    },
+    {
+      "path": "src/platform_impl/linux/wayland/uri_list.rs",
+      "status": "added",
+      "upstream_sha256": null,
+      "local_sha256": "dc7a788172403f4789cdba01050863cd82a7e145ef1b403fc29c23b9f5205f65"
+    }
+  ],
+  "status": "PASS_BASE_AND_SCOPED_PATCH_PROVENANCE; NO_NATIVE_OR_SECURITY_QUALIFICATION",
+  "normalized_manifest_only_changes": [
+    "Activate existing optional percent-encoding dependency for wayland",
+    "Enable fs on existing Unix rustix dependency"
+  ],
+  "native_platform_source_changes_outside_wayland": [],
+  "upstream_archive_file_count": 217,
+  "original_patch_note_misstates_normalized_manifest_unchanged": true,
+  "observed_component_tree": "9290acff170e2c33c8b70ab5875e17ffffd6a167",
+  "not_covered": [
+    "Native Wayland protocol behavior/desktop acceptance",
+    "Downstream patch memory/lifetime/security approval",
+    "Compiler/native runtime qualification for other app changes"
+  ],
+  "corrected_patch_note_sha256": "435cece1b5d4e3517d49756ec86219267335f669fe6fbf2f879b8abd2152f295",
+  "comparison_scope": "Immutable upstream archive versus the pre-correction vendored component tree; source_commit identifies that observed tree. Only provenance wording is corrected in this documentation candidate.",
+  "documentation_correction_only": true
+}
