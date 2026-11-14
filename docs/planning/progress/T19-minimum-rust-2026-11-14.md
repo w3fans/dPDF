@@ -1,8 +1,10 @@
 # T19 declared minimum Rust source checks
 
-Status: IN_PROGRESS. Both native minimum targets and all hosted gates passed
-on 63607995; current main reconciliation and explicit-target follow-up require
-updated gates before merge.
+Status: DONE for native minimum-source-check tooling. Final explicit-target
+source 87e12390 passed all hosted gates and both actual Rust 1.92.0 native source
+checks in run 43548625649; merged as 847d1c58. Minimum-compiler release/runtime
+and native operator/package acceptance remain separately unqualified.
+Historical candidate states below retain their original scope.
 Base main e7bec799b0d5ff30175fa28cd2ff743d9b9b4a72; isolated
 /tmp/dpdf-minimum-rust, branch test/minimum-rust. Independent of unmerged lifecycle
 and engine drafts #10/#16/#17/#18. It does not qualify their changed sources.
@@ -88,8 +90,29 @@ environment, so an inherited cross-target setting cannot change the claimed
 scope. Existing injected-runner test now supplies a conflicting target and checks
 that it is replaced. No incorrect target was observed in the qualified run.
 
-Current merged/follow-up source must repeat all applicable hosted gates. The
+The final explicit-target follow-up repeated all applicable hosted gates. The
 prior Windows lock failure remains retained and under independent diagnosis;
 a later passing run is not a root-cause verdict. No minimum-compiler release
 binary, physical/native operator acceptance or experienced lifecycle/engine
 approval follows from these source checks.
+
+
+## Final explicit-target qualification and merge
+
+Final source 87e12390 / run 43548625649 passed policy 132305660372, Linux
+132305660793 and Windows 132305660688. Verified actual Rust 1.92.0 compiler
+reports, explicit native GNU/MSVC targets and all seven minimum-check commands.
+Both stable suites passed (33 Linux / 18 Windows checks). Exact native notice
+inventories match 349/255 components, with all 648/485 referenced texts rehashed.
+Linux archive 14095503559 SHA-256
+60b94b7e24e8418dc9f1ec80cf0a5f580c16f4ba4e3a62551d0ba24069320c47;
+Windows archive 14095344006 SHA-256
+f305e99a4742c4de32c7db70a56eba1b95bc21fbce59aaaee17440df18aadc16.
+Windows minimum-check peak committed job memory was 1,256,439,808 bytes under
+the unchanged 2,147,483,648-byte cap; not RSS or a whole-app budget.
+
+Routine CI PR #19 merged as 847d1c581bf80ce0e66f2d25d9242a4b4b7e3333. This closes
+the declared-minimum source-test coverage gap and changes no app/runtime pin or
+release authority. It does not explain the earlier mark-lock failure, qualify
+unmerged lifecycle/engine sources, or provide minimum-compiler release/runtime,
+physical/native operator or package acceptance.

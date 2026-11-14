@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Retain both writer timing traces when the concurrent mark-metadata regression
+  fails, without changing its assertions or the bounded production lock wait.
+
 - Check the declared minimum Rust compiler on hosted Linux and native MSVC,
   retaining source-check logs separately from qualified stable runtime artifacts.
 

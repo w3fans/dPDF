@@ -1,5 +1,6 @@
 """Source-safe CI contract checks plus native Windows process-tree qualification."""
 import importlib.util
+import io
 import json
 import os
 import re
@@ -9,6 +10,7 @@ import sys
 import tempfile
 import time
 import unittest
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -18,6 +20,8 @@ import runtime
 import validate_windows
 import windows_job
 import validate_linux
+import trace_mark_metadata
+
 import check_minimum_rust
 
 
@@ -43,6 +47,30 @@ def check_ci_step_keys(content):
 
 
 class Contracts(unittest.TestCase):
+    def test_metadata_diagnostic_stops_at_first_failure_without_retry(self):
+        calls = []
+        def runner(command, **kwargs):
+            calls.append(command)
+            return subprocess.CompletedProcess(command, 101)
+        with redirect_stdout(io.StringIO()) as output:
+            code = trace_mark_metadata.repeat_cases(['generated-fixture'], 32, runner=runner)
+        self.assertEqual(code, 101)
+        self.assertEqual(len(calls), 1)
+        self.assertIn('stopping without retry', output.getvalue())
+
+    def test_metadata_diagnostic_budget_exhaustion_is_incomplete_not_pass(self):
+        ticks = iter([0, 0, 211])
+        calls = []
+        def runner(command, **kwargs):
+            calls.append(command)
+            return subprocess.CompletedProcess(command, 0)
+        with redirect_stdout(io.StringIO()) as output:
+            code = trace_mark_metadata.repeat_cases(['generated-fixture'], 32, runner=runner,
+                                                    clock=lambda: next(ticks))
+        self.assertEqual(code, 124)
+        self.assertEqual(len(calls), 1)
+        self.assertIn('INCOMPLETE', output.getvalue())
+
     def minimum_fixture(self, root, version='1.92'):
         source = root / 'source'
         source.mkdir()

@@ -189,5 +189,7 @@ candidate and complete scoped advisory lookup are recorded in
 [the receipt](planning/progress/T19-engine-8125-advisory-refresh-2026-11-14.md).
 It also links the verified vendored Winit provenance correction. These records do
 not change main's runtime pins, row qualification marks, manual platform/package
-acceptance or experienced review gates. Minimum-compiler checks are a separate
-unqualified candidate in draft #19.
+acceptance or experienced review gates. Native minimum-compiler source checks merged in [PR #19](https://github.com/w3fans/dPDF/pull/19)
+after final source 87e12390 passed all jobs in run 43548625649; actual Rust 1.92.0
+and explicit GNU/MSVC targets were verified. This qualifies source compatibility,
+not a release binary or runtime/operator acceptance on the minimum compiler.

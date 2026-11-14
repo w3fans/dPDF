@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "source_commit": "1b5f692706812bf9b69be9449ec1486990cfdf65",
+  "run_id": 43544105201,
+  "windows_job": 132291176971,
+  "windows_artifact_id": 14093747060,
+  "archive_sha256": "8af10791193761a309056763df85639ba05aef0676358bb891d91aa422f16c18",
+  "report_sha256": "bd7ef8697dd8b53eddee447380f838456a1611acc30c78e6b1c5297da279b37d",
+  "unit_log_sha256": "a2f5285a22e1174eef73611b93228b70328d2911f559a16c06777c8087c4eccd",
+  "status": "FAILED_STABLE_WINDOWS_UNIT_TEST; MINIMUM_COMPILER_NOT_RUN",
+  "failing_test": "marks::tests::concurrent_usage_and_size_updates_preserve_assets_and_future_metadata",
+  "failure": "Asset metadata is locked or unavailable: lock acquisition failed because the operation would block",
+  "unit_result": {
+    "passed": 67,
+    "failed": 1,
+    "ignored_fixture": 1
+  },
+  "linux_minimum_rust_status": "PASS",
+  "linux_artifact_id": 14093801438,
+  "linux_archive_sha256": "0af0226286855a8f9bdb0ede1f1cfa55a18b9bd080ea21dd8214dc193dc05ee6",
+  "cause_unconfirmed": [
+    "single writer held the file lock longer than five seconds",
+    "a waiting writer starved behind repeated acquisitions"
+  ],
+  "next": "Retain timing traces for both writer loops before selecting a production fix; preserve the existing deadline and resource limits."
+}
