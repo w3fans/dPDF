@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "source_commit": "32f59f95aeb8cda6c661b85ea7cea41b29ce6b6e",
+  "binary_sha256": "6d68ced5b923e2f56949e8afa4ece3442640d34ce6142454b6cdfaff65f58e8b",
+  "source_sha256": "e07adb7d5a3a1ab26547159be6c32e32553e8b31ff376185daa61ecd09e7cb1d",
+  "helpers": [
+    {
+      "pid": 3099233,
+      "start": "65088776"
+    }
+  ],
+  "helpers_reaped": true,
+  "source_unchanged": true,
+  "scope": "Original native Ctrl+P/page-25 sequence; body rendered before any helper release; Ctrl+W cancelled pending print and reaped sole started decrypt; no native dialog/submission",
+  "pending_viewport_ocr": "dPDF sample contract - page 25\n\nReview clause 25: payment due within 30 days.\n\nSearch for payment; navigate by thumbnail or bookmark.",
+  "helper_count_before_cancel": 1
+}
