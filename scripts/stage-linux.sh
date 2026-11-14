@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 output="${1:-/app/dPDF}"
 binary="${DPDF_BINARY:-target/release/dpdf}"
-: "${DPDF_PDFIUM_DISTRIBUTION:?Set DPDF_PDFIUM_DISTRIBUTION to the extracted PDFium 7881 distribution}"
+: "${DPDF_PDFIUM_DISTRIBUTION:?Set DPDF_PDFIUM_DISTRIBUTION to the extracted PDFium 8125 distribution}"
 [[ -x "$binary" && -f "$DPDF_PDFIUM_DISTRIBUTION/lib/libpdfium.so" && -d "$DPDF_PDFIUM_DISTRIBUTION/licenses" ]] || {
     echo 'Build dPDF and provide a complete matching PDFium distribution first.' >&2; exit 2;
 }

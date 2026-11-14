@@ -102,7 +102,7 @@ def main():
                 shutil.copy2(vendor_archive, cached)
                 cached_info.write_text(json.dumps(dict(lock_sha256=lock_digest,
                         archive_sha256=sha256_file(cached))) + '\n')
-        pdfium = sources / 'pdfium-7881-source.tar.gz'
+        pdfium = sources / 'pdfium-8125-source.tar.gz'
         if args.pdfium_sources:
             with tarfile.open(args.pdfium_sources) as archive:
                 import json

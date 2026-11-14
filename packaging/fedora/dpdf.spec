@@ -10,7 +10,7 @@ License:        GPL-3.0-only AND Apache-2.0 AND BSD-3-Clause AND (Apache-2.0 WIT
 URL:            https://github.com/w3fans/dPDF
 Source0:        dpdf-%{version}.tar.gz
 Source1:        dpdf-%{version}-vendor.tar.gz
-Source2:        pdfium-7881-source.tar.gz
+Source2:        pdfium-8125-source.tar.gz
 ExclusiveArch:  x86_64
 BuildRequires:  cargo >= 1.92
 BuildRequires:  rust >= 1.92

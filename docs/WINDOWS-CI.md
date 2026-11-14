@@ -82,7 +82,7 @@ Service-mode checks run sequentially:
 
 Generated PDFs, synthetic mark images, config, data and temporary files are isolated
 per run. Report directories include run ID, attempt and lane under RUNNER_TEMP;
-publication verifies the same identity to reject stale persistent-runner results. Existing smoke flags are removed. PDFium 7881 and qpdf 12.4.2 archives are
+publication verifies the same identity to reject stale persistent-runner results. Existing smoke flags are removed. PDFium 8125 and qpdf 12.4.2 archives are
 SHA-256-verified and extracted into the run directory; existing `C:\deps` is not
 used or changed. The application does not acquire an automatic runtime downloader.
 

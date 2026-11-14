@@ -19,8 +19,8 @@ concurrency:
 env:
   CARGO_TERM_COLOR: never
   CARGO_INCREMENTAL: '0'
-  PDFIUM_URL: https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/7881/pdfium-linux-x64.tgz
-  PDFIUM_SHA256: 1470e21b8b4a3b4ad7f85684e2da11d94f3b69a86d81dee11b9b6709d927ac1d
+  PDFIUM_URL: https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/8125/pdfium-linux-x64.tgz
+  PDFIUM_SHA256: e1c3ce6e270cb5e0c20816b379ad9f2c1309972697c505f508de92bf5e7d6659
 
 jobs:
   policy:
@@ -58,6 +58,7 @@ jobs:
           python3 scripts/ci/test_delivery_checkpoint.py
           python3 scripts/ci/test_resolve_ref.py
           python3 scripts/test-cargo-notices.py
+          python3 scripts/test-pdfium-source.py
           python3 scripts/test-print-dialog.py
           python3 scripts/test-print-benchmark.py
           python3 scripts/test-rpm-publication.py
@@ -133,7 +134,7 @@ jobs:
           python3 scripts/ci/collect_notices.py --source . --cargo "$(command -v cargo)" \
             --target x86_64-unknown-linux-gnu --retained packaging/licenses/rust/inventory-linux.json \
             --output "$RUNNER_TEMP/linux-validation/notices"
-      - name: Pinned PDFium 7881
+      - name: Pinned PDFium 8125
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/pdfium"

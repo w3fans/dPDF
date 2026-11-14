@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "retrieved_at_utc": "2026-11-13T23:37:05.430072+00:00",
+  "scope": "Pinned PDFium archive configuration and JavaScript-source triage; not full engine clearance",
+  "archives": [
+    {
+      "target": "linux",
+      "archive_sha256": "1470e21b8b4a3b4ad7f85684e2da11d94f3b69a86d81dee11b9b6709d927ac1d",
+      "args.gn": {
+        "content": "clang_use_chrome_plugins = false\nis_component_build = false\nis_debug = false\npdf_enable_v8 = false\npdf_enable_xfa = false\npdf_is_standalone = true\npdf_use_partition_alloc = false\ntarget_cpu = \"x64\"\ntarget_os = \"linux\"\ntreat_warnings_as_errors = false\n",
+        "sha256": "962426b1d9d24084e2d61980b38f322cbfb47d92464c339fe443545cecee9f9c"
+      },
+      "VERSION": {
+        "content": "MAJOR=151\nMINOR=0\nBUILD=7881\nPATCH=0\n",
+        "sha256": "9ea21b933a52e57cd585f5a543c16155513f8195a158b0526f3a3c50fc3431cd"
+      },
+      "binary_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+      "matches_qualified_linux_runtime": true
+    },
+    {
+      "target": "win",
+      "archive_sha256": "73cc0de638ac2095e7445bf56a38200a5b7c7ca0e9f4ba144598f2457377ac08",
+      "args.gn": {
+        "content": "is_component_build = false\nis_debug = false\npdf_enable_v8 = false\npdf_enable_xfa = false\npdf_is_standalone = true\npdf_use_partition_alloc = false\ntarget_cpu = \"x64\"\ntarget_os = \"win\"\ntreat_warnings_as_errors = false\n",
+        "sha256": "161bf08999e403b7da9d924c45b7ee7bc8beb3038b08f9e174ba6761dd06a976"
+      },
+      "VERSION": {
+        "content": "MAJOR=151\nMINOR=0\nBUILD=7881\nPATCH=0\n",
+        "sha256": "9ea21b933a52e57cd585f5a543c16155513f8195a158b0526f3a3c50fc3431cd"
+      },
+      "binary_sha256": "79d4676b656cfb1abcea88f9ade3b4b0826c5200382db5f4ec72a636c598c118"
+    }
+  ],
+  "source_files": [
+    {
+      "label": "pinned",
+      "url": "https://pdfium.googlesource.com/pdfium/+/91b9d569b34be4f38eed7b3c49b227356c3aadad/fxjs/cjs_global.cpp",
+      "bytes": 18914,
+      "sha256": "46364fae4171a058a8b4e03fb0f16ec5b64dbfc9935c85be32cc91e7fba116d9"
+    },
+    {
+      "label": "fixed",
+      "url": "https://pdfium.googlesource.com/pdfium/+/cce5c5ed801f54cadb5b039d98ed43804994764c/fxjs/cjs_global.cpp",
+      "bytes": 18838,
+      "sha256": "dbbff7f754c1ecd2202347a3d862997f9ba3c7f1c55cac71b20ccea415e71f27"
+    },
+    {
+      "label": "build_guard",
+      "url": "https://pdfium.googlesource.com/pdfium/+/91b9d569b34be4f38eed7b3c49b227356c3aadad/fxjs/BUILD.gn",
+      "bytes": 8033,
+      "sha256": "fa1fb41740079b20940ffe3b8d2d76146264988bfa8ee7bf8c473369fe80197c"
+    }
+  ],
+  "assessment": {
+    "pinned_function_uses_reentrant_array_write_removed_by_fix": true,
+    "archive_v8_disabled": [
+      "linux",
+      "win"
+    ],
+    "archive_xfa_disabled": [
+      "linux",
+      "win"
+    ],
+    "pinned_fxjs_build_guards_cjs_global_with_pdf_enable_v8": true,
+    "inference": "The described V8-specific JavaScript route is excluded by the inspected archive configuration. No broader engine security conclusion; other advisories remain unresolved.",
+    "windows_dll_direct_match_to_runtime_artifact": "NOT_CHECKED: hosted report retains archive hash, not DLL bytes",
+    "fedora_installed_binary_configuration": "PENDING actual build/installed artifact receipts"
+  }
+}

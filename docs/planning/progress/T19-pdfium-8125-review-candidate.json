@@ -1,0 +1,86 @@
+{
+  "archives": [
+    {
+      "asset": "pdfium-linux-x64.tgz",
+      "url": "https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/8125/pdfium-linux-x64.tgz",
+      "archive_sha256": "e1c3ce6e270cb5e0c20816b379ad9f2c1309972697c505f508de92bf5e7d6659",
+      "args.gn": {
+        "content": "clang_use_chrome_plugins = false\nis_component_build = false\nis_debug = false\npdf_enable_v8 = false\npdf_enable_xfa = false\npdf_is_standalone = true\npdf_use_partition_alloc = false\ntarget_cpu = \"x64\"\ntarget_os = \"linux\"\ntreat_warnings_as_errors = false\n",
+        "sha256": "962426b1d9d24084e2d61980b38f322cbfb47d92464c339fe443545cecee9f9c"
+      },
+      "VERSION": {
+        "content": "MAJOR=158\nMINOR=0\nBUILD=8125\nPATCH=0\n",
+        "sha256": "77f606e89976f8563ad68506f457f9e37e8049793a0f8abe485840171db822d2"
+      }
+    },
+    {
+      "asset": "pdfium-win-x64.tgz",
+      "url": "https://github.com/bblanchon/pdfium-binaries/releases/download/chromium/8125/pdfium-win-x64.tgz",
+      "archive_sha256": "9a964261760cff52570aabf038ab346d3a5034dd8b30d0d5fe8861235d356b8b",
+      "args.gn": {
+        "content": "is_component_build = false\nis_debug = false\npdf_enable_v8 = false\npdf_enable_xfa = false\npdf_is_standalone = true\npdf_use_partition_alloc = false\ntarget_cpu = \"x64\"\ntarget_os = \"win\"\ntreat_warnings_as_errors = false\n",
+        "sha256": "161bf08999e403b7da9d924c45b7ee7bc8beb3038b08f9e174ba6761dd06a976"
+      },
+      "VERSION": {
+        "content": "MAJOR=158\nMINOR=0\nBUILD=8125\nPATCH=0\n",
+        "sha256": "77f606e89976f8563ad68506f457f9e37e8049793a0f8abe485840171db822d2"
+      }
+    }
+  ],
+  "source_revision": "43d55e429cf72c21e9a1e60475b50feefa16fda9",
+  "source_commit_time": "Thu Oct 22 16:08:11 2026 -0700",
+  "source_files": [
+    {
+      "path": "core/fxcodec/jpeg/libjpeg_scanline_decoder.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/core/fxcodec/jpeg/libjpeg_scanline_decoder.cpp?format=TEXT",
+      "sha256": "8bf26f23b4f0846751e43c274a5ca9404e08f9bf0a9ef99e1d3d982b6ad7d9c1",
+      "bytes": 14887
+    },
+    {
+      "path": "fpdfsdk/formfiller/cffl_formfield.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/fpdfsdk/formfiller/cffl_formfield.cpp?format=TEXT",
+      "sha256": "d95ecb5724b30ab32e9b776e8249e8ba1089b7e2cd482f352e49a46f93d2bd4c",
+      "bytes": 18089
+    },
+    {
+      "path": "fxjs/cjs_global.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/fxjs/cjs_global.cpp?format=TEXT",
+      "sha256": "dbbff7f754c1ecd2202347a3d862997f9ba3c7f1c55cac71b20ccea415e71f27",
+      "bytes": 18838
+    },
+    {
+      "path": "DEPS",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/DEPS?format=TEXT",
+      "sha256": "e95c97e4651e7e6a2dc44d85fd3ca24f5877df7ee9781bd424a2dc4054bededa",
+      "bytes": 42270
+    }
+  ],
+  "binding": {
+    "version": "0.9.5",
+    "features": [
+      "pdfium_8125",
+      "thread_safe",
+      "image_025"
+    ],
+    "crate_sha256": "296b1146652b486ea6eea0d316e85ab6837ff69e8d2b1568e6fa7bc38bd4c00e",
+    "upstream_source_commit": "06952ffbca7d7c9336ac7f0313e84fa259712df6",
+    "license_declaration": "MIT OR Apache-2.0",
+    "retained_license_md_identical_to_0_9_4": true,
+    "license_md_sha256": "819dfb7c49a24bec7511f29304478d67f272bfd1f976b728095f2eb2c522791c"
+  },
+  "source_observations": {
+    "jpeg_owned_correction_present": true,
+    "form_observed_self_lifetime_checks_present": true,
+    "cjs_global_file_identical_to_inspected_fix_revision": true
+  },
+  "status": "Pre-implementation provenance snapshot; this branch now selects the proposed pair, with compiled/runtime/Fedora source-build qualification PENDING",
+  "remaining": [
+    "compatible binding compile and API behavior",
+    "complete lock/notices regeneration",
+    "minimal Fedora DEPS/source-manifest and toolchain adaptation",
+    "source-bound Linux and Windows full runtime/geometry/printing gates",
+    "malformed-JPEG regression and exact asset build/source provenance",
+    "Fedora source build and native package lifecycle acceptance",
+    "experienced engine review; no broader advisory clearance"
+  ]
+}

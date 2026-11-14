@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "candidate_revision": "43d55e429cf72c21e9a1e60475b50feefa16fda9",
+  "source_files": [
+    {
+      "file": "8125-formfill.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/fpdfsdk/fpdf_formfill.cpp?format=TEXT",
+      "sha256": "02daa515298029d0c97f9b426c1ae54cfaba00add40d3371799c3c4dbcd11264",
+      "bytes": 36400
+    },
+    {
+      "file": "8125-formfill-env.h",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/fpdfsdk/cpdfsdk_formfillenvironment.h?format=TEXT",
+      "sha256": "02287a33956436d38294b7014be2e99029f1a7976012daca07a04eb3655766a3",
+      "bytes": 12436
+    },
+    {
+      "file": "8125-openjpeg-tree.json",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/third_party/libopenjpeg/?format=JSON",
+      "sha256": "11a6552e6e16b82e85f88be795443c9940ac877919f48b70ab014634291a9171",
+      "bytes": 1332
+    },
+    {
+      "file": "8125-openjpeg-image.c",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/third_party/libopenjpeg/src/image.c?format=TEXT",
+      "sha256": "afa33bcf1a6d0692ba0bb47fb569cbf749098f240f43be4efe44bc4e5687dd7f",
+      "bytes": 9993
+    },
+    {
+      "file": "8125-openjpeg-image.h",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/third_party/libopenjpeg/src/image.h?format=TEXT",
+      "sha256": "7b7a1d0358975f7658a86551e8cd527e018ee24d7876f7e7fd22f8bd46bb8484",
+      "bytes": 2624
+    },
+    {
+      "file": "8125-openjpeg-j2k.c",
+      "url": "https://pdfium.googlesource.com/pdfium/+/43d55e429cf72c21e9a1e60475b50feefa16fda9/third_party/libopenjpeg/src/j2k.c?format=TEXT",
+      "sha256": "6f47b9b1051ae2b66aaee1c5ff139d760fa48e18b974783c0163611807ba1abd",
+      "bytes": 516585
+    }
+  ],
+  "findings": [
+    {
+      "cve": "CVE-2026-95338",
+      "issue": 556535630,
+      "fix": "4a36628222bb647c23b4ef3b8f3fc64e93e1dd3b",
+      "fix_url": "https://pdfium.googlesource.com/pdfium/+/4a36628222bb647c23b4ef3b8f3fc64e93e1dd3b",
+      "candidate_observation": "InPassiveFFICallback flag and early-entry guards present in the immutable candidate; exact application callback reentrancy and binary exploitability are not demonstrated."
+    },
+    {
+      "cve": "CVE-2026-118345",
+      "issue": 574061024,
+      "fix": "0a42f6e64f28603f3aee118a1c140e9bd0647b71",
+      "fix_url": "https://pdfium.googlesource.com/pdfium/+/0a42f6e64f28603f3aee118a1c140e9bd0647b71",
+      "candidate_observation": "OpenJPEG header-copy returns success/failure and callers check it before continuing; observed in historical files now moved directly under third_party/libopenjpeg/src/."
+    }
+  ],
+  "scope": "Additional source/fix mapping only; not exhaustive engine advisory or exact binary security clearance",
+  "source_only": true,
+  "compiled_runtime_qualification": "PENDING"
+}

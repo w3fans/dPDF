@@ -1,0 +1,4121 @@
+{
+  "schema": 1,
+  "status": "PASS_IDENTICAL",
+  "scope": "generated Linux old/new paired runtime comparison",
+  "old": {
+    "source_commit": "e7bec799b0d5ff30175fa28cd2ff743d9b9b4a72",
+    "binary_sha256": "e6d6458e7385a7f7235e11cdd802112a84b6cd5587f318654732c95616280f92",
+    "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+    "run_url": "https://github.com/w3fans/dPDF/actions/runs/43515604481"
+  },
+  "new": {
+    "source_commit": "2ebb7825a20e90f4fd26f8ac5a3a79f7b204c9ae",
+    "binary_sha256": "72a83d2094c0959f94136954dd6325ad1f5e4b4d82c0468128bafef1f8c80766",
+    "pdfium_sha256": "1c251efce460d67437a4c76d4be9033ae2f17bf5603f5bff1af10209b94ca723",
+    "run_url": "https://github.com/w3fans/dPDF/actions/runs/43538066209"
+  },
+  "cases": [
+    {
+      "name": "geometry-r0-crop0-inherit0-unit0.5",
+      "source_sha256": "7f34defe5d908b6b12f1beafaf17ca0f86ada1d971bdde14e37e42b2d1a7932f",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop0-inherit0-unit1",
+      "source_sha256": "e831627e05b8282d45f6fe112d38a445bffa6441ed9bd6f21945c8024a95fc88",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop0-inherit0-unit2",
+      "source_sha256": "1230ee552c9bf7198d347936243877f080d195eb78a16fd10a84266cd1ed75c4",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop0-inherit1-unit0.5",
+      "source_sha256": "396ff7d8976e4875ab116174b5f4a8529aa5216fe895e2780d7e3386cb2aee42",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop0-inherit1-unit1",
+      "source_sha256": "42a9f5cc4d023ea994aaa8ef1e1cd664da76d89347bdeccf56f9b8e320ee1c30",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop0-inherit1-unit2",
+      "source_sha256": "16976eb29288e3024fd19f3da77ca42e1ffee1e99d639f28835f6b51cd79c5d5",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1785,
+            0.495,
+            0.3051,
+            0.050000012
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "f4fc819279024a1a"
+        },
+        "render_sha256": "20a025775cae86d555e8b6c1bfaabd051ff325c5f69171d10bbbb1207167a36e"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop1-inherit0-unit0.5",
+      "source_sha256": "688ad96009c2e9098989469abf9548fa5cea04b1dd3e15054ade3d4f9e477557",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop1-inherit0-unit1",
+      "source_sha256": "3a3acd52ae987782d16fd6e5756481f30e7dc7aea3a44e596a2d24b41174eb7e",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop1-inherit0-unit2",
+      "source_sha256": "452ba4aef5e1a4ae4ecc2c420bb35db6b2813de91760579cf158203107f20bf1",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop1-inherit1-unit0.5",
+      "source_sha256": "682004cb5b2769a33836eede714e38de8761e3876626665ef52ad6bf470e184b",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop1-inherit1-unit1",
+      "source_sha256": "5015418a4cb2febd6f38bb47ee3ba9de30aa3ffb30100968d0cbedeabac05b67",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r0-crop1-inherit1-unit2",
+      "source_sha256": "c29487b787841b3c7afb105f0275d574dfb95c72407ae93d77a67eaf31aeb06e",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.1218,
+            0.4521,
+            0.35889998,
+            0.06249997
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "3ce4a59129937487"
+        },
+        "render_sha256": "b4d7294869973d62f3a1d1f7a79b092ea1f98e29bafe9801b9cb04fad73f79e7"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop0-inherit0-unit0.5",
+      "source_sha256": "c5d7d35b2587bca09b8d32caac25e82e3f3e630ad13405e6ba127966026573be",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop0-inherit0-unit1",
+      "source_sha256": "a7cf986360996f923641cb123030e92868eaedfed51d1813409b271d852c2b5f",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop0-inherit0-unit2",
+      "source_sha256": "de6a156cb05e9d6dcaad99fc0e165c4dbaea421e2b9bb93c9f9a0ea5499ef8f5",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop0-inherit1-unit0.5",
+      "source_sha256": "be0357b789df36a285e7f2bf487cc2c421d3f89bc8a1b0daca136fb67acfadda",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop0-inherit1-unit1",
+      "source_sha256": "caacde3ba4743adb55b3f9641d4a0c51c1b40a1a74677dc3ce200820bbb38f84",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop0-inherit1-unit2",
+      "source_sha256": "3a98842f2d8a51075738ffee28419b3cf6593ab823ddddd185e25a467db1d889",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.455,
+            0.1785,
+            0.049999982,
+            0.3051
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "c923ec16ebbc5ade"
+        },
+        "render_sha256": "bebb44b162e4796b4bc440a25cf0495250adfcf71e9b8a05cc110a83b7efb51f"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop1-inherit0-unit0.5",
+      "source_sha256": "0d7854ff10f1d05c5a19664cd488ad6df4cd85188072bdd0eb021e1ca080f8d9",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop1-inherit0-unit1",
+      "source_sha256": "4bce139e0134114e28d3c0b3047837210172007c3104ffa19a7e606dcfd2fbdb",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop1-inherit0-unit2",
+      "source_sha256": "d41ee5bca896079541a0b4768f2b1b6dbb64a01a183f3754daeb0e7084579669",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop1-inherit1-unit0.5",
+      "source_sha256": "4b20292600911ff351a8a30728ea630819b187e7b8d2b6f5be57120e4f10aef9",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop1-inherit1-unit1",
+      "source_sha256": "6d0d035570240c0857d1b0f922646b3814edadefe03d839c52172626c270186a",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r90-crop1-inherit1-unit2",
+      "source_sha256": "881ab27fe7aac9f89049504c86c0ca958dece391463eccf53424acbf9cd98f03",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4854,
+            0.1218,
+            0.06250003,
+            0.35889998
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "8feec7737bba1df8"
+        },
+        "render_sha256": "dde9d172b1613ae0f320ef080487340e938c3db84fc8fe6636a2ec50d0b208bb"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop0-inherit0-unit0.5",
+      "source_sha256": "0319a3cedaf79469e8e46bb5d661d4ace6d8edd381939281ad32c83efe6d66f6",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop0-inherit0-unit1",
+      "source_sha256": "4bc4db6f4486a311ba433b29111f85dec467d9ddf657bbe6102a51367ec94c08",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop0-inherit0-unit2",
+      "source_sha256": "dc1214370d780f8e2d22105c918ffa40ae85acf2bd3d358646b1d8c8cd578b7a",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop0-inherit1-unit0.5",
+      "source_sha256": "892b52613049a30935bd5eb9fcf946cbb53f7947501b850df66b7e4c9040b81b",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop0-inherit1-unit1",
+      "source_sha256": "e47b84fd566c8c7a1ab4d1e5580cff709c87796add8d5a426a4e3005c55db294",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop0-inherit1-unit2",
+      "source_sha256": "c2d45949719c5a4ff12aaadd09a87f09a753f2420ccbd7707dd997297a9f5616",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        750
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5164,
+            0.455,
+            0.30510002,
+            0.049999982
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x750",
+          "text_chars": "15",
+          "rgba_checksum": "d2bcb4a53bf1bd0f"
+        },
+        "render_sha256": "e94e0916ba4cf94bded47cf989818af34cd5a350e0a91437356370b88f16edbd"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop1-inherit0-unit0.5",
+      "source_sha256": "f638ebaa62bc96cdb5e814b3e3693e397d622c22755acec93629f20411632a22",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop1-inherit0-unit1",
+      "source_sha256": "fb45720f684a24f73aa75ac3844e71d89e50aa5ed81f96792380eaf8aafd1849",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop1-inherit0-unit2",
+      "source_sha256": "3b3d3bd1a034d6b36e1bca33e3aa319679d6c37042e736a15ed8562112d70d9e",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop1-inherit1-unit0.5",
+      "source_sha256": "7ba53a9ff11c4f98285a321b7653ee13f84cb4b812707f340cd78458bc0e5f4a",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop1-inherit1-unit1",
+      "source_sha256": "b9e04528867d1f381c85d8a7c04388096da81320d1e565783ff4b194d466ef95",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r180-crop1-inherit1-unit2",
+      "source_sha256": "3b1910de3c329d1fd2c86e9c8c713fd5e4e3ee833a5c954acd630ff19cac307b",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        706
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.5193,
+            0.4854,
+            0.3589,
+            0.06250003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x706",
+          "text_chars": "15",
+          "rgba_checksum": "a9b6735d74b8ddf9"
+        },
+        "render_sha256": "19d180c0dcaf59a33629cae5adabc5f8eafd990d304ea8919c7faacc87041a65"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop0-inherit0-unit0.5",
+      "source_sha256": "bf9fa89bd12e3d3e72a1edfa6d057a785eb404e0bea5ee6656dec7847102f4b8",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop0-inherit0-unit1",
+      "source_sha256": "43f6ba6fa5dfa332e5e87c515ad26c096c1eb298a0a03b89de1b87d1c876e72d",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop0-inherit0-unit2",
+      "source_sha256": "3045f5f19b9149dc8964f0dba2095b33420083ad4aea0199513735c37ad8e270",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop0-inherit1-unit0.5",
+      "source_sha256": "daa8c6229f6e3b3873e34c65d03a923d387a1bedd2619a6ebb6be5144b9602e5",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop0-inherit1-unit1",
+      "source_sha256": "41674bf7ad29e53d8bd29fcb2ce938201eebb5a6f0e78066e382c438e90e7510",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop0-inherit1-unit2",
+      "source_sha256": "74f4a0654b18f8dab034362d47ec32f4227b4ae69d773e91a3f2afde5c8dfa6e",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1333
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.495,
+            0.5164,
+            0.050000012,
+            0.30510002
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1333",
+          "text_chars": "15",
+          "rgba_checksum": "b5819c125f08f633"
+        },
+        "render_sha256": "eead1ec25246870e7dbfc6c1722e8d68b1ac4749c5f93b63ecb0da8782fdd4d9"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop1-inherit0-unit0.5",
+      "source_sha256": "4feb9793fc127570d1328253b92d01503fbb0cc7e23e652de468edba285b551a",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop1-inherit0-unit1",
+      "source_sha256": "79959e5f6721b3d1d78968b45127f12f5c0474a5dcf30e0c4e72e928478c48d3",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop1-inherit0-unit2",
+      "source_sha256": "14a6c2747d6f1beafe3811d27e80cbae7a9187cff1a5515881a39468a4701c58",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop1-inherit1-unit0.5",
+      "source_sha256": "db569dde05aa0340e93a59ba6fa03de474a5e6695108658f182b638379b27596",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop1-inherit1-unit1",
+      "source_sha256": "080f96424f15b00e3b3c2781ec87b00a24599de9e577294d450c3fd63f8445ff",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "geometry-r270-crop1-inherit1-unit2",
+      "source_sha256": "0cc3ddb3da8876844a6411a539cf63425ec2b804bbb3331ae6e0760e90aa4e5b",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1417
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "new": {
+        "text": {
+          "text": "Reader geometry"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.4521,
+            0.5193,
+            0.06249997,
+            0.3589
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1417",
+          "text_chars": "15",
+          "rgba_checksum": "92fdc4d5f7f1bd68"
+        },
+        "render_sha256": "d9471daa38d911b377f0e5138cab730cfb79e221d6fc336a0c754a1802a7afa4"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r0-crop0",
+      "source_sha256": "0853ba783ac1fd80d15e57d30c93b912583362a31cb11ab73729adaa996e43d4",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "154",
+          "rgba_checksum": "fba1e9003f56f655"
+        },
+        "render_sha256": "1dca09ff10cd9d64528dd09bc942e523260c797dfb46ff29556211a7d3577135"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "154",
+          "rgba_checksum": "fba1e9003f56f655"
+        },
+        "render_sha256": "1dca09ff10cd9d64528dd09bc942e523260c797dfb46ff29556211a7d3577135"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r0-crop1",
+      "source_sha256": "c8df678a0c0a1616f39c00aeef566e2ee61323cf459cc7d52461ae427cc72da1",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1301
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.2157,
+            0.08,
+            0.12810001,
+            0.016199999
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1301",
+          "text_chars": "123",
+          "rgba_checksum": "b4e6c118d9a8f1df"
+        },
+        "render_sha256": "9f675386234f2715e284da07c9efeb99ddf8e6ceea618d0d67c20a780230beb5"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.2157,
+            0.08,
+            0.12810001,
+            0.016199999
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1301",
+          "text_chars": "123",
+          "rgba_checksum": "b4e6c118d9a8f1df"
+        },
+        "render_sha256": "9f675386234f2715e284da07c9efeb99ddf8e6ceea618d0d67c20a780230beb5"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r90-crop0",
+      "source_sha256": "ce0b73eabb2a76011b65e576f5f34211414fea6d95f8d697cf30b1a0f2b62aa4",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        773
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Authorized signature:\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nReview clause 2: payment due within 30 days.\r\ndPDF sample contract - page 2"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.8655,
+            0.2528,
+            0.014100015,
+            0.111500025
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x773",
+          "text_chars": "21",
+          "rgba_checksum": "f79c255f9252da8c"
+        },
+        "render_sha256": "01f3efe3481934e97887729e741127da74d522523bcdc68a517bad2dbff16dc9"
+      },
+      "new": {
+        "text": {
+          "text": "Authorized signature:\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nReview clause 2: payment due within 30 days.\r\ndPDF sample contract - page 2"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.8655,
+            0.2528,
+            0.014100015,
+            0.111500025
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x773",
+          "text_chars": "21",
+          "rgba_checksum": "f79c255f9252da8c"
+        },
+        "render_sha256": "01f3efe3481934e97887729e741127da74d522523bcdc68a517bad2dbff16dc9"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r90-crop1",
+      "source_sha256": "4e911ab7f654442905f1891588af806367d4e7a3465c018516e22fbebaf47b28",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        769
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Authorized signature:\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nReview clause 2: payment due within 30 days.\r\ndPDF sample contract - page 2"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.9038,
+            0.2157,
+            0.016200006,
+            0.12810001
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x769",
+          "text_chars": "21",
+          "rgba_checksum": "ae2991f5d708146d"
+        },
+        "render_sha256": "114b90cdfc7453a802af59b029ab58a8c2366866f70377d7175ae6aa3128c988"
+      },
+      "new": {
+        "text": {
+          "text": "Authorized signature:\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nReview clause 2: payment due within 30 days.\r\ndPDF sample contract - page 2"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.9038,
+            0.2157,
+            0.016200006,
+            0.12810001
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x769",
+          "text_chars": "21",
+          "rgba_checksum": "ae2991f5d708146d"
+        },
+        "render_sha256": "114b90cdfc7453a802af59b029ab58a8c2366866f70377d7175ae6aa3128c988"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r180-crop0",
+      "source_sha256": "578909bd350e100c326a536bf0944b3d26f17f4ba374d65f176d5f01b2026d86",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.6357,
+            0.8655,
+            0.111500025,
+            0.014100015
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "154",
+          "rgba_checksum": "796ef360c10917b5"
+        },
+        "render_sha256": "975464262d6711e28d2c596aedb29fb77ad9a0b57509795772f6c5eb4c812a2e"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.6357,
+            0.8655,
+            0.111500025,
+            0.014100015
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "154",
+          "rgba_checksum": "796ef360c10917b5"
+        },
+        "render_sha256": "975464262d6711e28d2c596aedb29fb77ad9a0b57509795772f6c5eb4c812a2e"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r180-crop1",
+      "source_sha256": "bff8f15493b990291aa07b9c89d9a2457fa69db84e7b27e6437ad07cb85d4c99",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1301
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.6562,
+            0.9038,
+            0.12810004,
+            0.016200006
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1301",
+          "text_chars": "123",
+          "rgba_checksum": "181ba1b1df3d55f2"
+        },
+        "render_sha256": "63894159990de789bb2928ae4ff55215b53f20bc8d67edf8dc644145274f101b"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.6562,
+            0.9038,
+            0.12810004,
+            0.016200006
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1301",
+          "text_chars": "123",
+          "rgba_checksum": "181ba1b1df3d55f2"
+        },
+        "render_sha256": "63894159990de789bb2928ae4ff55215b53f20bc8d67edf8dc644145274f101b"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r270-crop0",
+      "source_sha256": "f6bb2729609a3fc1f3d3336f8faa12f3673053bd70bd6f6247e239ef6e97fe1c",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        773
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1204,
+            0.6357,
+            0.0141,
+            0.111500025
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x773",
+          "text_chars": "21",
+          "rgba_checksum": "388392b49ee3d35b"
+        },
+        "render_sha256": "94540cc6cb6ac1833c275bdab322bd220fe4765cecea790d4475376f74b24d71"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1204,
+            0.6357,
+            0.0141,
+            0.111500025
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x773",
+          "text_chars": "21",
+          "rgba_checksum": "388392b49ee3d35b"
+        },
+        "render_sha256": "94540cc6cb6ac1833c275bdab322bd220fe4765cecea790d4475376f74b24d71"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "contract-r270-crop1",
+      "source_sha256": "401da543ef2083716a44ce2d5fcc06f09567302be0bb9b5db69a9a7ff9f3b55e",
+      "page": 2,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        769
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.08,
+            0.6562,
+            0.016199999,
+            0.12810004
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x769",
+          "text_chars": "21",
+          "rgba_checksum": "87195fff8d43dfb3"
+        },
+        "render_sha256": "74b067b0a589248577e3278753dd476fde9e67d539fbaa947a52be5add319804"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 2\r\nReview clause 2: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.08,
+            0.6562,
+            0.016199999,
+            0.12810004
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x769",
+          "text_chars": "21",
+          "rgba_checksum": "87195fff8d43dfb3"
+        },
+        "render_sha256": "74b067b0a589248577e3278753dd476fde9e67d539fbaa947a52be5add319804"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "physical-unit0.5",
+      "source_sha256": "846f4224eeb11295e6e28d58fde519d2b8d5cd9dbdd5fde40edc2c0f01235eb6",
+      "page": 3,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Physical units"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1,
+            0.0656,
+            0.13710001,
+            0.016400002
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "14",
+          "rgba_checksum": "97a2b2229f497748"
+        },
+        "render_sha256": "2f9e43f7ad56f93f93daa3e5d36574849b76bd7f4ed81497a6c8d33cbc314cdc"
+      },
+      "new": {
+        "text": {
+          "text": "Physical units"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1,
+            0.0656,
+            0.13710001,
+            0.016400002
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "14",
+          "rgba_checksum": "97a2b2229f497748"
+        },
+        "render_sha256": "2f9e43f7ad56f93f93daa3e5d36574849b76bd7f4ed81497a6c8d33cbc314cdc"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "physical-unit1",
+      "source_sha256": "25f2025fe32d655af10af5dafae7d8c9eca7d1bd60175f195db125b694890490",
+      "page": 3,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Physical units"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1,
+            0.0656,
+            0.13710001,
+            0.016400002
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "14",
+          "rgba_checksum": "97a2b2229f497748"
+        },
+        "render_sha256": "2f9e43f7ad56f93f93daa3e5d36574849b76bd7f4ed81497a6c8d33cbc314cdc"
+      },
+      "new": {
+        "text": {
+          "text": "Physical units"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1,
+            0.0656,
+            0.13710001,
+            0.016400002
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "14",
+          "rgba_checksum": "97a2b2229f497748"
+        },
+        "render_sha256": "2f9e43f7ad56f93f93daa3e5d36574849b76bd7f4ed81497a6c8d33cbc314cdc"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "physical-unit2",
+      "source_sha256": "ed2d2d074cb95a00ea7e19ac307c11dd56edf1c18a4754578e5780dad7f4ae9f",
+      "page": 3,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Physical units"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1,
+            0.0656,
+            0.13710001,
+            0.016400002
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "14",
+          "rgba_checksum": "97a2b2229f497748"
+        },
+        "render_sha256": "2f9e43f7ad56f93f93daa3e5d36574849b76bd7f4ed81497a6c8d33cbc314cdc"
+      },
+      "new": {
+        "text": {
+          "text": "Physical units"
+        },
+        "search": {
+          "matches": 3,
+          "rectangles": 3,
+          "truncated": false,
+          "first": [
+            0.1,
+            0.0656,
+            0.13710001,
+            0.016400002
+          ]
+        },
+        "probe": {
+          "pages": "3",
+          "first_frame": "1000x1294",
+          "text_chars": "14",
+          "rgba_checksum": "97a2b2229f497748"
+        },
+        "render_sha256": "2f9e43f7ad56f93f93daa3e5d36574849b76bd7f4ed81497a6c8d33cbc314cdc"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "thousand-page1",
+      "source_sha256": "a15eae7fe97bf85997f28ef95cd162915bea1629f2ea8e4f725f6301e8c29b3e",
+      "page": 1,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 1\r\nReview clause 1: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 1000,
+          "rectangles": 1000,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "1000",
+          "first_frame": "1000x1294",
+          "text_chars": "154",
+          "rgba_checksum": "a68d5f114b190cd5"
+        },
+        "render_sha256": "fc948e1c93ff4ee0415fc77a39319d9c217eb297f78be30db1bf989d97f41a4a"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 1\r\nReview clause 1: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 1000,
+          "rectangles": 1000,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "1000",
+          "first_frame": "1000x1294",
+          "text_chars": "154",
+          "rgba_checksum": "a68d5f114b190cd5"
+        },
+        "render_sha256": "fc948e1c93ff4ee0415fc77a39319d9c217eb297f78be30db1bf989d97f41a4a"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "thousand-page500",
+      "source_sha256": "a15eae7fe97bf85997f28ef95cd162915bea1629f2ea8e4f725f6301e8c29b3e",
+      "page": 500,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 500\r\nReview clause 500: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 1000,
+          "rectangles": 1000,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "1000",
+          "first_frame": "1000x1294",
+          "text_chars": "158",
+          "rgba_checksum": "46dc2ded067f3809"
+        },
+        "render_sha256": "bd4b48b4960f99f73275e2c42d602f4ef5934960393c9064127dc714ddd34805"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 500\r\nReview clause 500: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 1000,
+          "rectangles": 1000,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "1000",
+          "first_frame": "1000x1294",
+          "text_chars": "158",
+          "rgba_checksum": "46dc2ded067f3809"
+        },
+        "render_sha256": "bd4b48b4960f99f73275e2c42d602f4ef5934960393c9064127dc714ddd34805"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "thousand-page1000",
+      "source_sha256": "a15eae7fe97bf85997f28ef95cd162915bea1629f2ea8e4f725f6301e8c29b3e",
+      "page": 1000,
+      "width": 1000,
+      "dimensions_equal": true,
+      "dimensions": [
+        1000,
+        1294
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "dPDF sample contract - page 1000\r\nReview clause 1000: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 1000,
+          "rectangles": 1000,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "1000",
+          "first_frame": "1000x1294",
+          "text_chars": "160",
+          "rgba_checksum": "4548a5c0b6b335c5"
+        },
+        "render_sha256": "e2b4c41cbde378d15f5cbfb8d42834f8eb36a8f13b75a071fb07d5b2df6d0167"
+      },
+      "new": {
+        "text": {
+          "text": "dPDF sample contract - page 1000\r\nReview clause 1000: payment due within 30 days.\r\nSearch for payment; navigate by thumbnail or bookmark.\r\nAuthorized signature:"
+        },
+        "search": {
+          "matches": 1000,
+          "rectangles": 1000,
+          "truncated": false,
+          "first": [
+            0.2528,
+            0.1204,
+            0.111500025,
+            0.0141
+          ]
+        },
+        "probe": {
+          "pages": "1000",
+          "first_frame": "1000x1294",
+          "text_chars": "160",
+          "rgba_checksum": "4548a5c0b6b335c5"
+        },
+        "render_sha256": "e2b4c41cbde378d15f5cbfb8d42834f8eb36a8f13b75a071fb07d5b2df6d0167"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    },
+    {
+      "name": "vector-detail",
+      "source_sha256": "f2403e32e2ed7675bcedd7ee998ea97214a1ef93e57bed1a0b3d5feb7c1acd3a",
+      "page": 1,
+      "width": 2400,
+      "dimensions_equal": true,
+      "dimensions": [
+        2400,
+        3106
+      ],
+      "text_equal": true,
+      "search_equal": true,
+      "probe_equal": true,
+      "old": {
+        "text": {
+          "text": "Generated vector contract"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.0669,
+            0.047,
+            0.37559998,
+            0.019100003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1294",
+          "text_chars": "25",
+          "rgba_checksum": "97b9c2bf62c2edcd"
+        },
+        "render_sha256": "50bf4241fab49dc3f0f4c0140b71084c4a10c2800657b93ef765ce2e972bb17a"
+      },
+      "new": {
+        "text": {
+          "text": "Generated vector contract"
+        },
+        "search": {
+          "matches": 1,
+          "rectangles": 1,
+          "truncated": false,
+          "first": [
+            0.0669,
+            0.047,
+            0.37559998,
+            0.019100003
+          ]
+        },
+        "probe": {
+          "pages": "1",
+          "first_frame": "1000x1294",
+          "text_chars": "25",
+          "rgba_checksum": "97b9c2bf62c2edcd"
+        },
+        "render_sha256": "50bf4241fab49dc3f0f4c0140b71084c4a10c2800657b93ef765ce2e972bb17a"
+      },
+      "changed_pixels": 0,
+      "mean_abs_channel_error": 0.0,
+      "max_channel_error": 0,
+      "source_unchanged": true,
+      "status": "IDENTICAL"
+    }
+  ],
+  "unqualified": [
+    "Fedora source build",
+    "Windows manual native acceptance",
+    "real documents and printers",
+    "malformed JPEG repair regression",
+    "security clearance"
+  ]
+}

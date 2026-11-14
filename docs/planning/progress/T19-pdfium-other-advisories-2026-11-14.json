@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "retrieved_at_utc": "2026-11-13T23:49:58.914568+00:00",
+  "pinned_source": "91b9d569b34be4f38eed7b3c49b227356c3aadad",
+  "bulletin": "https://chromereleases.googleblog.com/2026/11/stable-channel-update-for-desktop.html",
+  "source_files": [
+    {
+      "name": "pinned-jpeg.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/91b9d569b34be4f38eed7b3c49b227356c3aadad/core/fxcodec/jpeg/libjpeg_scanline_decoder.cpp?format=TEXT",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "name": "fixed-jpeg.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/4150fb564e0d83109f33a06385d22bb13cc3cd97/core/fxcodec/jpeg/libjpeg_scanline_decoder.cpp?format=TEXT",
+      "sha256": "4b25ad76eae9cf28c52025ebf022d0d29b3ca371fd2791e3b679f671778050de",
+      "bytes": 14904
+    },
+    {
+      "name": "pinned-formfield.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/91b9d569b34be4f38eed7b3c49b227356c3aadad/fpdfsdk/formfiller/cffl_formfield.cpp?format=TEXT",
+      "sha256": "d9b652a67d82b23dc9dad6af3b14ca46ca92ac4758bfb672dd55f02ab54fc1ad",
+      "bytes": 17290
+    },
+    {
+      "name": "fixed-formfield.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/0a21f66dd0c665dc4d6dbdafc150e93528cb0020/fpdfsdk/formfiller/cffl_formfield.cpp?format=TEXT",
+      "sha256": "dd8606ff25f9ead3ce399102dad75d8d01011cb122de47dccc3f16153eae0467",
+      "bytes": 18090
+    },
+    {
+      "name": "pinned-jpegmodule.cpp",
+      "url": "https://pdfium.googlesource.com/pdfium/+/91b9d569b34be4f38eed7b3c49b227356c3aadad/core/fxcodec/jpeg/jpegmodule.cpp?format=TEXT",
+      "bytes": 15965,
+      "sha256": "0eeb0b14b77e8585134ba7ff8cb64b511476ec58446f89a29a6b290e79879a2b"
+    }
+  ],
+  "findings": [
+    {
+      "cve": "CVE-2026-121113",
+      "issue": 567106301,
+      "fix": "4150fb564e0d83109f33a06385d22bb13cc3cd97",
+      "fix_url": "https://pdfium.googlesource.com/pdfium/+/4150fb564e0d83109f33a06385d22bb13cc3cd97",
+      "scope": "Pinned source uses historical core/fxcodec/jpeg/jpegmodule.cpp. GetWritableSrcData casts away const on source bytes, the input-repair approach replaced by owned copy-on-write in the fix. This core JPEG route is independent of disabling V8/XFA.",
+      "status": "SOURCE MATCH REQUIRES ENGINE UPGRADE/BACKPORT REVIEW; no exploit or exact binary vulnerability demonstration",
+      "limitation": "No automated malicious JPEG regression or independently qualified compatible runtime update yet."
+    },
+    {
+      "cve": "CVE-2026-121179",
+      "issue": 567936263,
+      "fix": "0a21f66dd0c665dc4d6dbdafc150e93528cb0020",
+      "fix_url": "https://pdfium.googlesource.com/pdfium/+/0a21f66dd0c665dc4d6dbdafc150e93528cb0020",
+      "scope": "Pinned form-field focus code lacks the new observed-self lifetime checks added by the fix. Native print renders form data, but exact callback/reentrancy reachability has not been proven.",
+      "status": "SOURCE DIFFERENCE CONFIRMED; APPLICATION/BINARY APPLICABILITY PENDING",
+      "limitation": "Direct issue page still requires sign-in; no reproducer or reachability proof supplied."
+    }
+  ],
+  "decision": "Do not clear pinned engine based on non-V8 configuration. Prepare separately reviewed compatible binding/runtime upgrade or backport, with full exact-source native geometry/interop/printing/notices and packaging gates. Preserve existing authority and pins until qualification.",
+  "not_claimed": [
+    "all exact binaries are exploitable",
+    "whole-engine advisory clearance",
+    "new runtime compatibility",
+    "package/release authorization"
+  ]
+}

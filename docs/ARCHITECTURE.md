@@ -63,7 +63,7 @@ explicitly configured SumatraPDF helper. Toolbar/Ctrl+P printing uses separate
 native GTK or Windows system-dialog/GDI children. Slint uses its Winit desktop
 backend and software renderer.
 
-PDFium 7881 is dynamically loaded from an explicit absolute environment path or
+PDFium 8125 is dynamically loaded from an explicit absolute environment path or
 the executable directory. Linux also supports the system library loader. Windows
 requires the configured/bundled PDFium DLL and never requests a bare-name search
 for it through the document directory or PATH. Distribution packages must carry matching engine
