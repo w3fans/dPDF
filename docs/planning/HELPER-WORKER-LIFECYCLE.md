@@ -319,3 +319,24 @@ release/version/tag, resource-cap, runtime pin or production baking change.
 
 Local combined-source checks pass: fifteen suites, 127 tests (123 passed/four
 existing platform skips), formatting and whitespace. No local Rust compilation.
+
+
+### Qualified recovery lock fix integration
+
+Normally merge accepted main 30767936, retaining the prior candidate. The exact
+qualified main recovery guard/regression delta is the only Rust production
+change; all other source, manifests/lock and UI bytes remain unchanged. Only
+changelog insertion conflicted and both entries are retained. Main's focused
+fix passed every gate on a68ebe6b: new duplicate-handle regression and original
+handoff in both Linux profiles, plus Windows portable handoff and both native
+minimum compilers. The original transient descriptors were not captured, so
+attribution remains inferred; unrelated historical failures are not diagnosed.
+
+Fresh combined-source hosted/native/minimum-compiler and affected runtime gates
+remain PENDING. No new ownership/engine implementation is promoted by this
+integration. Existing experienced lifecycle/engine review, actual Fedora source
+build and manual/operator gates remain REQUIRED; keep draft. No version/tag/
+release, resource-cap/private build route, runtime pin or production baking change.
+
+Local recovery-integration checks pass: fifteen suites, 127 tests: 123 pass/four existing platform skips.
+Formatting/whitespace pass; no local Rust/C++ compilation. Hosted gates pending.

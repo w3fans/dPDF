@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "observed_head": "e1af0ea89e6bc1aeb22b59d915bb21d1b943d407",
+  "tested_merge": "4f894e51b003046241839c95a6d9a1959d8e5233",
+  "run_id": 43565022530,
+  "job_id": 132356847217,
+  "profile": "debug",
+  "failed_test": "recovery::tests::store_lock_recovery_ownership_and_successful_handoff",
+  "passed_tests": 92,
+  "failed_tests": 1,
+  "error": "Recovery is unavailable while another dPDF instance owns it: lock acquisition failed because the operation would block",
+  "log_excerpt": [
+    "2026-11-14T06:12:35.0653693Z ---- recovery::tests::store_lock_recovery_ownership_and_successful_handoff stdout ----",
+    "2026-11-14T06:12:35.0653976Z ",
+    "2026-11-14T06:12:35.0654283Z thread 'recovery::tests::store_lock_recovery_ownership_and_successful_handoff' (3352) panicked at src/recovery.rs:690:63:",
+    "2026-11-14T06:12:35.0656958Z called `Result::unwrap()` on an `Err` value: Recovery is unavailable while another dPDF instance owns it: lock acquisition failed because the operation would block",
+    "2026-11-14T06:12:35.0657569Z ",
+    "2026-11-14T06:12:35.0657573Z ",
+    "2026-11-14T06:12:35.0657674Z failures:",
+    "2026-11-14T06:12:35.0658008Z     recovery::tests::store_lock_recovery_ownership_and_successful_handoff",
+    "2026-11-14T06:12:35.0658331Z ",
+    "2026-11-14T06:12:35.0658638Z test result: FAILED. 92 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.55s",
+    "2026-11-14T06:12:35.0659040Z ",
+    "2026-11-14T06:12:35.0659345Z error: test failed, to rerun pass `--bin dpdf`",
+    "2026-11-14T06:12:35.0762718Z ##[error]Process completed with exit code 101.",
+    "2026-11-14T06:12:35.0838154Z ##[group]Run set -euo pipefail",
+    "2026-11-14T06:12:35.0838422Z \u001b[36;1mset -euo pipefail\u001b[0m"
+  ],
+  "artifact": {
+    "id": 14101509953,
+    "sha256": "3bfd5f56b99445fda695d5da2dbe9e6e121d8853ba62e65d6ee14ff55b7952e7",
+    "scope": "minimum compiler reports only; failed unit-test assertion retained from exact-source job log"
+  },
+  "os_mechanism_reproduction": {
+    "status": "PASS: deterministic Linux inherited-file-description lock mechanism reproduced",
+    "platform": "Linux",
+    "cases": [
+      {
+        "explicit_unlock": false,
+        "close_on_exec": true,
+        "handoff_acquired_while_inherited_handle_alive": false,
+        "errno_when_blocked": 11,
+        "handoff_after_child_exit": true,
+        "new_owner_remains_exclusive": true,
+        "source_unchanged": true
+      },
+      {
+        "explicit_unlock": true,
+        "close_on_exec": true,
+        "handoff_acquired_while_inherited_handle_alive": true,
+        "errno_when_blocked": null,
+        "handoff_after_child_exit": true,
+        "new_owner_remains_exclusive": true,
+        "source_unchanged": true
+      }
+    ],
+    "attribution": "consistent with CI handoff failure; original concurrent process descriptors were not captured"
+  },
+  "attribution": "Inherited/duplicated open-file-description mechanism reproduced deterministically; original CI concurrent descriptors not captured, so transient-process attribution remains inferred."
+}
