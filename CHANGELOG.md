@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Cancel and join printer discovery during normal application shutdown, retaining the existing deadline and single pending UI request.
+
 - Own print preparation and immutable print actions through shutdown, supervise native dialog pipes without an interaction deadline, and cancel/reap nested helpers without retrying ambiguous submissions.
 
 - Prepare page-input snapshots and image pixels off the reader, retaining one decoded image per operation and staging cancellable unit/assembly exports for document-owner publication.

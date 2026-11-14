@@ -316,3 +316,12 @@ abort the host; Windows retains nested jobs without breakaway or relaxed limits.
 See progress/T03-print-ownership-2026-11-14.md for the reproduced defect, exact
 source, containment tradeoff, tests and pending qualification/review. This changes
 the earlier unfinished-print description but does not close its review gate.
+
+
+Printer discovery follow-up: Application owns its separate Jobs<(), Vec<String>>
+service, whose Drop cancels and joins noninteractive discovery. Its registry is
+independent of document closure and the print actor; the UI retains one pending
+request. The main metadata pool keeps two leases; each UI print/discovery service
+admits one action. This is a bounded operation count, not a whole-app RSS claim.
+The native panel-open reproduction and eighteenth window case must pass on the
+new head. Previous seventeen-case evidence is retained with its exact source.

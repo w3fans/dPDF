@@ -38,7 +38,7 @@ def main():
         for mode in ('close', 'retry', 'shutdown', 'recovery', 'protected-print', 'protected-export',
                      'overlay-close', 'overlay-save', 'overlay-units', 'overlay-review',
                      'image-preflight', 'image-unit-write', 'image-save', 'pages-save', 'pages-retry',
-                     'print-review-close', 'print-review-shutdown'):
+                     'print-review-close', 'print-review-shutdown', 'print-discovery'):
             folder = root / mode
             folder.mkdir()
             source = folder / 'generated50.pdf'
@@ -75,7 +75,9 @@ def main():
             driver = folder / 'helper.py'
             # Helpers exec directly without shell children. Metadata modes stall
             # the first inspection; protected modes stall every decryption.
-            if mode in ('image-save', 'pages-save', 'pages-retry'):
+            if mode == 'print-discovery':
+                condition = 'True'
+            elif mode in ('image-save', 'pages-save', 'pages-retry'):
                 condition = 'arm.exists() and not ready.exists() and any(arg.startswith("--job-json-file=") for arg in sys.argv[1:])'
             elif mode == 'image-preflight':
                 condition = 'arm.exists() and not ready.exists() and sys.argv[1:2]==["--json"]'
@@ -106,7 +108,7 @@ def main():
                 ' while time.monotonic()<deadline:time.sleep(.02)\n'
                 f'os.execv({str(args.qpdf.resolve())!r}, [{str(args.qpdf.resolve())!r}, *sys.argv[1:]])\n',
                 encoding='utf-8')
-            helper = folder / 'qpdf-fixture'
+            helper = folder / ('lpstat' if mode == 'print-discovery' else 'qpdf-fixture')
             helper.write_text('#!/bin/sh\nexec ' + shlex.quote(sys.executable) + ' ' +
                               shlex.quote(str(driver)) + ' "$@"\n', encoding='utf-8')
             helper.chmod(0o700)
@@ -141,6 +143,8 @@ def main():
                         assert 'durable checkpoint written' in prepared.stdout
                         assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1
                         env['DPDF_SMOKE_RECOVERY'] = 'read'
+                    if mode == 'print-discovery':
+                        env['PATH'] = str(folder) + os.pathsep + env['PATH']
                     env.update(DPDF_SMOKE_HELPER_PAGE_INPUTS=json.dumps([str(path) for path in inputs]),
                                DPDF_SMOKE_PLACEMENT_IMAGE=str(Path(__file__).with_name('fixtures').joinpath('page-photo.jpg').resolve()),
                                DPDF_SMOKE_PASSWORD_VALUE='generated-only helper test',
@@ -148,7 +152,7 @@ def main():
                                GTK_PRINT_BACKENDS='file', GTK_USE_PORTAL='0',
                                DPDF_SMOKE_HELPER=mode, DPDF_SMOKE_HELPER_READY=str(ready),
                                DPDF_SMOKE_HELPER_ARM=str(arm),
-                               DPDF_PDFIUM_LIBRARY=str(args.pdfium.resolve()), DPDF_QPDF_BINARY=str(helper),
+                               DPDF_PDFIUM_LIBRARY=str(args.pdfium.resolve()), DPDF_QPDF_BINARY=str(args.qpdf.resolve()) if mode == 'print-discovery' else str(helper),
                                SLINT_SCALE_FACTOR='1')
                     started = time.monotonic()
                     result = subprocess.run([str(args.binary.resolve()), '--smoke-ui', str(source)],
@@ -158,12 +162,14 @@ def main():
                         print(result.stderr, end='', flush=True)
                     result.check_returncode()
                     assert ready.is_file(), 'Generated helper never started'
-                    rendered = ('rendered page 25 while reviewed print helper remained stalled' if mode.startswith('print-review-') else
+                    rendered = ('rendered page 25 while printer discovery remained stalled' if mode == 'print-discovery' else
+                                'rendered page 25 while reviewed print helper remained stalled' if mode.startswith('print-review-') else
                                 'rendered page 25 while page export helper remained stalled' if mode.startswith(('image-', 'pages-')) else
                                 'rendered page 25 while export helper remained stalled' if mode.startswith('overlay-') else
                                 'rendered page 25 while metadata remained stalled')
                     assert rendered in result.stdout
-                    expected = {'print-review-close': 'tab close cancelled reviewed print before native handoff',
+                    expected = {'print-discovery': 'owned printer discovery stayed pending until normal shutdown',
+                                'print-review-close': 'tab close cancelled reviewed print before native handoff',
                                 'print-review-shutdown': 'owned reviewed print preparation stayed pending until normal shutdown',
                                 'close': 'closed stalled document and reopened without a stale completion',
                                 'retry': 'retry replaced stalled metadata without accepting its cancelled completion',

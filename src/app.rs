@@ -17,7 +17,7 @@ use std::{
     collections::{HashMap, HashSet, VecDeque},
     path::PathBuf,
     rc::Rc,
-    sync::{atomic::Ordering, mpsc},
+    sync::atomic::Ordering,
     time::{Duration, Instant},
 };
 
@@ -164,8 +164,7 @@ pub struct Application {
     preferences_path: Option<PathBuf>,
     preferences_warning: Option<String>,
     preferences_changed: Option<Instant>,
-    printer_results: mpsc::Receiver<Result<Vec<String>, String>>,
-    printer_sender: mpsc::SyncSender<Result<Vec<String>, String>>,
+    printer_jobs: anyhow::Result<crate::background_jobs::Jobs<(), Vec<String>>>,
     printer_names: Vec<String>,
     printer_loading: bool,
     print_pending: bool,
@@ -1026,7 +1025,10 @@ impl Application {
                 )
             }
         };
-        let (printer_sender, printer_results) = mpsc::sync_channel(1);
+        let printer_jobs = crate::background_jobs::Jobs::new(
+            crate::background_jobs::Cancellation::default(),
+            |(), cancel| platform::discover_printers(Some(cancel)),
+        );
         let recovery_on = enable_recovery && preferences.recovery_enabled;
         Self {
             worker: pdf::start(),
@@ -1055,8 +1057,7 @@ impl Application {
             preferences_path,
             preferences_warning,
             preferences_changed: None,
-            printer_results,
-            printer_sender,
+            printer_jobs,
             printer_names: vec![],
             printer_loading: false,
             print_pending: false,
@@ -1118,13 +1119,18 @@ impl Application {
         if self.printer_loading {
             return;
         }
-        self.printer_loading = true;
-        ui.set_printer_loading(true);
-        let sender = self.printer_sender.clone();
-        std::thread::spawn(move || {
-            let _ =
-                sender.send(platform::discover_printers().map_err(|error| format!("{error:#}")));
-        });
+        let result = self
+            .printer_jobs
+            .as_mut()
+            .map_err(|error| anyhow::anyhow!("{error:#}"))
+            .and_then(|jobs| jobs.submit(0, ()));
+        match result {
+            Ok(_) => {
+                self.printer_loading = true;
+                ui.set_printer_loading(true);
+            }
+            Err(error) => ui.set_printer_note(format!("Find printers: {error:#}").into()),
+        }
     }
 
     fn printer_choices(&self, ui: &Workspace) {
@@ -2154,7 +2160,8 @@ impl Application {
         } else if self.arrangement.take().is_some() {
             self.rebuild_sidebar(ui);
         }
-        if let Ok(result) = self.printer_results.try_recv() {
+        if let Some(reply) = self.printer_jobs.as_ref().ok().and_then(|jobs| jobs.poll()) {
+            let result = reply.result;
             self.printer_loading = false;
             ui.set_printer_loading(false);
             match result {

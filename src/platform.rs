@@ -153,13 +153,14 @@ pub fn validate_range(range: &str, page_count: usize) -> Result<String> {
     Ok(normalized.join(","))
 }
 
-pub fn discover_printers() -> Result<Vec<String>> {
+pub fn discover_printers(cancel: Option<&AtomicBool>) -> Result<Vec<String>> {
     #[cfg(target_os = "linux")]
     {
-        discover_cups_printers(Path::new("lpstat"))
+        discover_cups_printers(Path::new("lpstat"), cancel)
     }
     #[cfg(not(target_os = "linux"))]
     {
+        let _ = cancel;
         bail!(
             "Printer discovery is not implemented on this platform; use the default or enter a printer name"
         )
@@ -167,11 +168,12 @@ pub fn discover_printers() -> Result<Vec<String>> {
 }
 
 #[cfg(target_os = "linux")]
-fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
-    let output = cups_output(
+fn discover_cups_printers(executable: &Path, cancel: Option<&AtomicBool>) -> Result<Vec<String>> {
+    let output = cups_output_cancellable(
         Command::new(executable).arg("-e"),
         std::time::Duration::from_secs(5),
         false,
+        cancel,
     )?;
     if !output.status.success() {
         bail!(
@@ -194,7 +196,7 @@ fn discover_cups_printers(executable: &Path) -> Result<Vec<String>> {
     Ok(names)
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", test))]
 fn cups_output(
     command: &mut Command,
     timeout: std::time::Duration,
@@ -586,7 +588,10 @@ mod tests {
         )
         .unwrap();
         std::fs::set_permissions(&mock, std::fs::Permissions::from_mode(0o700)).unwrap();
-        assert_eq!(discover_cups_printers(&mock).unwrap(), vec!["East", "West"]);
+        assert_eq!(
+            discover_cups_printers(&mock, None).unwrap(),
+            vec!["East", "West"]
+        );
     }
 
     #[test]

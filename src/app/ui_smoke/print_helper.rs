@@ -9,7 +9,10 @@ impl SmokeCheck {
     ) {
         let result = (|| -> anyhow::Result<()> {
             anyhow::ensure!(
-                matches!(mode, "print-review-close" | "print-review-shutdown"),
+                matches!(
+                    mode,
+                    "print-review-close" | "print-review-shutdown" | "print-discovery"
+                ),
                 "Unknown print preparation diagnostic"
             );
             anyhow::ensure!(
@@ -21,6 +24,30 @@ impl SmokeCheck {
                     .ok_or_else(|| anyhow::anyhow!("Missing helper marker"))?,
             );
             match self.stage {
+                0 if mode == "print-discovery"
+                    && ui.get_review_ready()
+                    && app.pages.iter().any(|page| page.ready) =>
+                {
+                    app.discover_printers(ui);
+                    anyhow::ensure!(app.printer_loading, "Printer discovery was not admitted");
+                    self.stage = 4;
+                }
+                4 if marker.exists() => {
+                    app.go_to(ui, 24);
+                    self.stage = 5;
+                }
+                5 if app.pages.iter().any(|page| page.page == 24 && page.ready) => {
+                    anyhow::ensure!(
+                        app.printer_loading && ui.get_printer_loading(),
+                        "Printer discovery finished before held helper returned"
+                    );
+                    println!("helper: rendered page 25 while printer discovery remained stalled");
+                    println!(
+                        "helper: owned printer discovery stayed pending until normal shutdown"
+                    );
+                    self.stage = 99;
+                    let _ = slint::quit_event_loop();
+                }
                 0 if ui.get_review_ready() && app.pages.iter().any(|page| page.ready) => {
                     let tab = &app.tabs[app.active];
                     let mut review = tab

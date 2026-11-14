@@ -46,7 +46,7 @@ pub(super) struct SmokeCheck {
 
 impl SmokeCheck {
     fn helper_advance(&mut self, app: &mut Application, ui: &Workspace, mode: &str) {
-        if mode.starts_with("print-review-") {
+        if mode.starts_with("print-review-") || mode == "print-discovery" {
             self.print_helper_advance(app, ui, mode);
             return;
         }

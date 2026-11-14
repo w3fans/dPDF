@@ -107,3 +107,57 @@ state to clear before handoff; the other quits normally and requires cleanup.
 The generated model contains a real note and the fixture permits only GTK's file
 backend. Held preparation prevents native handoff; no submission occurs. This
 extends the existing fifteen helper windows to seventeen for the current source.
+
+
+## Qualified immutable print increment
+
+Head affa712c2c8ff0c35c5ec98ce32f0602db4fcd06, tree
+940dd3dac1f845d6936aae1bfcee45e7378a8ef0, passed ALL jobs in run 43530445402
+(Linux 132246572773, Windows 132246572584, policy 132246572779), including all
+seventeen helper windows and new actor/process tests in debug and release.
+Linux artifact 14087985393 ZIP SHA-256
+86f832ba4752b6b7c0167b642972477550374027dc630295c54fb666b3661f91;
+tested merge a2dd9cbde822744baee36b379d3adc3c7a21ae7c, executable SHA-256
+0f2231fb14922ff16351f44532cec948b3828f644c695e61c75e91808a2ce6d1.
+Windows artifact 14087592207 ZIP SHA-256
+2d50582a974a052ac5f59d935d057a4c5298f634ac0cf49321b9b0113f0565c1;
+source affa712c, executable SHA-256
+51e8ca51bc2009f0a387921a32cd626adeddadaec9256dba673d69d2e175e9ac.
+Both native notice inventory objects match Linux 349 / Windows 255 components;
+all 648 / 485 notice references verify.
+
+Three original native replays on that exact artifact passed. Standard main-window
+close now exits 0 with the native child reaped. Closing the tab after handoff keeps
+its dialog alive; user cancellation reaps it while the reader remains alive.
+Actual-size preflight's held qpdf joins the native host group and is no longer live
+after normal app exit. All three leave private scratch empty and source unchanged,
+with GTK file backend and no submission. The fixture subreaper reaped the adopted
+nested descendant; this does not prove the GUI directly waits on grandchildren.
+See the three T03-print-owned-*-replay.json receipts. Experienced review must
+assess that scope and the fatal nested-error policy. These passes do not close
+printer discovery ownership, physical/native desktop or the review gate.
+
+
+## Printer discovery follow-up (current source UNQUALIFIED)
+
+Qualified affa712c native Print options opening auto-starts discovery. With a
+fixture lpstat held, standard main-window close exited 0 in 0.012 seconds while
+its child remained alive. Source unchanged; fixture killed/reaped the orphan.
+See T03-printer-discovery-shutdown-reproduction.json. An initial fixture tried to
+click the disabled Refresh button after discovery had already started; corrected
+that setup without treating it as a product failure.
+
+Application now owns a separate bounded Jobs<(), Vec<String>> service for printer
+names, with its own cancellation registry. The existing loading flag permits one
+pending UI request; replies are polled exactly as before. Source/tab lifetime is
+irrelevant to this service. Normal Application field destruction cancels/kills/
+reaps/joins it; no detached sender thread survives main exit. Discovery keeps its
+five-second deadline, existing output limits and Windows unsupported behavior.
+No PDFium handle enters it and it cannot stall the native dialog's separate actor.
+
+Added an eighteenth real-window helper case: completed initial review, start held
+lpstat discovery, render page 25 while the loading flag remains set, then quit
+normally and require the child gone/reaped. The original native panel-open/close
+reproduction must also be replayed on the new artifact. Earlier affa712c passes
+qualify only its seventeen-case immutable-print scope; the discovery follow-up
+requires new full gates and experienced review. No release or production baking.
