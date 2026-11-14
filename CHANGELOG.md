@@ -7,6 +7,9 @@
 
 - Select matching PDFium 8125 and pdfium-render 0.9.5 for engine-update qualification, retaining source-only Fedora packaging and existing license choices.
 
+- Release recovery-store ownership explicitly after cleanup so lingering
+  duplicate or inherited handles cannot retain the ended owner's lock.
+
 - Retain bounded, value-redacted evidence when Windows shared registration
   cleanup assertions fail, preserving strict restoration and default checks.
 
