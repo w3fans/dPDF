@@ -172,6 +172,14 @@ requires exact-source native hosted execution; see
 [the T19 receipt](planning/progress/T19-portable-qpdf-2026-11-14.md). This changes
 no installer, native operator or milestone qualification mark above.
 
+MSI retention preparation (14 November): the artifact-only source 847d1c58 run
+passed fresh generated install/probe/registration/uninstall and sentinel checks;
+this qualifies that source/profile only. Valid generated mark-library seeding,
+exact installed-binary comparison and CLI reload through uninstall are a separate
+candidate; see [the receipt](planning/progress/T19-msi-mark-retention-2026-11-14.md).
+Native execution of the new check, older-package upgrade, recovery/GUI reopening,
+explicit default-app starting states and owner acceptance remain separate gates.
+
 ## Milestone summary
 
 | Milestone | State | Open gates |

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Verify generated mark-library data survives MSI installation/uninstallation and
+  reloads through the exact candidate executable; retain native toolchain receipts.
+
 - Check bundled qpdf assembly and missing/invalid-helper preservation in complete
   Windows portable runtimes under Unicode paths, without runtime overrides.
 

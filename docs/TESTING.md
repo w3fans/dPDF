@@ -852,6 +852,24 @@ corpora still prove those models reopen. Success removes only fixture-created
 data roots; failure retains them and MSI logs for diagnosis. Do not rerun against
 retained failed-fixture state as though it were a clean account.
 
+The maintained package-preview path also supplies the staged candidate as
+`-SeedBinary` and the generated `scripts/fixtures/page-photo.jpg` as `-SeedImage`.
+These optional manual arguments must be paired. After the existing absent-data
+guards, the test clears data/config overrides and imports one synthetic stamp
+through that binary into the real default mark-library location. It snapshots
+the original, cleaned PNG, thumbnail and metadata hashes, verifies the original
+against the source and decodes both PNGs, then compares CLI model
+reloads before install, through the installed executable, and after uninstall
+through the retained staged executable. Every reload requires the candidate
+binary hash; source image bytes and all retained model files must stay unchanged.
+
+Without paired seed inputs, a manual invocation covers sentinels only. The
+packaging workflow always enables the valid-mark check. This tests the current
+generated mark format and CLI reload, not recovery draft reopening, GUI rendering
+or old-format migration. Major upgrade still requires an existing qualified
+strictly older MSI; a same-version reinstall is insufficient. Version-probe text
+and packaging Job Object memory metrics are retained with workflow artifacts.
+
 For major-upgrade coverage supply both optional parameters with an existing
 qualified older package (no new version allocation or publication):
 
