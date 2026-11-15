@@ -65,7 +65,7 @@ def main():
     count = 0
     observations = dict(schema=1, scope='bounded_native_tile_comparison_review_gated',
                         binary_sha256=hashlib.sha256(args.binary.read_bytes()).hexdigest(),
-                        pdfium_sha256=hashlib.sha256(args.pdfium.read_bytes()).hexdigest(), cases=[])
+                        pdfium_sha256=hashlib.sha256(args.pdfium.read_bytes()).hexdigest(), status='IN_PROGRESS', cases=[])
     with tempfile.TemporaryDirectory(prefix='dpdf-render-tiles-') as directory:
         root = Path(directory)
         for name, content in cases:
@@ -77,46 +77,60 @@ def main():
                 reference = root / 'form-reference.ppm'
                 if name == 'form-annotation' and turn == 0:
                     command.append(str(reference))
-                result = subprocess.run(command, env=env, text=True, capture_output=True, timeout=90)
-                report = json.loads(result.stdout)
-                # Strict CLI remains exact and refuses every changed pixel. The
-                # corpus contract separately bounds independently reproduced
-                # native origin-dependent text-edge rounding; never hide a crash.
-                changed = report['changed_pixels']
-                assert (result.returncode == 0 if changed == 0 else
-                        result.returncode == 1 and 'Detail tiles differ from the native full-page reference' in result.stderr), (name, turn, result.stderr, report)
-                observations['cases'].append(dict(name=name, turn=turn, input_sha256=before,
-                                                 strict_exit_code=result.returncode, comparison=report))
-                if args.report:
-                    args.report.write_text(json.dumps(observations, indent=2) + '\n')
-                assert report['forms_enabled'] is True
-                assert report['max_channel_delta'] <= 1 and report['alpha_changed_pixels'] == 0, (name, turn, report)
-                assert report['larger_delta_pixels'] == 0 and report['non_edge_changed_pixels'] == 0, (name, turn, report)
-                assert report['native_edge_quantization_limit_pixels'] == 3600 * 2400 // 10000
-                assert changed <= report['native_edge_quantization_limit_pixels'] and report['within_native_edge_quantization'] is True, (name, turn, report)
-                if name in ('large-image', 'jpeg-image'):
-                    assert changed == 0, (name, turn, report)
-                assert 0 < report['peak_tile_bytes'] <= 512 * 512 * 4
-                assert report['tiles'] > 1
-                if reference.exists():
-                    magic, size, maximum, rgb = reference.read_bytes().split(b'\n', 3)
-                    assert (magic, size, maximum) == (b'P6', b'3600 2400', b'255')
-                    assert len(rgb) == 3600 * 2400 * 3
-                    field = b''.join(rgb[(y * 3600 + 480) * 3:(y * 3600 + 2520) * 3]
-                                     for y in range(720, 1080))
-                    pixels = list(zip(field[0::3], field[1::3], field[2::3]))
-                    assert sum(g > 180 and r > 150 and b < 130 for r, g, b in pixels) > 10000, 'form background absent'
-                    assert sum(max(p) < 80 for p in pixels) > 500, 'form value absent'
-                    reference.unlink()
+                case_result = dict(name=name, turn=turn, input_sha256=before, status='FAIL')
+                observations['cases'].append(case_result)
+                result = None
+                try:
+                    result = subprocess.run(command, env=env, text=True, capture_output=True, timeout=90)
+                    report = json.loads(result.stdout)
+                    # Strict CLI remains exact and refuses every changed pixel. The
+                    # corpus contract separately bounds independently reproduced
+                    # native origin-dependent text-edge rounding; never hide a crash.
+                    changed = report['changed_pixels']
+                    controls = report['native_origin_controls']
+                    assert [item['offset'] for item in controls] == ([1, 127, 509] if changed else []), (name, turn, report)
+                    assert (result.returncode == 0 if changed == 0 else
+                            result.returncode == 1 and 'Detail tiles differ from the native full-page reference' in result.stderr), (name, turn, result.stderr, report)
+                    case_result.update(strict_exit_code=result.returncode, comparison=report)
+                    assert report['forms_enabled'] is True
+                    assert report['max_channel_delta'] <= 1 and report['alpha_changed_pixels'] == 0, (name, turn, report)
+                    assert report['larger_delta_pixels'] == 0 and report['non_edge_changed_pixels'] == 0, (name, turn, report)
+                    assert report['native_edge_quantization_limit_pixels'] == 3600 * 2400 // 10000
+                    assert changed <= report['native_edge_quantization_limit_pixels'] and report['within_native_edge_quantization'] is True, (name, turn, report)
+                    if name in ('large-image', 'jpeg-image'):
+                        assert changed == 0, (name, turn, report)
+                    assert 0 < report['peak_tile_bytes'] <= 512 * 512 * 4
+                    assert report['tiles'] > 1
+                    if reference.exists():
+                        magic, size, maximum, rgb = reference.read_bytes().split(b'\n', 3)
+                        assert (magic, size, maximum) == (b'P6', b'3600 2400', b'255')
+                        assert len(rgb) == 3600 * 2400 * 3
+                        field = b''.join(rgb[(y * 3600 + 480) * 3:(y * 3600 + 2520) * 3]
+                                         for y in range(720, 1080))
+                        pixels = list(zip(field[0::3], field[1::3], field[2::3]))
+                        assert sum(g > 180 and r > 150 and b < 130 for r, g, b in pixels) > 10000, 'form background absent'
+                        assert sum(max(p) < 80 for p in pixels) > 500, 'form value absent'
+                    case_result['status'] = 'PASS_BOUNDED_COMPARISON'
+                except (AssertionError, ValueError, OSError, subprocess.SubprocessError) as error:
+                    case_result['error'] = str(error)
+                    if result is not None:
+                        case_result['stderr_tail'] = result.stderr[-4000:]
+                    print(f'FAIL: {name} rotation={turn}: {error}', flush=True)
+                finally:
+                    reference.unlink(missing_ok=True)
+                    if args.report:
+                        args.report.write_text(json.dumps(observations, indent=2) + '\n')
                 assert hashlib.sha256(path.read_bytes()).hexdigest() == before
                 count += 1
         # Invalid regions must refuse before allocating a diagnostic full page.
         result = subprocess.run([binary, '--check-render-tiles', str(path), '1', '999999', '2400', '0'],
                                 env=env, text=True, capture_output=True, timeout=20)
         assert result.returncode != 0 and 'diagnostic budget' in result.stderr
-    observations['status'] = 'PASS_BOUNDED_COMPARISON_REQUIRES_RENDERER_REVIEW'
+    failures = [case for case in observations['cases'] if case['status'] != 'PASS_BOUNDED_COMPARISON']
+    observations['status'] = 'FAIL' if failures else 'PASS_BOUNDED_COMPARISON_REQUIRES_RENDERER_REVIEW'
     if args.report:
         args.report.write_text(json.dumps(observations, indent=2) + '\n')
+    assert not failures, [(case['name'], case['turn'], case.get('error')) for case in failures]
     print(f'PASS: {count} bounded native tile/full comparisons, exact image cases, visible form appearance/value, strict mode retained and input preservation')
 
 

@@ -39,10 +39,13 @@ def geometry_fixture(sample, rotation, cropped, inherited, user_unit):
     ])
 
 
-def vector_fixture(sample, count=50, detail=1000):
+def vector_fixture(sample, count=50, detail=1000, landmarks=False):
     content = b'BT /F1 20 Tf 40 740 Td (Generated vector contract) Tj ET\n'
     content += b'0.6 0.6 0.6 RG 0.2 w\n'
     content += b''.join(f'{40+i%50*10} {160+i//50*14} 8 10 re S\n'.encode() for i in range(detail))
+    if landmarks:
+        for fx, fy, color in [(.51, .51, '1 0 1'), (.49, .49, '0 1 1')]:
+            content += f'q {color} rg {fx*612-1:.6f} {(1-fy)*792-1:.6f} 2 2 re f Q\n'.encode()
     objects = [b'<< /Type /Catalog /Pages 2 0 R >>', b'', b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>']
     pages = []
     for _ in range(count):

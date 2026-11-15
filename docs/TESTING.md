@@ -1008,3 +1008,16 @@ ImageMagick import. The launch phase includes a Fit Page request; input and
 capture overhead are retained. This is neither stock-startup latency nor
 Windows operator acceptance. Generated inputs and runtime hashes are checked,
 and current/peak process RSS is recorded separately from child-tree memory.
+
+The diagnostic also records large, untiled origin-offset controls (1/127/509
+pixels) whenever strict comparison differs. They characterize native rounding
+without changing the comparison bound. The corpus attempts all cases and
+returns failure if any case violates its assertions, retaining all failed
+counters rather than stopping at the first case.
+
+The high-zoom window fixture now includes two colored PDF landmarks. Snapshot
+centroids must remain within two physical pixels per axis of rotated page
+coordinates. `check-raster-ui.py --rounds 3 ...` repeats the view/rotation
+matrix on pages 7/17/27 for longer finite cache/memory observations; it keeps
+the original diagnostic deadline, render budget and memory guard. These new
+checks require their source-bound compiled runtime.

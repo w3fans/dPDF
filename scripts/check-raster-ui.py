@@ -27,6 +27,7 @@ def main():
     parser.add_argument('--pdfium', type=Path, required=True)
     parser.add_argument('--xvfb', default='Xvfb')
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--rounds', type=int, choices=[1, 3], default=1)
     parser.add_argument('--scale', type=float, choices=[1, 1.5, 2], default=1)
     args = parser.parse_args()
     bench = module('raster_fixtures', 'benchmark-reader.py')
@@ -34,10 +35,10 @@ def main():
     with tempfile.TemporaryDirectory(prefix='dpdf-raster-ui-') as directory:
         folder = Path(directory)
         fixture = folder / 'Generated raster fixture.pdf'
-        original = bench.vector_fixture(bench.sample_module(), 50)
+        original = bench.vector_fixture(bench.sample_module(), 50, landmarks=True)
         fixture.write_bytes(original)
         with private.display(folder, args.xvfb, screen='2560x1800x24') as env:
-            env.update(DPDF_SMOKE_RASTER_TILES='1', SLINT_SCALE_FACTOR=str(args.scale),
+            env.update(DPDF_SMOKE_RASTER_TILES='1', DPDF_SMOKE_RASTER_ROUNDS=str(args.rounds), SLINT_SCALE_FACTOR=str(args.scale),
                        DPDF_PDFIUM_LIBRARY=str(args.pdfium.resolve()))
             if os.name != 'nt':
                 env['DBUS_SESSION_BUS_ADDRESS'] = 'unix:path=' + str(folder / 'no-session-bus')
@@ -66,7 +67,7 @@ def main():
                                 stdout, stderr = child.communicate()
                                 raise subprocess.TimeoutExpired(command, 60, stdout, stderr)
                     result = subprocess.CompletedProcess(command, child.returncode, stdout, stderr)
-                observations = dict(schema=1, scope='generated_native_raster_window', scale=args.scale,
+                observations = dict(schema=1, scope='generated_native_raster_window', scale=args.scale, rounds=args.rounds,
                                     binary_sha256=hashlib.sha256(args.binary.read_bytes()).hexdigest(),
                                     pdfium_sha256=hashlib.sha256(args.pdfium.read_bytes()).hexdigest(),
                                     input_sha256=hashlib.sha256(original).hexdigest(),
@@ -89,10 +90,14 @@ def main():
                         print(output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output)
                 raise
             result.check_returncode()
-            summary = re.search(r'raster: summary peak_render_slots=(\d+) peak_detail_bytes=(\d+) cases=12 tab_switch_close=true', result.stdout)
-            if result.stdout.count('raster: case=') != 12 or not summary:
+            summary = re.search(r'raster: summary peak_render_slots=(\d+) peak_detail_bytes=(\d+) cases=(\d+) tab_switch_close=true', result.stdout)
+            expected = 12 * args.rounds
+            if (result.stdout.count('raster: case=') != expected or
+                    result.stdout.count('raster: landmarks case=') != expected or not summary):
                 raise RuntimeError('Raster window diagnostic did not complete all twelve cases and tab lifecycle')
-            slots, size = map(int, summary.groups())
+            slots, size, completed = map(int, summary.groups())
+            if completed != expected:
+                raise RuntimeError('Raster round coverage differs from the request')
             if not 0 < slots <= 8 or not 0 < size <= 32 * 1024 ** 2:
                 raise RuntimeError('Observed raster metrics exceeded their budgets or were empty')
             if fixture.read_bytes() != original:

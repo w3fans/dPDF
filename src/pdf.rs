@@ -1366,6 +1366,38 @@ pub fn check_render_tiles(
         crate::raster_tiles::compare_rgba(&expected, &stitched, width as usize, height as usize)
             .context("Invalid tile comparison dimensions")?;
     let changed_pixels = comparison.changed_pixels;
+    // Untiled, large destination controls distinguish native origin rounding
+    // from tile clipping. They never relax the strict CLI's equality assertion.
+    let mut origin_controls = Vec::new();
+    if changed_pixels != 0 {
+        for offset in [1, 127, 509] {
+            if width <= offset || height <= offset {
+                continue;
+            }
+            let (cw, ch) = (width - offset, height - offset);
+            let mut bitmap = PdfBitmap::empty(cw, ch, PdfBitmapFormat::BGRA)?;
+            page.render_into_bitmap_with_config(
+                &mut bitmap,
+                &PdfRenderConfig::new()
+                    .set_fixed_size(width, height)
+                    .rotate(turn, false)
+                    .set_origin(-offset, -offset),
+            )?;
+            let actual = bitmap.as_rgba_bytes();
+            let mut cropped = Vec::with_capacity(cw as usize * ch as usize * 4);
+            for row in offset..height {
+                let start = (row as usize * width as usize + offset as usize) * 4;
+                cropped.extend_from_slice(&expected[start..start + cw as usize * 4]);
+            }
+            let control =
+                crate::raster_tiles::compare_rgba(&cropped, &actual, cw as usize, ch as usize)
+                    .context("Invalid native origin control dimensions")?;
+            origin_controls.push(serde_json::json!({"offset":offset,"width":cw,"height":ch,
+                "changed_pixels":control.changed_pixels,"max_channel_delta":control.max_channel_delta,
+                "alpha_changed_pixels":control.alpha_changed_pixels,"larger_delta_pixels":control.larger_delta_pixels,
+                "non_edge_changed_pixels":control.non_edge_changed_pixels}));
+        }
+    }
     if let Some(output) = reference {
         let mut file = std::io::BufWriter::new(std::fs::File::create(output)?);
         write!(file, "P6\n{width} {height}\n255\n")?;
@@ -1384,7 +1416,8 @@ pub fn check_render_tiles(
         "larger_delta_pixels":comparison.larger_delta_pixels,
         "non_edge_changed_pixels":comparison.non_edge_changed_pixels,
         "native_edge_quantization_limit_pixels":comparison.quantization_limit_pixels,
-        "within_native_edge_quantization":comparison.within_native_edge_quantization()})
+        "within_native_edge_quantization":comparison.within_native_edge_quantization(),
+        "native_origin_controls":origin_controls})
     );
     ensure!(
         changed_pixels == 0,
