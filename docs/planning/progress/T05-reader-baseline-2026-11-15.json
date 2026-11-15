@@ -1,0 +1,2213 @@
+{
+  "schema": 1,
+  "scope": "generated_headless_reader_engine",
+  "os": "posix",
+  "platform": "Linux-7.2.15-300.fc45.x86_64-x86_64-with-glibc2.44",
+  "recorded_at": "2026-11-15T08:33:37.808109+00:00",
+  "binary_version": "dPDF 0.1.54 (reader development preview)",
+  "binary_sha256": "3d2db092c50eeb89346ff5b4fb8f6a1f8f0b2e959e00749ac4a84ec4233374ae",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "timing_is_gui_presentation": false,
+  "cases": [
+    {
+      "name": "50-office",
+      "pages": 50,
+      "input_bytes": 32064,
+      "runs": [
+        {
+          "bind_ms": 0.9824949999999999,
+          "bookmarks": 50,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 1.373403,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.243008,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 21.342579999999998,
+          "first_render_ms": 19.124874,
+          "input_bytes": 32064,
+          "load_ms": 0.216729,
+          "metadata_ms": 0.9614940000000001,
+          "pages": 50,
+          "read_ms": 0.056988,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 7.514812,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 7.139023000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 43.108757999999995,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.59318,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000501,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 97420
+        },
+        {
+          "bind_ms": 0.776455,
+          "bookmarks": 50,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 1.157293,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.227129,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 16.28288,
+          "first_render_ms": 14.57193,
+          "input_bytes": 32064,
+          "load_ms": 0.142128,
+          "metadata_ms": 0.7435229999999999,
+          "pages": 50,
+          "read_ms": 0.048844,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.628049,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 7.178779,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 40.391219,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.483683,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000521,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 97376
+        },
+        {
+          "bind_ms": 0.760275,
+          "bookmarks": 50,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 1.420871,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.29742100000000005,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 17.362448,
+          "first_render_ms": 15.736158,
+          "input_bytes": 32064,
+          "load_ms": 0.15899,
+          "metadata_ms": 0.657331,
+          "pages": 50,
+          "read_ms": 0.049694,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.989992000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 6.5167589999999995,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 41.721469,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.531893,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.0007109999999999999,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 97544
+        },
+        {
+          "bind_ms": 0.766416,
+          "bookmarks": 50,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 1.60051,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.366242,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 17.784274,
+          "first_render_ms": 16.205194,
+          "input_bytes": 32064,
+          "load_ms": 0.177495,
+          "metadata_ms": 0.597388,
+          "pages": 50,
+          "read_ms": 0.037781,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 7.526523999999999,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 6.805344,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 42.529565,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.5609080000000001,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000571,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 97504
+        },
+        {
+          "bind_ms": 1.036526,
+          "bookmarks": 50,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 1.27716,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.230184,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 21.000814,
+          "first_render_ms": 18.839254999999998,
+          "input_bytes": 32064,
+          "load_ms": 0.19582,
+          "metadata_ms": 0.865874,
+          "pages": 50,
+          "read_ms": 0.06333899999999999,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 8.605441,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 6.6753979999999995,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 42.120403,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.51398,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000551,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 97396
+        }
+      ],
+      "median": {
+        "first_page_ready_ms": 17.784274,
+        "metadata_ms": 0.7435229999999999,
+        "first_render_ms": 16.205194,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 0.243008,
+        "eager_page_sizes_ms": 1.373403,
+        "process_peak_kib": 97420
+      }
+    },
+    {
+      "name": "300-office",
+      "pages": 300,
+      "input_bytes": 192170,
+      "runs": [
+        {
+          "bind_ms": 0.864641,
+          "bookmarks": 300,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 6.571423,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 3.0541240000000003,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 21.683761999999998,
+          "first_render_ms": 16.031606,
+          "input_bytes": 192170,
+          "load_ms": 0.353136,
+          "metadata_ms": 4.246364,
+          "pages": 300,
+          "read_ms": 0.18801500000000002,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.451715999999999,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 6.771901000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 45.493558,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.896292,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000562,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 98408
+        },
+        {
+          "bind_ms": 1.0442209999999998,
+          "bookmarks": 300,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 5.951802,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 1.4149909999999999,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 22.223922,
+          "first_render_ms": 15.859611,
+          "input_bytes": 192170,
+          "load_ms": 0.541201,
+          "metadata_ms": 4.558223,
+          "pages": 300,
+          "read_ms": 0.220666,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 8.147857,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 6.654269,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 44.493251,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.504031,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000441,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 98364
+        },
+        {
+          "bind_ms": 0.793928,
+          "bookmarks": 300,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 4.834014,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 1.377879,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 20.012949,
+          "first_render_ms": 15.232828,
+          "input_bytes": 192170,
+          "load_ms": 0.281953,
+          "metadata_ms": 3.503381,
+          "pages": 300,
+          "read_ms": 0.200859,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.6855780000000005,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 6.725022,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 45.532512,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.6531129999999999,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000861,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 98512
+        },
+        {
+          "bind_ms": 0.729357,
+          "bookmarks": 300,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 5.1739239999999995,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 2.469791,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 18.922673,
+          "first_render_ms": 14.239585,
+          "input_bytes": 192170,
+          "load_ms": 0.289997,
+          "metadata_ms": 3.482622,
+          "pages": 300,
+          "read_ms": 0.18111200000000002,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.011164,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 6.481412,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 48.811752,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.7470089999999999,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.0006010000000000001,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 98556
+        },
+        {
+          "bind_ms": 0.680746,
+          "bookmarks": 300,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 5.190365,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 1.436121,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 19.500543,
+          "first_render_ms": 14.738295,
+          "input_bytes": 192170,
+          "load_ms": 0.380608,
+          "metadata_ms": 3.506507,
+          "pages": 300,
+          "read_ms": 0.194387,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.516147,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 8.177543,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 43.254093,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.489153,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000411,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 98592
+        }
+      ],
+      "median": {
+        "first_page_ready_ms": 20.012949,
+        "metadata_ms": 3.506507,
+        "first_render_ms": 15.232828,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 1.436121,
+        "eager_page_sizes_ms": 5.190365,
+        "process_peak_kib": 98512
+      }
+    },
+    {
+      "name": "1000-text",
+      "pages": 1000,
+      "input_bytes": 646389,
+      "runs": [
+        {
+          "bind_ms": 0.686977,
+          "bookmarks": 1000,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 17.552656,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 5.592313,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 27.333025,
+          "first_render_ms": 13.603152999999999,
+          "input_bytes": 646389,
+          "load_ms": 0.7257490000000001,
+          "metadata_ms": 11.835196,
+          "pages": 1000,
+          "read_ms": 0.48195,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.619252,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 1000,
+              "render_ms": 6.629923000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 43.906563000000006,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.966383,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000381,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 101276
+        },
+        {
+          "bind_ms": 0.671727,
+          "bookmarks": 1000,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 19.180518,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 4.992862,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 27.801268,
+          "first_render_ms": 14.283306000000001,
+          "input_bytes": 646389,
+          "load_ms": 0.7713359999999999,
+          "metadata_ms": 11.618578,
+          "pages": 1000,
+          "read_ms": 0.456321,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.458138000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 1000,
+              "render_ms": 6.427941000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 39.881087,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.44778500000000004,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.00033,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 101224
+        },
+        {
+          "bind_ms": 0.759123,
+          "bookmarks": 1000,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 16.104121999999997,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 4.647870999999999,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 30.141836,
+          "first_render_ms": 14.701215,
+          "input_bytes": 646389,
+          "load_ms": 0.731842,
+          "metadata_ms": 13.462417,
+          "pages": 1000,
+          "read_ms": 0.487239,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.857902,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 1000,
+              "render_ms": 6.678804,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 42.352900999999996,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.44313600000000003,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.00043099999999999996,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 101076
+        },
+        {
+          "bind_ms": 0.6787409999999999,
+          "bookmarks": 1000,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 23.400474000000003,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 5.254046,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 29.745207,
+          "first_render_ms": 14.981714,
+          "input_bytes": 646389,
+          "load_ms": 0.789429,
+          "metadata_ms": 12.829694000000002,
+          "pages": 1000,
+          "read_ms": 0.465629,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.7035,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 1000,
+              "render_ms": 6.539052,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 43.319345000000006,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.513559,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000521,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 101068
+        },
+        {
+          "bind_ms": 0.707455,
+          "bookmarks": 1000,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 18.846698,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 4.758781,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 29.652892,
+          "first_render_ms": 15.512896999999999,
+          "input_bytes": 646389,
+          "load_ms": 0.717263,
+          "metadata_ms": 12.167233,
+          "pages": 1000,
+          "read_ms": 0.548044,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.720914,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 1000,
+              "render_ms": 6.725824,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 42.541988,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.54565,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000531,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 101060
+        }
+      ],
+      "median": {
+        "first_page_ready_ms": 29.652892,
+        "metadata_ms": 12.167233,
+        "first_render_ms": 14.701215,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 4.992862,
+        "eager_page_sizes_ms": 18.846698,
+        "process_peak_kib": 101076
+      }
+    },
+    {
+      "name": "50-vector",
+      "pages": 50,
+      "input_bytes": 909632,
+      "runs": [
+        {
+          "bind_ms": 0.8247960000000001,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 33.90619,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.239041,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 24.144598,
+          "first_render_ms": 21.806856,
+          "input_bytes": 909632,
+          "load_ms": 0.22920300000000002,
+          "metadata_ms": 0.369146,
+          "pages": 50,
+          "read_ms": 0.914597,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 11.439499000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 10.525444,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 51.945325000000004,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 2.700256,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.0006619999999999999,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 93596
+        },
+        {
+          "bind_ms": 0.673732,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 36.109297999999995,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.218653,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 23.227677,
+          "first_render_ms": 21.278018,
+          "input_bytes": 909632,
+          "load_ms": 0.180471,
+          "metadata_ms": 0.39419299999999996,
+          "pages": 50,
+          "read_ms": 0.7012630000000001,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 12.165479999999999,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 9.437249999999999,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 55.054483000000005,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 3.026932,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000751,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 93448
+        },
+        {
+          "bind_ms": 0.743803,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 37.646629000000004,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.229473,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 22.116529,
+          "first_render_ms": 19.989856,
+          "input_bytes": 909632,
+          "load_ms": 0.2546,
+          "metadata_ms": 0.401828,
+          "pages": 50,
+          "read_ms": 0.726442,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 12.815226000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 11.481288,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 53.195513,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 3.084371,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.0008010000000000001,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 93404
+        },
+        {
+          "bind_ms": 0.6898110000000001,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 36.774683,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.236968,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 20.625384999999998,
+          "first_render_ms": 18.770425,
+          "input_bytes": 909632,
+          "load_ms": 0.183606,
+          "metadata_ms": 0.329823,
+          "pages": 50,
+          "read_ms": 0.65172,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 13.324688,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 9.800375,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 55.450731000000005,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 3.625281,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000651,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 93420
+        },
+        {
+          "bind_ms": 0.6457080000000001,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 34.909755000000004,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.242327,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 20.697962,
+          "first_render_ms": 18.826421,
+          "input_bytes": 909632,
+          "load_ms": 0.15109499999999998,
+          "metadata_ms": 0.324142,
+          "pages": 50,
+          "read_ms": 0.7505959999999999,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 11.738673,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 9.764768,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 52.829454,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 3.014329,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000592,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 93308
+        }
+      ],
+      "median": {
+        "first_page_ready_ms": 22.116529,
+        "metadata_ms": 0.369146,
+        "first_render_ms": 19.989856,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 0.236968,
+        "eager_page_sizes_ms": 36.109297999999995,
+        "process_peak_kib": 93420
+      }
+    },
+    {
+      "name": "50-large-image",
+      "pages": 50,
+      "input_bytes": 364017,
+      "runs": [
+        {
+          "bind_ms": 0.8961410000000001,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 0.7493139999999999,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.341325,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 76.288247,
+          "first_render_ms": 74.344007,
+          "input_bytes": 364017,
+          "load_ms": 0.192575,
+          "metadata_ms": 0.480827,
+          "pages": 50,
+          "read_ms": 0.374697,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 66.576157,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 57.824518999999995,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 144.688917,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 36.705481999999996,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.001062,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 129816
+        },
+        {
+          "bind_ms": 0.655598,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 0.494874,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.243008,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 77.507929,
+          "first_render_ms": 76.130739,
+          "input_bytes": 364017,
+          "load_ms": 0.15349,
+          "metadata_ms": 0.301389,
+          "pages": 50,
+          "read_ms": 0.26671300000000003,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 71.356919,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 54.530513,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 125.41424,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 34.811398,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000761,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 129908
+        },
+        {
+          "bind_ms": 0.6703749999999999,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 0.517817,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.20946499999999998,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 70.55793200000001,
+          "first_render_ms": 69.18415999999999,
+          "input_bytes": 364017,
+          "load_ms": 0.137779,
+          "metadata_ms": 0.28461699999999995,
+          "pages": 50,
+          "read_ms": 0.281001,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 63.335611,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 50.332651999999996,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 128.972846,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 33.816251,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000792,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 129892
+        },
+        {
+          "bind_ms": 0.7232449999999999,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 0.8683179999999999,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.294165,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 72.19596200000001,
+          "first_render_ms": 70.66878899999999,
+          "input_bytes": 364017,
+          "load_ms": 0.171034,
+          "metadata_ms": 0.35662299999999997,
+          "pages": 50,
+          "read_ms": 0.27627100000000004,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 67.73155799999999,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 55.091573,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 132.031399,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 35.428874,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.001142,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 130016
+        },
+        {
+          "bind_ms": 0.7862439999999999,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 45459264,
+          "comparison": {
+            "eager_page_sizes_ms": 0.47250200000000003,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 0.240624,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5176000,
+          "first_page_ready_ms": 74.59241499999999,
+          "first_render_ms": 73.040186,
+          "input_bytes": 364017,
+          "load_ms": 0.140976,
+          "metadata_ms": 0.31839,
+          "pages": 50,
+          "read_ms": 0.306619,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 64.651976,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "last_page",
+              "page": 50,
+              "render_ms": 52.079899,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 29817600,
+              "height": 3106,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 129.459564,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 113664,
+              "height": 192,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 34.364436,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5176000,
+              "height": 1294,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.0008010000000000001,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 129876
+        }
+      ],
+      "median": {
+        "first_page_ready_ms": 74.59241499999999,
+        "metadata_ms": 0.31839,
+        "first_render_ms": 73.040186,
+        "cache_bytes": 45459264,
+        "lazy_page_sizes_ms": 0.243008,
+        "eager_page_sizes_ms": 0.517817,
+        "process_peak_kib": 129892
+      }
+    },
+    {
+      "name": "300-mixed-geometry",
+      "pages": 300,
+      "input_bytes": 100799,
+      "runs": [
+        {
+          "bind_ms": 0.665295,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 42472032,
+          "comparison": {
+            "eager_page_sizes_ms": 3.95767,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 2.060469,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5284000,
+          "first_page_ready_ms": 17.436317,
+          "first_render_ms": 13.969615,
+          "input_bytes": 100799,
+          "load_ms": 0.259561,
+          "metadata_ms": 2.4433800000000003,
+          "pages": 300,
+          "read_ms": 0.098466,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.545974,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 1356000,
+              "height": 339,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 0.623707,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 30432000,
+              "height": 3170,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 41.732802,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 116032,
+              "height": 196,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.240414,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.0003,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 89424
+        },
+        {
+          "bind_ms": 0.695001,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 42472032,
+          "comparison": {
+            "eager_page_sizes_ms": 3.6518829999999998,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 1.950451,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5284000,
+          "first_page_ready_ms": 17.119608000000003,
+          "first_render_ms": 13.430836,
+          "input_bytes": 100799,
+          "load_ms": 0.277914,
+          "metadata_ms": 2.615838,
+          "pages": 300,
+          "read_ms": 0.10001900000000001,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 7.906873,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 1356000,
+              "height": 339,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 0.772527,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 30432000,
+              "height": 3170,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 43.671178999999995,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 116032,
+              "height": 196,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.24602499999999997,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000531,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 89200
+        },
+        {
+          "bind_ms": 0.92258,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 42472032,
+          "comparison": {
+            "eager_page_sizes_ms": 3.9958700000000005,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 1.9013579999999999,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5284000,
+          "first_page_ready_ms": 19.039462,
+          "first_render_ms": 14.529982,
+          "input_bytes": 100799,
+          "load_ms": 0.29574799999999996,
+          "metadata_ms": 3.15262,
+          "pages": 300,
+          "read_ms": 0.138532,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 6.794563,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 1356000,
+              "height": 339,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 0.746059,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 30432000,
+              "height": 3170,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 42.179454,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 116032,
+              "height": 196,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.24899999999999997,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.0006309999999999999,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 89368
+        },
+        {
+          "bind_ms": 0.743092,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 42472032,
+          "comparison": {
+            "eager_page_sizes_ms": 3.574185,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 1.761674,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5284000,
+          "first_page_ready_ms": 16.916865,
+          "first_render_ms": 13.273349,
+          "input_bytes": 100799,
+          "load_ms": 0.28379499999999996,
+          "metadata_ms": 2.512833,
+          "pages": 300,
+          "read_ms": 0.103796,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 7.135376,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 1356000,
+              "height": 339,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 0.716542,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 30432000,
+              "height": 3170,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 42.490781999999996,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 116032,
+              "height": 196,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.198264,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.000441,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 89348
+        },
+        {
+          "bind_ms": 0.727654,
+          "bookmarks": 0,
+          "cache_budget_bytes": 67108864,
+          "cache_bytes": 42472032,
+          "comparison": {
+            "eager_page_sizes_ms": 4.187393,
+            "geometry_matches_loaded": true,
+            "lazy_page_sizes_ms": 2.00784,
+            "mismatches": []
+          },
+          "first_frame_bytes": 5284000,
+          "first_page_ready_ms": 18.137321,
+          "first_render_ms": 14.606276,
+          "input_bytes": 100799,
+          "load_ms": 0.24502299999999996,
+          "metadata_ms": 2.4688190000000003,
+          "pages": 300,
+          "read_ms": 0.089549,
+          "samples": [
+            {
+              "cache_hit": false,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "page_7",
+              "page": 7,
+              "render_ms": 7.568344000000001,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 1356000,
+              "height": 339,
+              "name": "last_page",
+              "page": 300,
+              "render_ms": 0.546631,
+              "width": 1000
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 30432000,
+              "height": 3170,
+              "name": "zoom",
+              "page": 1,
+              "render_ms": 40.340884,
+              "width": 2400
+            },
+            {
+              "cache_hit": false,
+              "frame_bytes": 116032,
+              "height": 196,
+              "name": "thumbnail",
+              "page": 1,
+              "render_ms": 0.217982,
+              "width": 148
+            },
+            {
+              "cache_hit": true,
+              "frame_bytes": 5284000,
+              "height": 1321,
+              "name": "revisit",
+              "page": 1,
+              "render_ms": 0.00031,
+              "width": 1000
+            }
+          ],
+          "schema_version": 1,
+          "scope": "headless_reader_engine",
+          "process_peak_kib": 89648
+        }
+      ],
+      "median": {
+        "first_page_ready_ms": 17.436317,
+        "metadata_ms": 2.512833,
+        "first_render_ms": 13.969615,
+        "cache_bytes": 42472032,
+        "lazy_page_sizes_ms": 1.950451,
+        "eager_page_sizes_ms": 3.95767,
+        "process_peak_kib": 89368
+      }
+    }
+  ],
+  "application_source_head": "5d7b0da37c3632ed618c793b776bd0c01753f2f6",
+  "tested_merge_source": "ecc4f82d0d426a2e25e22babd979065b2f0de312",
+  "fixture_driver_sha256": "486029f0086efdc42d98776f71ede4665bfa53d29695b2727a5d18d2a7ab7164",
+  "qualification_scope": "qualified parent runtime; new generated fixture driver; headless engine/RSS baseline only; GUI/queue baseline still pending"
+}

@@ -31,6 +31,7 @@ mod placement_ui;
 mod platform;
 mod preferences;
 mod print_plan;
+mod raster_tiles;
 mod recovery;
 mod review;
 mod snapshot;
@@ -99,6 +100,45 @@ fn main() -> anyhow::Result<()> {
         }
         if first == "--overlay" {
             return overlay::run_cli(args);
+        }
+        if first == "--check-render-tiles" {
+            let input = std::path::PathBuf::from(
+                args.next()
+                    .ok_or_else(|| anyhow::anyhow!("Missing tile input"))?,
+            );
+            let page: usize = args
+                .next()
+                .ok_or_else(|| anyhow::anyhow!("Missing page"))?
+                .to_string_lossy()
+                .parse()?;
+            let width: i32 = args
+                .next()
+                .ok_or_else(|| anyhow::anyhow!("Missing width"))?
+                .to_string_lossy()
+                .parse()?;
+            let height: i32 = args
+                .next()
+                .ok_or_else(|| anyhow::anyhow!("Missing height"))?
+                .to_string_lossy()
+                .parse()?;
+            let rotation: u8 = args
+                .next()
+                .ok_or_else(|| anyhow::anyhow!("Missing rotation"))?
+                .to_string_lossy()
+                .parse()?;
+            let reference = args.next().map(std::path::PathBuf::from);
+            anyhow::ensure!(
+                page > 0 && args.next().is_none(),
+                "--check-render-tiles INPUT PAGE WIDTH HEIGHT ROTATION [REFERENCE.ppm]"
+            );
+            return pdf::check_render_tiles(
+                &input,
+                page - 1,
+                width,
+                height,
+                rotation,
+                reference.as_deref(),
+            );
         }
         if first == "--render-page" {
             let input = std::path::PathBuf::from(

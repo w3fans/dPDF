@@ -8,6 +8,7 @@ mod print_helper;
 #[derive(Default)]
 pub(super) struct SmokeCheck {
     viewport: viewport_smoke::Check,
+    raster: raster_smoke::Check,
     physical: physical_smoke::Check,
     stage: u8,
     ticks: u32,
@@ -1316,6 +1317,19 @@ impl SmokeCheck {
         }
         if let Ok(mode) = std::env::var("DPDF_SMOKE_HELPER") {
             self.helper_advance(app, ui, &mode);
+            return;
+        }
+        if std::env::var_os("DPDF_SMOKE_RASTER_TILES").is_some() {
+            match self.raster.advance(app, ui) {
+                Ok(true) => {
+                    let _ = slint::quit_event_loop();
+                }
+                Ok(false) => {}
+                Err(error) => {
+                    self.failure = Some(format!("{error:#}"));
+                    let _ = slint::quit_event_loop();
+                }
+            }
             return;
         }
         if std::env::var_os("DPDF_SMOKE_PHYSICAL").is_some() {

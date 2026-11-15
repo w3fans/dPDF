@@ -43,6 +43,8 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
                               *common, '--pdfium', str(pdfium), '--geometry-only'], 300))
     tests.append(('engine-paths', [python, str(source / 'scripts' / 'check-engine-paths.py'),
                                   *common, '--pdfium', str(pdfium)], 300))
+    tests.append(('render-tiles', [python, str(source / 'scripts' / 'check-render-tiles.py'),
+                                 *common, '--pdfium', str(pdfium)], 600))
     command = [python, str(source / 'scripts' / 'check-block-rust.py'), *common,
                '--pdfium', str(pdfium), '--qpdf', str(qpdf)]
     if probe_report is not None:
@@ -59,6 +61,9 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
                            '--pdfium', str(pdfium), '--scale', scale, '--allow-native-input'], 180))
             tests.append(('viewport-' + scale.replace('.', '-'),
                           [python, str(source / 'scripts' / 'check-viewport.py'), *common,
+                           '--pdfium', str(pdfium), '--scale', scale], 180))
+            tests.append(('raster-ui-' + scale.replace('.', '-'),
+                          [python, str(source / 'scripts' / 'check-raster-ui.py'), *common,
                            '--pdfium', str(pdfium), '--scale', scale], 180))
             tests.append(('physical-reader-' + scale.replace('.', '-'),
                           [python, str(source / 'scripts' / 'check-physical-reader.py'), *common,

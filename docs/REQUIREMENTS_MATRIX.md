@@ -94,7 +94,7 @@ Evidence columns:
 | R-READ-3 tabs | Automated tests passed | `src/app.rs` | `check-tabs.py`, smoke | ✓ | ✓ | ✓ v0.1.14 | – | — |
 | R-READ-4 smooth scroll | Automated tests passed | `src/document.rs`, `src/cache.rs` | `check-viewport.py` | ✓ | ✓ | – | – | Subjective acceptance |
 | R-READ-5 single/continuous/facing | Automated tests passed | `src/document.rs` | unit tests, smoke | ✓ | ✓ | ✓ v0.1.14 | – | — |
-| R-READ-6 fit/actual/zoom/wheel | Automated tests passed | `src/app.rs`, `src/document.rs` | smoke Ctrl+wheel, editable zoom field | ✓ | ✓ | – | – | Tiled high-zoom rendering (bitmap capped at 3072×4096) |
+| R-READ-6 fit/actual/zoom/wheel | Automated tests passed | `src/app.rs`, `src/document.rs` | smoke Ctrl+wheel, editable zoom field | ✓ | ✓ | – | – | T05 bounded high-zoom detail in dependent development draft; native stitch/window/performance results pending ([progress](planning/progress/T05-high-zoom-2026-11-15.md)) |
 | R-READ-7 thumbnails | Automated tests passed | `src/app.rs` | smoke | ✓ | ✓ | ✓ v0.1.14 | – | — |
 | R-READ-8 bookmarks | Automated tests passed | `src/pdf.rs`, `src/app.rs` | smoke bookmark navigation (v0.1.43) | ✓ | ✓ | – | – | Pointer click on a row is manual |
 | R-READ-9 page entry | Automated tests passed | `src/app.rs`, `ui/workspace.slint` | smoke slow entry, invalid/clamped (v0.1.43) | ✓ | ✓ | – | – | v0.1.43 fixed resets while typing |

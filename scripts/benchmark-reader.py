@@ -15,6 +15,9 @@ from pathlib import Path
 import statistics
 import subprocess
 import tempfile
+import io
+
+from PIL import Image
 
 
 def sample_module():
@@ -49,6 +52,44 @@ def vector_fixture(sample, count=50, detail=1000):
         pages.append(index)
         objects.append(f'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents {index+1} 0 R >>'.encode())
         objects.append(f'<< /Length {len(content)} >>\nstream\n'.encode()+content+b'endstream')
+    objects[1] = f'<< /Type /Pages /Count {count} /Kids [{" ".join(f"{n} 0 R" for n in pages)}] >>'.encode()
+    return sample.write_pdf(objects)
+
+
+def image_fixture(sample, count=50):
+    """One generated large scan, shared across pages; never private photo data."""
+    image = Image.new('RGB', (3200, 2400), (240, 245, 250))
+    for y in range(0, 2400, 40):
+        image.paste((20 + y % 180, 60, 150), (100, y, 3100, min(y + 8, 2400)))
+    encoded = io.BytesIO()
+    image.save(encoded, format='JPEG', quality=90)
+    jpeg = encoded.getvalue()
+    stream = b'q 532 0 0 399 40 190 cm /Scan Do Q\n'
+    objects = [b'<< /Type /Catalog /Pages 2 0 R >>', b'',
+               f'<< /Type /XObject /Subtype /Image /Width 3200 /Height 2400 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length {len(jpeg)} >>\nstream\n'.encode() + jpeg + b'\nendstream']
+    pages = []
+    for _ in range(count):
+        index = len(objects) + 1
+        pages.append(index)
+        objects.extend([
+            f'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /XObject << /Scan 3 0 R >> >> /Contents {index+1} 0 R >>'.encode(),
+            f'<< /Length {len(stream)} >>\nstream\n'.encode() + stream + b'endstream'])
+    objects[1] = f'<< /Type /Pages /Count {count} /Kids [{" ".join(f"{n} 0 R" for n in pages)}] >>'.encode()
+    return sample.write_pdf(objects)
+
+
+def mixed_fixture(sample, count=300):
+    objects = [b'<< /Type /Catalog /Pages 2 0 R >>', b'',
+               b'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>']
+    pages = []
+    for n in range(count):
+        index = len(objects) + 1
+        pages.append(index)
+        width, height = [(612, 792), (792, 612), (420, 1190)][n % 3]
+        stream = f'BT /F1 16 Tf 40 180 Td (Mixed geometry page {n+1}) Tj ET\n'.encode()
+        objects.extend([
+            f'<< /Type /Page /Parent 2 0 R /MediaBox [-20 -10 {width} {height}] /CropBox [0 0 {width-20} {height-10}] /Rotate {(n%4)*90} /UserUnit {0.5 if n%2 else 2} /Resources << /Font << /F1 3 0 R >> >> /Contents {index+1} 0 R >>'.encode(),
+            f'<< /Length {len(stream)} >>\nstream\n'.encode() + stream + b'endstream'])
     objects[1] = f'<< /Type /Pages /Count {count} /Kids [{" ".join(f"{n} 0 R" for n in pages)}] >>'.encode()
     return sample.write_pdf(objects)
 
@@ -105,7 +146,12 @@ def main():
         print('PASS: lazy versus loaded page sizes at all quarter turns, crop/negative origins, inherited boxes and UserUnit 1/2', flush=True)
 
         if not args.geometry_only:
-            for name, content in [('50-office', sample.make_pdf(50)), ('1000-text', sample.make_pdf(1000)), ('50-vector', vector_fixture(sample))]:
+            for name, content in [('50-office', sample.make_pdf(50)),
+                                  ('300-office', sample.make_pdf(300)),
+                                  ('1000-text', sample.make_pdf(1000)),
+                                  ('50-vector', vector_fixture(sample)),
+                                  ('50-large-image', image_fixture(sample)),
+                                  ('300-mixed-geometry', mixed_fixture(sample))]:
                 path = folder / (name+'.pdf')
                 path.write_bytes(content)
                 measurements = [run(path, memory=True) for _ in range(args.repeat)]

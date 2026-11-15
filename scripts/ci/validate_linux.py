@@ -32,6 +32,7 @@ def plan(source, binary, pdfium, qpdf, xvfb, desktop=True, print_report=None):
     tests = [('reader', [*py, script('check-reader.py'), *engines], 600),
              ('geometry', [*py, script('benchmark-reader.py'), *engines, '--geometry-only'], 300),
              ('engine-paths', [*py, script('check-engine-paths.py'), *engines], 300),
+             ('render-tiles', [*py, script('check-render-tiles.py'), *engines], 600),
              ('pages', [*py, script('check-pages.py'), *both], 900),
              ('marks', [*py, script('check-marks.py'), '--binary', str(binary)], 600),
              ('overlays', [*py, script('check-overlays.py'), *both], 1200),
@@ -50,6 +51,7 @@ def plan(source, binary, pdfium, qpdf, xvfb, desktop=True, print_report=None):
         suffix = '-' + scale.replace('.', '-')
         scaled = [*display, '--scale', scale]
         tests += [('viewport' + suffix, [*py, script('check-viewport.py'), *engines, *scaled], 300),
+                  ('raster-ui' + suffix, [*py, script('check-raster-ui.py'), *engines, *scaled], 300),
                   ('physical-reader' + suffix, [*py, script('check-physical-reader.py'), *both, *scaled], 300),
                   ('tabs' + suffix, [*py, script('check-tabs.py'), *engines, *scaled], 300),
                   ('clipboard-placement' + suffix,

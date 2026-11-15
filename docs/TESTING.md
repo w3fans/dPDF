@@ -969,3 +969,18 @@ Run this compiler helper only on approved build infrastructure. Public contract
 tests inject a process runner; they do not compile locally. They reject wrong
 source identity or a newer compiler, retain a failing check's exit/log and verify
 private-target cleanup. A skipped platform test is not native compiler evidence.
+
+## Bounded high-zoom detail diagnostics (T05 draft)
+
+`check-render-tiles.py --binary PATH --pdfium PATH` compares generated tile cores
+with the exact native full-page transform at all rotations, crop/UserUnit variants,
+a generated scan, forms and annotations. It also asserts a positive visible form
+appearance. Individual tile allocations are at most 512×512 RGBA.
+
+`check-raster-ui.py --binary PATH --pdfium PATH --scale 1.5` uses a private
+authenticated X11 display, or the explicitly enabled dedicated Windows test
+desktop. It exercises three view modes, all rotations, panning, successive zoom
+generations and tab switching/closure. Observed render slots include queued,
+active and unconsumed replies; they do not measure the complete command queue.
+The suite does not prove subjective sharpness, complete RSS plateau, native
+Wayland input or physical output. Use approved compiler lanes for its executable.

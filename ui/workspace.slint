@@ -3,6 +3,7 @@ export { MarkStudioWindow } from "marks.slint";
 export { AboutWindow } from "about.slint";
 
 export struct PageTile { page: int, px: float, py: float, pw: float, ph: float, bitmap: image, ready: bool }
+export struct RasterTile { px: float, py: float, pw: float, ph: float, bitmap: image, ready: bool }
 export struct SidebarItem { title: string, page: int, bitmap: image, drag: data-transfer }
 export struct SearchMarker { px: float, py: float, pw: float, ph: float, active: bool }
 export struct DocumentTab { name: string, selected: bool }
@@ -134,6 +135,7 @@ export component Workspace inherits Window {
     out property <float> tab-strip-width: tab-strip.visible-width / 1px;
     out property <float> tab-strip-height: tab-strip.visible-height / 1px;
     in property <[PageTile]> pages;
+    in property <[RasterTile]> raster-tiles;
     in property <[SearchMarker]> search-markers;
     in property <[SearchMarker]> selection-markers;
     in property <bool> text-selected;
@@ -690,6 +692,13 @@ export component Workspace inherits Window {
                                     return reject;
                                 }
                             }
+                        }
+                        for tile in root.raster-tiles: Image {
+                            visible: tile.ready;
+                            source: tile.bitmap;
+                            x: tile.px * 1px; y: tile.py * 1px;
+                            width: tile.pw * 1px; height: tile.ph * 1px;
+                            image-fit: fill;
                         }
                         for marker in root.search-markers: Rectangle {
                             visible: root.search-visible;

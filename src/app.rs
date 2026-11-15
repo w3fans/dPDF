@@ -1,10 +1,11 @@
 mod physical_smoke;
+mod raster_smoke;
 mod search_queue;
 mod ui_smoke;
 mod viewport_smoke;
 
 use crate::{
-    DocumentTab, MarkTile, PageTile, ReviewTile, SearchMarker, SidebarItem, Workspace,
+    DocumentTab, MarkTile, PageTile, RasterTile, ReviewTile, SearchMarker, SidebarItem, Workspace,
     assembly::{OperationKind, PageOperation},
     document::*,
     pdf::{self, Command, Event, RenderKey},
@@ -154,6 +155,9 @@ pub struct Application {
     search_queue: search_queue::SearchQueue,
     failed: HashSet<RenderKey>,
     pages: Rc<VecModel<PageTile>>,
+    detail_tiles: Rc<VecModel<RasterTile>>,
+    detail_keys: Vec<RenderKey>,
+    detail_images: HashMap<RenderKey, slint::Image>,
     mark_tiles: Rc<VecModel<MarkTile>>,
     sidebar: Rc<VecModel<SidebarItem>>,
     frames: HashMap<usize, RenderKey>,
@@ -1047,6 +1051,9 @@ impl Application {
             search_queue: search_queue::SearchQueue::default(),
             failed: HashSet::new(),
             pages: Rc::new(VecModel::default()),
+            detail_tiles: Rc::new(VecModel::default()),
+            detail_keys: vec![],
+            detail_images: HashMap::new(),
             mark_tiles: Rc::new(VecModel::default()),
             sidebar: Rc::new(VecModel::default()),
             frames: HashMap::new(),
@@ -1314,6 +1321,9 @@ impl Application {
                 .store(self.generation, Ordering::Relaxed);
             self.worker.search_token.fetch_add(1, Ordering::Relaxed);
             self.pages.set_vec(vec![]);
+            self.detail_tiles.set_vec(vec![]);
+            self.detail_keys.clear();
+            self.detail_images.clear();
             ui.set_search_markers(ModelRc::default());
             self.sidebar.set_vec(vec![]);
             self.layout = None;
@@ -1352,6 +1362,9 @@ impl Application {
         self.failed.clear();
         self.frames.clear();
         self.pages.set_vec(vec![]);
+        self.detail_tiles.set_vec(vec![]);
+        self.detail_keys.clear();
+        self.detail_images.clear();
         self.render_window.clear();
         ui.set_canvas_width(layout.width);
         ui.set_canvas_height(layout.height);
@@ -2045,11 +2058,63 @@ impl Application {
                 width,
                 rotation,
                 thumbnail: false,
+                region: None,
             };
             if self.frames.get(&placement.page) != Some(&key) {
                 keys.push(key);
             }
         }
+        let detail_plan = crate::raster_tiles::plan(
+            &layout.pages,
+            (-ui.get_scroll_x(), -offset, ui.get_viewport_width(), height),
+            scale,
+        );
+        let detail_keys: Vec<_> = detail_plan
+            .iter()
+            .map(|p| RenderKey {
+                document: id,
+                page: p.page,
+                width: p.canvas_width as i32,
+                rotation,
+                thumbnail: false,
+                region: Some(p.region),
+            })
+            .collect();
+        if detail_keys.len() != self.detail_keys.len()
+            || detail_keys
+                .iter()
+                .any(|key| !self.detail_keys.contains(key))
+        {
+            self.generation += 1;
+            self.worker
+                .generation
+                .store(self.generation, Ordering::Relaxed);
+            self.pending.clear();
+            self.failed.clear();
+            self.detail_images
+                .retain(|key, _| detail_keys.contains(key));
+            self.detail_tiles.set_vec(
+                detail_plan
+                    .iter()
+                    .zip(&detail_keys)
+                    .map(|(p, key)| RasterTile {
+                        px: p.x,
+                        py: p.y,
+                        pw: p.width,
+                        ph: p.height,
+                        bitmap: self.detail_images.get(key).cloned().unwrap_or_default(),
+                        ready: self.detail_images.contains_key(key),
+                    })
+                    .collect(),
+            );
+            self.detail_keys = detail_keys;
+        }
+        keys.extend(
+            self.detail_keys
+                .iter()
+                .filter(|key| !self.detail_images.contains_key(key))
+                .cloned(),
+        );
         if ui.get_sidebar_visible() && ui.get_sidebar_tab() == 0 {
             let first = (ui.get_sidebar_offset().max(0.0) / 174.0) as usize;
             let end = (first + (ui.get_sidebar_height().max(0.0) / 174.0).ceil() as usize + 2)
@@ -2065,6 +2130,7 @@ impl Application {
                         width: 160,
                         rotation: 0,
                         thumbnail: true,
+                        region: None,
                     });
                 }
             }
@@ -2092,15 +2158,10 @@ impl Application {
             if self.pending.contains(&key) || self.failed.contains(&key) {
                 continue;
             }
-            if self
-                .worker
-                .commands
-                .try_send(Command::Render {
-                    generation: self.generation,
-                    key: key.clone(),
-                })
-                .is_ok()
-            {
+            if self.worker.render_requests_in_flight() >= crate::raster_tiles::MAX_PENDING_RENDERS {
+                break;
+            }
+            if self.worker.try_render(self.generation, key.clone()).is_ok() {
                 self.pending.insert(key);
             } else {
                 break;
@@ -2414,6 +2475,7 @@ impl Application {
                     generation,
                     key,
                     frame,
+                    permit: _permit,
                 } => {
                     if generation != self.generation {
                         continue;
@@ -2437,6 +2499,15 @@ impl Application {
                             self.sidebar.set_row_data(row, data);
                             self.thumb_frames.insert(key.page);
                         }
+                    } else if key.region.is_some() {
+                        if let Some(row) = self.detail_keys.iter().position(|wanted| wanted == &key)
+                            && let Some(mut data) = self.detail_tiles.row_data(row)
+                        {
+                            data.bitmap = image.clone();
+                            data.ready = true;
+                            self.detail_tiles.set_row_data(row, data);
+                            self.detail_images.insert(key, image);
+                        }
                     } else if let Some(row) = self
                         .pages
                         .iter()
@@ -2453,6 +2524,7 @@ impl Application {
                     generation,
                     key,
                     message,
+                    permit: _permit,
                 } => {
                     if generation == self.generation {
                         self.pending.remove(&key);
@@ -3288,6 +3360,7 @@ fn run_window(paths: Vec<PathBuf>, smoke: bool) -> Result<(), slint::PlatformErr
     }
     ui.set_pages(ModelRc::from(app.borrow().pages.clone()));
     ui.set_mark_tiles(ModelRc::from(app.borrow().mark_tiles.clone()));
+    ui.set_raster_tiles(ModelRc::from(app.borrow().detail_tiles.clone()));
     ui.set_sidebar_items(ModelRc::from(app.borrow().sidebar.clone()));
     macro_rules! callback {
         ($name:ident, |$state:ident, $window:ident $(, $arg:ident)*| $body:block) => {{
