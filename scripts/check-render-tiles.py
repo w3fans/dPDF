@@ -9,8 +9,6 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-from PIL import Image
-
 
 def load(name, path):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -34,6 +32,18 @@ def form_fixture(sample):
         b'<< /Fields [6 0 R] /DR << /Font << /Helv 3 0 R >> >> /DA (/Helv 18 Tf 0 g) >>'])
 
 
+def jpeg_fixture(sample, source):
+    # Existing generated photo fixture, also used by check-pages.py (400x200).
+    jpeg = (source / 'fixtures' / 'page-photo.jpg').read_bytes()
+    content = b'q 532 0 0 266 40 200 cm /Photo Do Q\n'
+    return sample.write_pdf([
+        b'<< /Type /Catalog /Pages 2 0 R >>',
+        b'<< /Type /Pages /Count 1 /Kids [3 0 R] >>',
+        b'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /XObject << /Photo 4 0 R >> >> /Contents 5 0 R >>',
+        f'<< /Type /XObject /Subtype /Image /Width 400 /Height 200 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length {len(jpeg)} >>\nstream\n'.encode() + jpeg + b'\nendstream',
+        f'<< /Length {len(content)} >>\nstream\n'.encode() + content + b'endstream'])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--binary', type=Path, required=True)
@@ -50,7 +60,7 @@ def main():
             for unit in (0.5, 2):
                 cases.append((f'geometry-{intrinsic}-{cropped}-{unit}',
                               bench.geometry_fixture(sample, intrinsic, cropped, True, unit)))
-    cases.extend([('large-image', bench.image_fixture(sample, 1)), ('form-annotation', form_fixture(sample))])
+    cases.extend([('large-image', bench.image_fixture(sample, 1)), ('jpeg-image', jpeg_fixture(sample, source)), ('form-annotation', form_fixture(sample))])
     count = 0
     with tempfile.TemporaryDirectory(prefix='dpdf-render-tiles-') as directory:
         root = Path(directory)
@@ -70,11 +80,14 @@ def main():
                 assert 0 < report['peak_tile_bytes'] <= 512 * 512 * 4
                 assert report['tiles'] > 1
                 if reference.exists():
-                    with Image.open(reference) as frame:
-                        field = frame.convert('RGB').crop((480, 720, 2520, 1080))
-                        pixels = list(field.get_flattened_data())
-                        assert sum(g > 180 and r > 150 and b < 130 for r, g, b in pixels) > 10000, 'form background absent'
-                        assert sum(max(p) < 80 for p in pixels) > 500, 'form value absent'
+                    magic, size, maximum, rgb = reference.read_bytes().split(b'\n', 3)
+                    assert (magic, size, maximum) == (b'P6', b'3600 2400', b'255')
+                    assert len(rgb) == 3600 * 2400 * 3
+                    field = b''.join(rgb[(y * 3600 + 480) * 3:(y * 3600 + 2520) * 3]
+                                     for y in range(720, 1080))
+                    pixels = list(zip(field[0::3], field[1::3], field[2::3]))
+                    assert sum(g > 180 and r > 150 and b < 130 for r, g, b in pixels) > 10000, 'form background absent'
+                    assert sum(max(p) < 80 for p in pixels) > 500, 'form value absent'
                     reference.unlink()
                 assert hashlib.sha256(path.read_bytes()).hexdigest() == before
                 count += 1

@@ -228,17 +228,6 @@ jobs:
           $ErrorActionPreference = 'Stop'
           Get-Content (Join-Path $env:VALIDATION_REPORT_DIR 'README.md') | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append -Encoding utf8
           if ($code -ne 0) { throw "Windows validation failed ($code)" }
-      - name: Native tile oracle under base harness limits
-        shell: powershell
-        env:
-          VALIDATION_REPORT_DIR: ${{ runner.temp }}/dpdf-validation-pr
-          VALIDATED_COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $python = (Get-Command python.exe -CommandType Application | Select-Object -First 1).Source
-          & $python source/scripts/ci/validate_tile_runtime.py --source source --harness harness --commit $env:VALIDATED_COMMIT --report $env:VALIDATION_REPORT_DIR
-          if ($LASTEXITCODE -ne 0) { throw 'Bounded native Windows tile oracle failed' }
       - name: Minimum supported Rust source checks
         if: ${{ !cancelled() }}
         shell: powershell

@@ -15,9 +15,7 @@ from pathlib import Path
 import statistics
 import subprocess
 import tempfile
-import io
-
-from PIL import Image
+import zlib
 
 
 def sample_module():
@@ -58,15 +56,18 @@ def vector_fixture(sample, count=50, detail=1000):
 
 def image_fixture(sample, count=50):
     """One generated large scan, shared across pages; never private photo data."""
-    image = Image.new('RGB', (3200, 2400), (240, 245, 250))
-    for y in range(0, 2400, 40):
-        image.paste((20 + y % 180, 60, 150), (100, y, 3100, min(y + 8, 2400)))
-    encoded = io.BytesIO()
-    image.save(encoded, format='JPEG', quality=90)
-    jpeg = encoded.getvalue()
+    compressor = zlib.compressobj()
+    chunks = []
+    for y in range(2400):
+        row = bytearray(bytes((240, 245, 250)) * 3200)
+        if y % 40 < 8:
+            row[300:9300] = bytes((20 + (y // 40 * 40) % 180, 60, 150)) * 3000
+        chunks.append(compressor.compress(row))
+    chunks.append(compressor.flush())
+    scan = b''.join(chunks)
     stream = b'q 532 0 0 399 40 190 cm /Scan Do Q\n'
     objects = [b'<< /Type /Catalog /Pages 2 0 R >>', b'',
-               f'<< /Type /XObject /Subtype /Image /Width 3200 /Height 2400 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length {len(jpeg)} >>\nstream\n'.encode() + jpeg + b'\nendstream']
+               f'<< /Type /XObject /Subtype /Image /Width 3200 /Height 2400 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /FlateDecode /Length {len(scan)} >>\nstream\n'.encode() + scan + b'\nendstream']
     pages = []
     for _ in range(count):
         index = len(objects) + 1
