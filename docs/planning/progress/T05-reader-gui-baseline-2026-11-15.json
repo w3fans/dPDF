@@ -1,0 +1,408 @@
+{
+  "schema": 1,
+  "scope": "generated_private_x11_gui_timing_upper_bounds",
+  "recorded_at": "2026-11-15T09:34:02.243093+00:00",
+  "scale": 1,
+  "includes_input_and_capture_overhead": true,
+  "first_phase_includes_fit_page_request": true,
+  "input_is_generated_fiducial_overlay": true,
+  "windows_qualified": false,
+  "complete_command_queue_depth_measured": false,
+  "binary_sha256": "3d2db092c50eeb89346ff5b4fb8f6a1f8f0b2e959e00749ac4a84ec4233374ae",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "qpdf_sha256": "4e1ae7f108826b4cc4217a774e1b1f3c9c41636a3d388cf1ee06b68a79fd68f3",
+  "cases": [
+    {
+      "name": "50-office",
+      "pages": 50,
+      "input_sha256": "08c9e43a641d7fdad7b18ff07198bbcb18bc5839540fef774a0e9d0939c2d393",
+      "original_input_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+      "runs": [
+        {
+          "launch_fit_page_ready_ms": 336.6163290338591,
+          "page7_ready_ms": 296.3097710162401,
+          "zoom_ready_ms": 149.2047020001337,
+          "last_page_fit_ready_ms": 375.9840138955042,
+          "final_rss_kib": 59568,
+          "process_peak_rss_kib": 59568,
+          "capture_ms": [
+            66.05433905497193,
+            47.55237093195319,
+            48.96725295111537,
+            45.3516700072214,
+            45.712340041063726,
+            50.02226203214377,
+            81.53840992599726
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 244.06841001473367,
+          "page7_ready_ms": 288.9776839874685,
+          "zoom_ready_ms": 157.4568150099367,
+          "last_page_fit_ready_ms": 341.1126430146396,
+          "final_rss_kib": 57980,
+          "process_peak_rss_kib": 57980,
+          "capture_ms": [
+            45.77586892992258,
+            48.60138101503253,
+            45.049417996779084,
+            50.07795803248882,
+            43.93389308825135,
+            44.89817295689136
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 238.56039508245885,
+          "page7_ready_ms": 282.34974609222263,
+          "zoom_ready_ms": 145.18691902048886,
+          "last_page_fit_ready_ms": 374.7604639502242,
+          "final_rss_kib": 59228,
+          "process_peak_rss_kib": 59228,
+          "capture_ms": [
+            45.004454092122614,
+            44.028331991285086,
+            43.878839001990855,
+            42.263239971362054,
+            43.237979989498854,
+            61.94274895824492
+          ]
+        }
+      ],
+      "median": {
+        "launch_fit_page_ready_ms": 244.06841001473367,
+        "page7_ready_ms": 288.9776839874685,
+        "zoom_ready_ms": 149.2047020001337,
+        "last_page_fit_ready_ms": 374.7604639502242,
+        "final_rss_kib": 59228,
+        "process_peak_rss_kib": 59228
+      }
+    },
+    {
+      "name": "300-office",
+      "pages": 300,
+      "input_sha256": "80b5ba03f76b46ad6855d882bf6c6e0a8c04122ebcc0ee2c14d00d7184fc7655",
+      "original_input_sha256": "b0f6b27592edb817e3c765db05efc93bcd4e563d1e624d2c0cb6545fa39fd616",
+      "runs": [
+        {
+          "launch_fit_page_ready_ms": 242.44137795176357,
+          "page7_ready_ms": 296.00746103096753,
+          "zoom_ready_ms": 153.13117299228907,
+          "last_page_fit_ready_ms": 374.8963309917599,
+          "final_rss_kib": 67524,
+          "process_peak_rss_kib": 67524,
+          "capture_ms": [
+            47.678229049779475,
+            48.68848493788391,
+            51.52783403173089,
+            49.72489201463759,
+            50.480065983720124,
+            50.43453106191009
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 246.17388402111828,
+          "page7_ready_ms": 317.43503792677075,
+          "zoom_ready_ms": 144.9738269438967,
+          "last_page_fit_ready_ms": 365.3649629559368,
+          "final_rss_kib": 67076,
+          "process_peak_rss_kib": 67076,
+          "capture_ms": [
+            52.200483973138034,
+            49.6304240077734,
+            45.82123609725386,
+            44.852275983430445,
+            44.85438100527972,
+            47.366581042297184
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 243.0361710721627,
+          "page7_ready_ms": 289.5932560786605,
+          "zoom_ready_ms": 149.8544670175761,
+          "last_page_fit_ready_ms": 353.6311590578407,
+          "final_rss_kib": 67068,
+          "process_peak_rss_kib": 67068,
+          "capture_ms": [
+            47.32601507566869,
+            47.25827497895807,
+            44.897280051372945,
+            48.61529800109565,
+            46.49146995507181,
+            44.98061805497855
+          ]
+        }
+      ],
+      "median": {
+        "launch_fit_page_ready_ms": 243.0361710721627,
+        "page7_ready_ms": 296.00746103096753,
+        "zoom_ready_ms": 149.8544670175761,
+        "last_page_fit_ready_ms": 365.3649629559368,
+        "final_rss_kib": 67076,
+        "process_peak_rss_kib": 67076
+      }
+    },
+    {
+      "name": "1000-text",
+      "pages": 1000,
+      "input_sha256": "21cb19cee4bbafd6c5788049b00f3874c69881530b30cb5883648fcb3f416bbe",
+      "original_input_sha256": "a15eae7fe97bf85997f28ef95cd162915bea1629f2ea8e4f725f6301e8c29b3e",
+      "runs": [
+        {
+          "launch_fit_page_ready_ms": 245.3757879557088,
+          "page7_ready_ms": 293.41985704377294,
+          "zoom_ready_ms": 164.71705702133477,
+          "last_page_fit_ready_ms": 368.53949399665,
+          "final_rss_kib": 87444,
+          "process_peak_rss_kib": 87444,
+          "capture_ms": [
+            48.663840047083795,
+            47.84140700940043,
+            49.36356097459793,
+            48.53157897014171,
+            59.76919806562364,
+            42.57647099439055
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 243.5096550034359,
+          "page7_ready_ms": 290.86774110328406,
+          "zoom_ready_ms": 158.96929893642664,
+          "last_page_fit_ready_ms": 375.3049519145861,
+          "final_rss_kib": 89912,
+          "process_peak_rss_kib": 89912,
+          "capture_ms": [
+            47.91558696888387,
+            45.357662020251155,
+            45.292224967852235,
+            56.858673924580216,
+            47.486596973612905,
+            46.425073989667
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 243.94019797910005,
+          "page7_ready_ms": 304.29925897624344,
+          "zoom_ready_ms": 183.85179806500673,
+          "last_page_fit_ready_ms": 367.46721994131804,
+          "final_rss_kib": 89812,
+          "process_peak_rss_kib": 89812,
+          "capture_ms": [
+            50.57623807806522,
+            49.52171805780381,
+            43.69465203490108,
+            52.48508101794869,
+            77.27264100685716,
+            45.815424993634224
+          ]
+        }
+      ],
+      "median": {
+        "launch_fit_page_ready_ms": 243.94019797910005,
+        "page7_ready_ms": 293.41985704377294,
+        "zoom_ready_ms": 164.71705702133477,
+        "last_page_fit_ready_ms": 368.53949399665,
+        "final_rss_kib": 89812,
+        "process_peak_rss_kib": 89812
+      }
+    },
+    {
+      "name": "50-vector",
+      "pages": 50,
+      "input_sha256": "57688bd01438a62f8c2d8f452a85736335022307a58d1b5da9e9bd13b0229067",
+      "original_input_sha256": "f570d25b5eca37672605e898373a82749b7c6c3769bb096487535a7fba8f2836",
+      "runs": [
+        {
+          "launch_fit_page_ready_ms": 245.91139901895076,
+          "page7_ready_ms": 288.57035492546856,
+          "zoom_ready_ms": 146.49584901053458,
+          "last_page_fit_ready_ms": 349.1706410422921,
+          "final_rss_kib": 56764,
+          "process_peak_rss_kib": 56764,
+          "capture_ms": [
+            48.37063490413129,
+            45.241972082294524,
+            44.52924698125571,
+            48.5082360683009,
+            44.80765305925161,
+            45.94459803774953
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 256.27176102716476,
+          "page7_ready_ms": 295.8483910188079,
+          "zoom_ready_ms": 169.49991299770772,
+          "last_page_fit_ready_ms": 349.70957902260125,
+          "final_rss_kib": 59920,
+          "process_peak_rss_kib": 59920,
+          "capture_ms": [
+            52.87037801463157,
+            49.94220193475485,
+            46.66954593267292,
+            48.56856900732964,
+            66.06224295683205,
+            48.128047958016396
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 245.59709907043725,
+          "page7_ready_ms": 288.23924507014453,
+          "zoom_ready_ms": 100.8343790890649,
+          "last_page_fit_ready_ms": 337.93827902991325,
+          "final_rss_kib": 59028,
+          "process_peak_rss_kib": 59028,
+          "capture_ms": [
+            49.26741903182119,
+            44.72486604936421,
+            43.02709107287228,
+            44.94141507893801,
+            44.14042294956744
+          ]
+        }
+      ],
+      "median": {
+        "launch_fit_page_ready_ms": 245.91139901895076,
+        "page7_ready_ms": 288.57035492546856,
+        "zoom_ready_ms": 146.49584901053458,
+        "last_page_fit_ready_ms": 349.1706410422921,
+        "final_rss_kib": 59028,
+        "process_peak_rss_kib": 59028
+      }
+    },
+    {
+      "name": "50-large-image",
+      "pages": 50,
+      "input_sha256": "953f7fa4d5041df0f9b4b4fbc65def9eaf81ba4343026ad074a7154be2ffad1f",
+      "original_input_sha256": "f5f3cf336e694af6c81766ca5f408545c5825176638ef6434e5aba6fd0c01ef1",
+      "runs": [
+        {
+          "launch_fit_page_ready_ms": 316.41880702227354,
+          "page7_ready_ms": 364.8908050963655,
+          "zoom_ready_ms": 147.60345104150474,
+          "last_page_fit_ready_ms": 380.1871018949896,
+          "final_rss_kib": 93828,
+          "process_peak_rss_kib": 93828,
+          "capture_ms": [
+            48.60549001023173,
+            47.57876298390329,
+            44.37495593447238,
+            49.434704007580876,
+            48.79718099255115,
+            47.408169019035995,
+            45.964195975102484,
+            45.4224330605939
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 310.8838910702616,
+          "page7_ready_ms": 297.02419496607035,
+          "zoom_ready_ms": 151.9046500325203,
+          "last_page_fit_ready_ms": 347.7105009369552,
+          "final_rss_kib": 93248,
+          "process_peak_rss_kib": 93248,
+          "capture_ms": [
+            45.204320922493935,
+            52.146242931485176,
+            48.18791197612882,
+            50.868461024947464,
+            47.905057086609304,
+            49.03715499676764,
+            51.448195008561015
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 257.5149609474465,
+          "page7_ready_ms": 370.9177690325305,
+          "zoom_ready_ms": 161.44279995933175,
+          "last_page_fit_ready_ms": 350.7774390745908,
+          "final_rss_kib": 94076,
+          "process_peak_rss_kib": 94076,
+          "capture_ms": [
+            46.85016698203981,
+            45.55305000394583,
+            54.21506694983691,
+            49.374210997484624,
+            53.58727090060711,
+            53.937001968733966,
+            54.9397140275687
+          ]
+        }
+      ],
+      "median": {
+        "launch_fit_page_ready_ms": 310.8838910702616,
+        "page7_ready_ms": 364.8908050963655,
+        "zoom_ready_ms": 151.9046500325203,
+        "last_page_fit_ready_ms": 350.7774390745908,
+        "final_rss_kib": 93828,
+        "process_peak_rss_kib": 93828
+      }
+    },
+    {
+      "name": "300-mixed-geometry",
+      "pages": 300,
+      "input_sha256": "3cd79b670e62493f6be9a5870adcdfb6639827212bb5f517d92ea07b3942cbeb",
+      "original_input_sha256": "d7e7e8bbc18c7739e40ded3bfbbd8f81ea8a05dc68d195bfe781bfbc8e9f0372",
+      "runs": [
+        {
+          "launch_fit_page_ready_ms": 239.05899096280336,
+          "page7_ready_ms": 294.0619739238173,
+          "zoom_ready_ms": 153.98456598632038,
+          "last_page_fit_ready_ms": 359.7801390569657,
+          "final_rss_kib": 63836,
+          "process_peak_rss_kib": 63836,
+          "capture_ms": [
+            46.12737300340086,
+            52.65868897549808,
+            47.29252203833312,
+            47.464706003665924,
+            46.34301003534347,
+            44.9098750250414
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 245.6089420011267,
+          "page7_ready_ms": 298.9405810367316,
+          "zoom_ready_ms": 151.80889994371682,
+          "last_page_fit_ready_ms": 355.3692150162533,
+          "final_rss_kib": 64364,
+          "process_peak_rss_kib": 64364,
+          "capture_ms": [
+            48.51184401195496,
+            51.96662188973278,
+            50.55298504885286,
+            48.730344977229834,
+            48.55732899159193,
+            43.5991829726845
+          ]
+        },
+        {
+          "launch_fit_page_ready_ms": 245.85851200390607,
+          "page7_ready_ms": 301.16740497760475,
+          "zoom_ready_ms": 155.62186506576836,
+          "last_page_fit_ready_ms": 356.00122797768563,
+          "final_rss_kib": 64252,
+          "process_peak_rss_kib": 64252,
+          "capture_ms": [
+            49.14964793715626,
+            46.65674199350178,
+            53.85667004156858,
+            49.96448499150574,
+            51.63713195361197,
+            45.88266205973923
+          ]
+        }
+      ],
+      "median": {
+        "launch_fit_page_ready_ms": 245.6089420011267,
+        "page7_ready_ms": 298.9405810367316,
+        "zoom_ready_ms": 153.98456598632038,
+        "last_page_fit_ready_ms": 356.00122797768563,
+        "final_rss_kib": 64252,
+        "process_peak_rss_kib": 64252
+      }
+    }
+  ],
+  "status": "MEASURED",
+  "source_head": "5d7b0da37c3632ed618c793b776bd0c01753f2f6",
+  "source_tested_merge": "ecc4f82d0d426a2e25e22babd979065b2f0de312",
+  "measurement_driver_revision_note": "Baseline driver used before subsequent failure-capture robustness edits; timing and generated input paths unchanged"
+}

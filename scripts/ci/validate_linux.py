@@ -29,10 +29,13 @@ def plan(source, binary, pdfium, qpdf, xvfb, desktop=True, print_report=None, ra
     script = lambda name: str(source / 'scripts' / name)
     engines = ['--binary', str(binary), '--pdfium', str(pdfium)]
     both = [*engines, '--qpdf', str(qpdf)]
+    tile_args = [*engines]
+    if raster_reports is not None:
+        tile_args += ['--report', str(Path(raster_reports) / 'render-tiles.json')]
     tests = [('reader', [*py, script('check-reader.py'), *engines], 600),
              ('geometry', [*py, script('benchmark-reader.py'), *engines, '--geometry-only'], 300),
              ('engine-paths', [*py, script('check-engine-paths.py'), *engines], 300),
-             ('render-tiles', [*py, script('check-render-tiles.py'), *engines], 600),
+             ('render-tiles', [*py, script('check-render-tiles.py'), *tile_args], 600),
              ('pages', [*py, script('check-pages.py'), *both], 900),
              ('marks', [*py, script('check-marks.py'), '--binary', str(binary)], 600),
              ('overlays', [*py, script('check-overlays.py'), *both], 1200),

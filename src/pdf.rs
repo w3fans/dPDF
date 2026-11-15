@@ -1362,13 +1362,10 @@ pub fn check_render_tiles(
             count += 1;
         }
     }
-    let changed_pixels = expected
-        .as_chunks::<4>()
-        .0
-        .iter()
-        .zip(stitched.as_chunks::<4>().0)
-        .filter(|(a, b)| a != b)
-        .count();
+    let comparison =
+        crate::raster_tiles::compare_rgba(&expected, &stitched, width as usize, height as usize)
+            .context("Invalid tile comparison dimensions")?;
+    let changed_pixels = comparison.changed_pixels;
     if let Some(output) = reference {
         let mut file = std::io::BufWriter::new(std::fs::File::create(output)?);
         write!(file, "P6\n{width} {height}\n255\n")?;
@@ -1381,7 +1378,13 @@ pub fn check_render_tiles(
         "{}",
         serde_json::json!({"schema":1,"scope":"bounded_native_tile_stitch_oracle",
         "width":width,"height":height,"rotation":rotation,"tiles":count,
-        "peak_tile_bytes":peak_tile_bytes,"changed_pixels":changed_pixels,"forms_enabled":true})
+        "peak_tile_bytes":peak_tile_bytes,"changed_pixels":changed_pixels,"forms_enabled":true,
+        "max_channel_delta":comparison.max_channel_delta,
+        "alpha_changed_pixels":comparison.alpha_changed_pixels,
+        "larger_delta_pixels":comparison.larger_delta_pixels,
+        "non_edge_changed_pixels":comparison.non_edge_changed_pixels,
+        "native_edge_quantization_limit_pixels":comparison.quantization_limit_pixels,
+        "within_native_edge_quantization":comparison.within_native_edge_quantization()})
     );
     ensure!(
         changed_pixels == 0,

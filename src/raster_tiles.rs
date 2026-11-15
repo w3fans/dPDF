@@ -233,6 +233,67 @@ pub fn plan(pages: &[PagePlacement], viewport: (f32, f32, f32, f32), scale: f32)
         .collect()
 }
 
+/// Describes every differing native pixel; it does not erase or clamp differences.
+#[derive(Default, Debug, PartialEq, Eq)]
+pub struct Comparison {
+    pub changed_pixels: usize,
+    pub max_channel_delta: u8,
+    pub alpha_changed_pixels: usize,
+    pub larger_delta_pixels: usize,
+    pub non_edge_changed_pixels: usize,
+    pub quantization_limit_pixels: usize,
+}
+impl Comparison {
+    /// Review-gated native text-edge rounding contract. Image fixtures additionally
+    /// require exact equality. The strict diagnostic still refuses any difference.
+    pub fn within_native_edge_quantization(&self) -> bool {
+        self.changed_pixels <= self.quantization_limit_pixels
+            && self.alpha_changed_pixels == 0
+            && self.larger_delta_pixels == 0
+            && self.non_edge_changed_pixels == 0
+    }
+}
+
+pub fn compare_rgba(
+    reference: &[u8],
+    actual: &[u8],
+    width: usize,
+    height: usize,
+) -> Option<Comparison> {
+    let pixels = width.checked_mul(height)?;
+    let bytes = pixels.checked_mul(4)?;
+    if width == 0 || height == 0 || reference.len() != bytes || actual.len() != bytes {
+        return None;
+    }
+    let reference = reference.as_chunks::<4>().0;
+    let actual = actual.as_chunks::<4>().0;
+    let mut result = Comparison {
+        quantization_limit_pixels: pixels / 10_000,
+        ..Comparison::default()
+    };
+    for (index, (a, b)) in reference.iter().zip(actual).enumerate() {
+        if a == b {
+            continue;
+        }
+        result.changed_pixels += 1;
+        let delta = a.iter().zip(b).map(|(a, b)| a.abs_diff(*b)).max().unwrap();
+        result.max_channel_delta = result.max_channel_delta.max(delta);
+        result.alpha_changed_pixels += usize::from(a[3] != b[3]);
+        result.larger_delta_pixels += usize::from(delta > 1);
+        let (x, y) = (index % width, index / width);
+        let edge = (y.saturating_sub(1)..=(y + 1).min(height - 1)).any(|ny| {
+            (x.saturating_sub(1)..=(x + 1).min(width - 1)).any(|nx| {
+                a[..3]
+                    .iter()
+                    .zip(&reference[ny * width + nx][..3])
+                    .any(|(a, n)| a.abs_diff(*n) >= 8)
+            })
+        });
+        result.non_edge_changed_pixels += usize::from(!edge);
+    }
+    Some(result)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -370,5 +431,61 @@ mod tests {
         assert!(tiles.len() <= MAX_REGIONS);
         assert!(tiles.iter().map(|t| t.region.bytes()).sum::<usize>() <= DETAIL_BUDGET);
         assert!(tiles.iter().any(|t| (450..650).contains(&t.page)));
+    }
+
+    fn reference() -> Vec<u8> {
+        let mut pixels = vec![255; 100 * 100 * 4];
+        for y in 0..100 {
+            for x in 50..100 {
+                pixels[(y * 100 + x) * 4..(y * 100 + x) * 4 + 3].fill(0);
+            }
+        }
+        pixels
+    }
+    #[test]
+    fn bounded_native_edge_rounding_is_reported_while_exact_pixels_stay_exact() {
+        let source = reference();
+        assert_eq!(
+            compare_rgba(&source, &source, 100, 100)
+                .unwrap()
+                .changed_pixels,
+            0
+        );
+        let mut actual = source.clone();
+        actual[(40 * 100 + 49) * 4..(40 * 100 + 49) * 4 + 3].fill(254);
+        let comparison = compare_rgba(&source, &actual, 100, 100).unwrap();
+        assert_eq!(comparison.changed_pixels, 1);
+        assert_eq!(comparison.max_channel_delta, 1);
+        assert!(comparison.within_native_edge_quantization());
+    }
+    #[test]
+    fn flat_area_alpha_and_larger_or_translated_pixels_are_rejected() {
+        let source = reference();
+        for (x, channel, value) in [(20, 0, 254), (49, 3, 254), (49, 0, 250), (50, 0, 255)] {
+            let mut actual = source.clone();
+            actual[(40 * 100 + x) * 4 + channel] = value;
+            assert!(
+                !compare_rgba(&source, &actual, 100, 100)
+                    .unwrap()
+                    .within_native_edge_quantization()
+            );
+        }
+    }
+    #[test]
+    fn many_edges_cannot_hide_a_systematic_change() {
+        let source = reference();
+        let mut actual = source.clone();
+        for y in 40..43 {
+            actual[(y * 100 + 49) * 4] = 254;
+        }
+        let comparison = compare_rgba(&source, &actual, 100, 100).unwrap();
+        assert_eq!(comparison.non_edge_changed_pixels, 0);
+        assert!(!comparison.within_native_edge_quantization());
+    }
+    #[test]
+    fn invalid_or_overflowed_geometry_is_refused() {
+        assert!(compare_rgba(&[], &[], 0, 0).is_none());
+        assert!(compare_rgba(&[], &[], usize::MAX, 2).is_none());
+        assert!(compare_rgba(&[0; 4], &[0; 3], 1, 1).is_none());
     }
 }

@@ -43,8 +43,9 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
                               *common, '--pdfium', str(pdfium), '--geometry-only'], 300))
     tests.append(('engine-paths', [python, str(source / 'scripts' / 'check-engine-paths.py'),
                                   *common, '--pdfium', str(pdfium)], 300))
+    tile_args = ['--report', str(Path(raster_reports) / 'render-tiles.json')] if raster_reports is not None else []
     tests.append(('render-tiles', [python, str(source / 'scripts' / 'check-render-tiles.py'),
-                                 *common, '--pdfium', str(pdfium)], 600))
+                                 *common, '--pdfium', str(pdfium), *tile_args], 600))
     command = [python, str(source / 'scripts' / 'check-block-rust.py'), *common,
                '--pdfium', str(pdfium), '--qpdf', str(qpdf)]
     if probe_report is not None:

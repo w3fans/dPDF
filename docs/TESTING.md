@@ -991,3 +991,20 @@ fixtures. Reports above the proposed 10% median guard require investigation,
 including run-to-run noise; the driver never converts a flag into acceptance.
 Use `check-raster-ui.py --report report.json` to retain diagnostic timings and
 50ms Linux RSS observations. These samples do not establish a full plateau.
+
+The strict `--check-render-tiles` CLI still returns failure for every nonzero
+pixel difference. The corpus records that exact-mode result and independently
+checks a review-gated native edge-rounding contract: at most one channel level,
+unchanged alpha, a neighbouring reference RGB contrast of at least 8 within
+3×3, and at most 0.01% changed pixels. Image-only fixtures remain exact.
+All differences and bounds are retained in `render-tiles.json`; crashes and
+other errors never satisfy the contract. See the dated T05 characterization
+before accepting this numerical policy or reusing it with another engine pair.
+
+`benchmark-reader-window.py --binary PATH --pdfium PATH --qpdf PATH --repeat 3
+--output report.json` measures Linux/private-X11 GUI timing upper bounds with
+deterministically generated per-page fiducials. It requires xdotool and
+ImageMagick import. The launch phase includes a Fit Page request; input and
+capture overhead are retained. This is neither stock-startup latency nor
+Windows operator acceptance. Generated inputs and runtime hashes are checked,
+and current/peak process RSS is recorded separately from child-tree memory.
