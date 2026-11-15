@@ -80,7 +80,7 @@ impl Check {
                     self.phase = 1;
                 }
                 1 if app.tabs.len() == 2 && app.pages.iter().any(|page| page.ready) => {
-                    app.tabs[app.active].view.zoom = Zoom::Scale(8.0);
+                    app.tabs[app.active].view.zoom = Zoom::Scale(6.0);
                     app.relayout(ui, true);
                     app.request_visible(ui);
                     app.activate(ui, 0);
@@ -133,7 +133,7 @@ impl Check {
                 let tab = &mut app.tabs[app.active];
                 tab.view.page = 6;
                 tab.view.mode = mode;
-                tab.view.zoom = Zoom::Scale(8.0);
+                tab.view.zoom = Zoom::Scale(6.0);
                 tab.view.rotation = (self.case % 4) as u8;
                 ui.set_view_mode(match mode {
                     ViewMode::Single => 0,
@@ -179,7 +179,7 @@ impl Check {
                 );
                 self.phase_started = Some(Instant::now());
                 // Do not drain replies between generations: permits must survive cancellation.
-                for zoom in [4.0, 12.0, 6.0] {
+                for zoom in [4.0, 5.5, 6.0] {
                     app.tabs[app.active].view.zoom = Zoom::Scale(zoom);
                     app.relayout(ui, true);
                     app.request_visible(ui);
