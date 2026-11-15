@@ -984,3 +984,10 @@ generations and tab switching/closure. Observed render slots include queued,
 active and unconsumed replies; they do not measure the complete command queue.
 The suite does not prove subjective sharpness, complete RSS plateau, native
 Wayland input or physical output. Use approved compiler lanes for its executable.
+
+`compare-reader.py --baseline PATH --candidate PATH --pdfium PATH --repeat 5
+--output report.json` alternates ordinary-path runs on identical generated
+fixtures. Reports above the proposed 10% median guard require investigation,
+including run-to-run noise; the driver never converts a flag into acceptance.
+Use `check-raster-ui.py --report report.json` to retain diagnostic timings and
+50ms Linux RSS observations. These samples do not establish a full plateau.

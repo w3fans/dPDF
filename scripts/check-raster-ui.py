@@ -2,6 +2,9 @@
 """Generated high-zoom window checks; bounded slots/bitmaps, pan, rotations and tabs."""
 import argparse
 import os
+import hashlib
+import json
+import time
 from pathlib import Path
 import re
 import subprocess
@@ -23,6 +26,7 @@ def main():
     parser.add_argument('--binary', type=Path, required=True)
     parser.add_argument('--pdfium', type=Path, required=True)
     parser.add_argument('--xvfb', default='Xvfb')
+    parser.add_argument('--report', type=Path)
     parser.add_argument('--scale', type=float, choices=[1, 1.5, 2], default=1)
     args = parser.parse_args()
     bench = module('raster_fixtures', 'benchmark-reader.py')
@@ -38,9 +42,43 @@ def main():
             if os.name != 'nt':
                 env['DBUS_SESSION_BUS_ADDRESS'] = 'unix:path=' + str(folder / 'no-session-bus')
             try:
-                result = subprocess.run([str(args.binary.resolve()), '--smoke-ui', str(fixture)],
-                                        env=env, capture_output=True, text=True, encoding='utf-8',
-                                        errors='replace', timeout=60)
+                command = [str(args.binary.resolve()), '--smoke-ui', str(fixture)]
+                started = time.monotonic()
+                rss = []
+                with subprocess.Popen(command, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                      text=True, encoding='utf-8', errors='replace') as child:
+                    while True:
+                        status = Path(f'/proc/{child.pid}/status')
+                        if os.name == 'posix' and status.is_file():
+                            try:
+                                match = re.search(r'^VmRSS:\s+(\d+) kB$', status.read_text(), re.M)
+                                if match:
+                                    rss.append(dict(seconds=time.monotonic() - started, kib=int(match[1])))
+                            except FileNotFoundError:
+                                pass  # Exited between status lookup and read.
+                        remaining = 60 - (time.monotonic() - started)
+                        try:
+                            stdout, stderr = child.communicate(timeout=min(0.05, max(0.001, remaining)))
+                            break
+                        except subprocess.TimeoutExpired:
+                            if remaining <= 0:
+                                child.kill()
+                                stdout, stderr = child.communicate()
+                                raise subprocess.TimeoutExpired(command, 60, stdout, stderr)
+                    result = subprocess.CompletedProcess(command, child.returncode, stdout, stderr)
+                observations = dict(schema=1, scope='generated_native_raster_window', scale=args.scale,
+                                    binary_sha256=hashlib.sha256(args.binary.read_bytes()).hexdigest(),
+                                    pdfium_sha256=hashlib.sha256(args.pdfium.read_bytes()).hexdigest(),
+                                    input_sha256=hashlib.sha256(original).hexdigest(),
+                                    rss_samples=rss, rss_sampling_seconds=0.05,
+                                    peak_rss_kib=max((item['kib'] for item in rss), default=None),
+                                    stdout=stdout, stderr=stderr, exit_code=child.returncode)
+                if args.report:
+                    args.report.write_text(json.dumps(observations, indent=2) + '\n')
+                if rss:
+                    print(f"raster: sampled_peak_rss_kib={observations['peak_rss_kib']}")
+                    if observations['peak_rss_kib'] > 512 * 1024:
+                        raise RuntimeError('Generated window exceeded proposed 512 MiB RSS guard; investigate report')
             except subprocess.TimeoutExpired as error:
                 for output in (error.stdout, error.stderr):
                     if output:
