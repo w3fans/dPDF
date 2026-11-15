@@ -1,0 +1,278 @@
+{
+  "schema": 1,
+  "scope": "supplemental_generated_private_x11_parent_observations",
+  "source_head": "5d7b0da37c3632ed618c793b776bd0c01753f2f6",
+  "source_tested_merge": "ecc4f82d0d426a2e25e22babd979065b2f0de312",
+  "first_page_latency_qualified": false,
+  "complete_command_queue_depth_measured": false,
+  "cases": [
+    {
+      "scope": "generated_private_x11_external_window_capture",
+      "binary_sha256": "3d2db092c50eeb89346ff5b4fb8f6a1f8f0b2e959e00749ac4a84ec4233374ae",
+      "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+      "input_sha256": "f570d25b5eca37672605e898373a82749b7c6c3769bb096487535a7fba8f2836",
+      "scale": "1",
+      "window_appearance_seconds": 0.12191932694986463,
+      "window_appearance_is_first_page_latency": false,
+      "zoom_input": "18 Ctrl+plus events; inspect UI zoom label",
+      "rss_kib": [
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680,
+        160680
+      ],
+      "artifacts": {
+        "high-zoom.png": "1d91fe2acc575ab0d2a9819c3408f00dee8ae15fb4017a40ec8ac6a23ae3f2e6",
+        "ordinary.png": "7cf8dada8d13c8c1a970082c2caff037249ace86fbee97d76846fd67db422cad"
+      }
+    },
+    {
+      "scope": "generated_private_x11_external_window_capture",
+      "binary_sha256": "3d2db092c50eeb89346ff5b4fb8f6a1f8f0b2e959e00749ac4a84ec4233374ae",
+      "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+      "input_sha256": "f570d25b5eca37672605e898373a82749b7c6c3769bb096487535a7fba8f2836",
+      "scale": "1.5",
+      "window_appearance_seconds": 0.1166534599615261,
+      "window_appearance_is_first_page_latency": false,
+      "zoom_input": "18 Ctrl+plus events; inspect UI zoom label",
+      "rss_kib": [
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504,
+        172504
+      ],
+      "artifacts": {
+        "high-zoom.png": "e6c129cab956e0e9d935212d79bd46a03b2972501a0aec0fb8de560cef13217b",
+        "ordinary.png": "ad29fece884463f54d0acffc5014d9abc2148c34563c8a17940e0ef383a769b9"
+      }
+    },
+    {
+      "scope": "generated_private_x11_external_window_capture",
+      "binary_sha256": "3d2db092c50eeb89346ff5b4fb8f6a1f8f0b2e959e00749ac4a84ec4233374ae",
+      "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+      "input_sha256": "f570d25b5eca37672605e898373a82749b7c6c3769bb096487535a7fba8f2836",
+      "scale": "2",
+      "window_appearance_seconds": 0.1153271859511733,
+      "window_appearance_is_first_page_latency": false,
+      "zoom_input": "18 Ctrl+plus events; inspect UI zoom label",
+      "rss_kib": [
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684,
+        184684
+      ],
+      "artifacts": {
+        "high-zoom.png": "54635b955fd93eaa45ceab195897a778fabbe3ab5e833afbd37c732fbc1b6b58",
+        "ordinary.png": "9c220be81d49e6c6147403c06aae411b72f6f6828681da57ede90b7a492f9b43"
+      }
+    },
+    {
+      "scope": "generated_private_x11_external_window_capture",
+      "binary_sha256": "3d2db092c50eeb89346ff5b4fb8f6a1f8f0b2e959e00749ac4a84ec4233374ae",
+      "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+      "input_sha256": "f570d25b5eca37672605e898373a82749b7c6c3769bb096487535a7fba8f2836",
+      "scale": "2",
+      "window_appearance_seconds": 0.11784665193408728,
+      "window_appearance_is_first_page_latency": false,
+      "zoom_input": "18 Ctrl+plus events; inspect UI zoom label",
+      "rss_kib": [
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660,
+        184660
+      ],
+      "cycle_rss": [
+        {
+          "cycle": 0,
+          "kib": 184476
+        },
+        {
+          "cycle": 1,
+          "kib": 184476
+        },
+        {
+          "cycle": 2,
+          "kib": 184476
+        },
+        {
+          "cycle": 3,
+          "kib": 184476
+        },
+        {
+          "cycle": 4,
+          "kib": 184476
+        },
+        {
+          "cycle": 5,
+          "kib": 184476
+        },
+        {
+          "cycle": 6,
+          "kib": 184476
+        },
+        {
+          "cycle": 7,
+          "kib": 184476
+        },
+        {
+          "cycle": 8,
+          "kib": 184476
+        },
+        {
+          "cycle": 9,
+          "kib": 184476
+        },
+        {
+          "cycle": 10,
+          "kib": 184476
+        },
+        {
+          "cycle": 11,
+          "kib": 184476
+        },
+        {
+          "cycle": 12,
+          "kib": 184476
+        },
+        {
+          "cycle": 13,
+          "kib": 184476
+        },
+        {
+          "cycle": 14,
+          "kib": 184476
+        },
+        {
+          "cycle": 15,
+          "kib": 184476
+        },
+        {
+          "cycle": 16,
+          "kib": 184476
+        },
+        {
+          "cycle": 17,
+          "kib": 184476
+        },
+        {
+          "cycle": 18,
+          "kib": 184476
+        },
+        {
+          "cycle": 19,
+          "kib": 184476
+        }
+      ],
+      "artifacts": {
+        "after-cycles.png": "f2a17fcc4096995206d04eed93eb72ba97a9139cc667eb766e23ca61eaad00e1",
+        "high-zoom.png": "54635b955fd93eaa45ceab195897a778fabbe3ab5e833afbd37c732fbc1b6b58",
+        "ordinary.png": "9c220be81d49e6c6147403c06aae411b72f6f6828681da57ede90b7a492f9b43"
+      }
+    }
+  ],
+  "reproduction_driver_sha256": "0b69d3ec4c119e1d3a7e21a311e91b0f0e24b439cdf968c239c3cc2823e97eec"
+}

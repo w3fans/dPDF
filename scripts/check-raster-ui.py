@@ -70,11 +70,15 @@ def main():
                                     binary_sha256=hashlib.sha256(args.binary.read_bytes()).hexdigest(),
                                     pdfium_sha256=hashlib.sha256(args.pdfium.read_bytes()).hexdigest(),
                                     input_sha256=hashlib.sha256(original).hexdigest(),
+                                    timing_origin='first diagnostic tick for preview; view mutation for detail/pan snapshots',
                                     rss_samples=rss, rss_sampling_seconds=0.05,
                                     peak_rss_kib=max((item['kib'] for item in rss), default=None),
                                     stdout=stdout, stderr=stderr, exit_code=child.returncode)
                 if args.report:
                     args.report.write_text(json.dumps(observations, indent=2) + '\n')
+                print(result.stdout, end='')
+                if result.returncode:
+                    print(result.stderr, end='')
                 if rss:
                     print(f"raster: sampled_peak_rss_kib={observations['peak_rss_kib']}")
                     if observations['peak_rss_kib'] > 512 * 1024:
@@ -84,9 +88,6 @@ def main():
                     if output:
                         print(output.decode('utf-8', errors='replace') if isinstance(output, bytes) else output)
                 raise
-            print(result.stdout, end='')
-            if result.returncode:
-                print(result.stderr, end='')
             result.check_returncode()
             summary = re.search(r'raster: summary peak_render_slots=(\d+) peak_detail_bytes=(\d+) cases=12 tab_switch_close=true', result.stdout)
             if result.stdout.count('raster: case=') != 12 or not summary:

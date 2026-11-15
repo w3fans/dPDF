@@ -24,6 +24,7 @@ def main():
     parser.add_argument('--pdfium', type=Path, required=True)
     parser.add_argument('--repeat', type=int, default=5)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--case', action='append', choices=['50-office', '300-office', '1000-text', '50-vector', '50-large-image', '300-mixed-geometry'])
     args = parser.parse_args()
     if not 3 <= args.repeat <= 10:
         parser.error('--repeat must be between 3 and 10')
@@ -37,7 +38,9 @@ def main():
     report = dict(schema=1, scope='interleaved_generated_headless_ordinary_path',
                   recorded_at=datetime.now(timezone.utc).isoformat(), platform=platform.platform(),
                   binary_sha256=identity, pdfium_sha256=digest(args.pdfium),
-                  gui_latency=False, full_command_queue_depth=False, threshold_percent=10, cases=[])
+                  gui_latency=False, full_command_queue_depth=False, threshold_percent=10,
+                  same_executable=identity['baseline'] == identity['candidate'],
+                  requested_cases=args.case, full_generated_corpus=args.case is None, cases=[])
     with tempfile.TemporaryDirectory(prefix='dpdf-reader-comparison-') as directory:
         folder = Path(directory)
         cases = [('50-office', sample.make_pdf(50)), ('300-office', sample.make_pdf(300)),
@@ -45,6 +48,8 @@ def main():
                  ('50-large-image', fixtures.image_fixture(sample)),
                  ('300-mixed-geometry', fixtures.mixed_fixture(sample))]
         for name, content in cases:
+            if args.case and name not in args.case:
+                continue
             fixture = folder / (name + '.pdf')
             fixture.write_bytes(content)
             runs = {'baseline': [], 'candidate': []}
