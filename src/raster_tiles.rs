@@ -24,13 +24,23 @@ pub struct RenderPermit(Arc<AtomicUsize>);
 
 impl RenderSlots {
     pub fn acquire(&self) -> Option<RenderPermit> {
-        self.0
-            .fetch_update(AtomicOrdering::AcqRel, AtomicOrdering::Acquire, |n| {
-                (n < MAX_PENDING_RENDERS).then_some(n + 1)
-            })
-            .ok()?;
-        Some(RenderPermit(self.0.clone()))
+        let mut count = self.0.load(AtomicOrdering::Acquire);
+        loop {
+            if count >= MAX_PENDING_RENDERS {
+                return None;
+            }
+            match self.0.compare_exchange_weak(
+                count,
+                count + 1,
+                AtomicOrdering::AcqRel,
+                AtomicOrdering::Acquire,
+            ) {
+                Ok(_) => return Some(RenderPermit(self.0.clone())),
+                Err(actual) => count = actual,
+            }
+        }
     }
+
     pub fn in_flight(&self) -> usize {
         self.0.load(AtomicOrdering::Acquire)
     }

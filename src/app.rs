@@ -2105,7 +2105,7 @@ impl Application {
                         bitmap: self.detail_images.get(key).cloned().unwrap_or_default(),
                         ready: self.detail_images.contains_key(key),
                     })
-                    .collect(),
+                    .collect::<Vec<_>>(),
             );
             self.detail_keys = detail_keys;
         }
