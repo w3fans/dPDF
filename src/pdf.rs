@@ -1363,14 +1363,16 @@ pub fn check_render_tiles(
         }
     }
     let changed_pixels = expected
-        .chunks_exact(4)
-        .zip(stitched.chunks_exact(4))
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .zip(stitched.as_chunks::<4>().0)
         .filter(|(a, b)| a != b)
         .count();
     if let Some(output) = reference {
         let mut file = std::io::BufWriter::new(std::fs::File::create(output)?);
         write!(file, "P6\n{width} {height}\n255\n")?;
-        for pixel in expected.chunks_exact(4) {
+        for pixel in expected.as_chunks::<4>().0 {
             file.write_all(&pixel[..3])?;
         }
         file.flush()?;
