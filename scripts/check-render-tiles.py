@@ -93,10 +93,19 @@ def main():
                             result.returncode == 1 and 'Detail tiles differ from the native full-page reference' in result.stderr), (name, turn, result.stderr, report)
                     case_result.update(strict_exit_code=result.returncode, comparison=report)
                     assert report['forms_enabled'] is True
-                    assert report['max_channel_delta'] <= 1 and report['alpha_changed_pixels'] == 0, (name, turn, report)
-                    assert report['larger_delta_pixels'] == 0 and report['non_edge_changed_pixels'] == 0, (name, turn, report)
+                    assert report['alpha_changed_pixels'] == 0 and report['non_edge_changed_pixels'] == 0, (name, turn, report)
                     assert report['native_edge_quantization_limit_pixels'] == 3600 * 2400 // 10000
-                    assert changed <= report['native_edge_quantization_limit_pixels'] and report['within_native_edge_quantization'] is True, (name, turn, report)
+                    assert changed <= report['native_edge_quantization_limit_pixels'], (name, turn, report)
+                    if report['larger_delta_pixels'] == 0:
+                        assert report['max_channel_delta'] <= 1 and report['within_native_edge_quantization'] is True, (name, turn, report)
+                    else:
+                        # Larger edge deltas are accepted only when an untiled
+                        # native origin control reproduces at least the same
+                        # delta and count (observed with Windows PDFium).
+                        assert all(c['alpha_changed_pixels'] == 0 and c['non_edge_changed_pixels'] == 0 for c in controls), (name, turn, report)
+                        assert any(c['max_channel_delta'] >= report['max_channel_delta'] and
+                                   c['larger_delta_pixels'] >= report['larger_delta_pixels'] for c in controls), (name, turn, report)
+                    assert report['within_native_origin_variance'] is True, (name, turn, report)
                     if name in ('large-image', 'jpeg-image'):
                         assert changed == 0, (name, turn, report)
                     assert 0 < report['peak_tile_bytes'] <= 512 * 512 * 4

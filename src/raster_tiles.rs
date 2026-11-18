@@ -234,7 +234,7 @@ pub fn plan(pages: &[PagePlacement], viewport: (f32, f32, f32, f32), scale: f32)
 }
 
 /// Describes every differing native pixel; it does not erase or clamp differences.
-#[derive(Default, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
 pub struct Comparison {
     pub changed_pixels: usize,
     pub max_channel_delta: u8,
@@ -251,6 +251,24 @@ impl Comparison {
             && self.alpha_changed_pixels == 0
             && self.larger_delta_pixels == 0
             && self.non_edge_changed_pixels == 0
+    }
+
+    /// Accepts edge-only rounding larger than one level only when untiled native
+    /// origin controls of the same page independently reproduce at least that
+    /// delta and count. Tiling may never exceed the renderer's own origin variance.
+    pub fn within_native_origin_variance(&self, controls: &[Comparison]) -> bool {
+        if self.within_native_edge_quantization() {
+            return true;
+        }
+        let edge_only =
+            |c: &Comparison| c.alpha_changed_pixels == 0 && c.non_edge_changed_pixels == 0;
+        self.changed_pixels <= self.quantization_limit_pixels
+            && edge_only(self)
+            && controls.iter().all(edge_only)
+            && controls.iter().any(|c| {
+                c.max_channel_delta >= self.max_channel_delta
+                    && c.larger_delta_pixels >= self.larger_delta_pixels
+            })
     }
 }
 
@@ -487,5 +505,40 @@ mod tests {
         assert!(compare_rgba(&[], &[], 0, 0).is_none());
         assert!(compare_rgba(&[], &[], usize::MAX, 2).is_none());
         assert!(compare_rgba(&[0; 4], &[0; 3], 1, 1).is_none());
+    }
+    #[test]
+    fn larger_edge_delta_requires_matching_untiled_origin_control() {
+        let tile = Comparison {
+            changed_pixels: 57,
+            max_channel_delta: 2,
+            larger_delta_pixels: 1,
+            quantization_limit_pixels: 864,
+            ..Comparison::default()
+        };
+        assert!(!tile.within_native_edge_quantization());
+        let weaker = Comparison {
+            max_channel_delta: 1,
+            changed_pixels: 16,
+            ..Comparison::default()
+        };
+        assert!(!tile.within_native_origin_variance(&[]));
+        assert!(!tile.within_native_origin_variance(&[weaker]));
+        let matching = Comparison {
+            max_channel_delta: 2,
+            larger_delta_pixels: 1,
+            changed_pixels: 53,
+            ..Comparison::default()
+        };
+        assert!(tile.within_native_origin_variance(&[weaker, matching]));
+        let interior = Comparison {
+            non_edge_changed_pixels: 1,
+            ..matching
+        };
+        assert!(!tile.within_native_origin_variance(&[interior]));
+        let tile_interior = Comparison {
+            non_edge_changed_pixels: 1,
+            ..tile
+        };
+        assert!(!tile_interior.within_native_origin_variance(&[matching]));
     }
 }

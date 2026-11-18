@@ -1369,6 +1369,7 @@ pub fn check_render_tiles(
     // Untiled, large destination controls distinguish native origin rounding
     // from tile clipping. They never relax the strict CLI's equality assertion.
     let mut origin_controls = Vec::new();
+    let mut control_results = Vec::new();
     if changed_pixels != 0 {
         for offset in [1, 127, 509] {
             if width <= offset || height <= offset {
@@ -1392,10 +1393,12 @@ pub fn check_render_tiles(
             let control =
                 crate::raster_tiles::compare_rgba(&cropped, &actual, cw as usize, ch as usize)
                     .context("Invalid native origin control dimensions")?;
-            origin_controls.push(serde_json::json!({"offset":offset,"width":cw,"height":ch,
+            let json = serde_json::json!({"offset":offset,"width":cw,"height":ch,
                 "changed_pixels":control.changed_pixels,"max_channel_delta":control.max_channel_delta,
                 "alpha_changed_pixels":control.alpha_changed_pixels,"larger_delta_pixels":control.larger_delta_pixels,
-                "non_edge_changed_pixels":control.non_edge_changed_pixels}));
+                "non_edge_changed_pixels":control.non_edge_changed_pixels});
+            control_results.push(control);
+            origin_controls.push(json);
         }
     }
     if let Some(output) = reference {
@@ -1417,6 +1420,7 @@ pub fn check_render_tiles(
         "non_edge_changed_pixels":comparison.non_edge_changed_pixels,
         "native_edge_quantization_limit_pixels":comparison.quantization_limit_pixels,
         "within_native_edge_quantization":comparison.within_native_edge_quantization(),
+        "within_native_origin_variance":comparison.within_native_origin_variance(&control_results),
         "native_origin_controls":origin_controls})
     );
     ensure!(
