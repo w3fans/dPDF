@@ -47,18 +47,18 @@ struct OwnedProcess {
     child: Child,
     group: i32,
     inherited: bool,
-    finished: bool,
 }
 impl Drop for OwnedProcess {
     fn drop(&mut self) {
         // The outer owner creates a separate group before exec; native-host
         // helpers join that group. Never target the reader's process group.
-        if !self.inherited || !self.finished {
-            // Nested helper failure aborts this print host and its entire group.
-            // The external owner reaps the host and removes its private scratch.
-            // Successful nested work must never kill the host that owns it.
+        if !self.inherited {
             unsafe { kill(-self.group, 9) };
         }
+        // A nested helper shares the print host's group, so it can never kill
+        // that group: a slow or failed probe (e.g. lpstat) must not abort the
+        // host after the user chose a printer. Any descendant it left stays in
+        // the host group, which the outer owner always kills when the host exits.
         let _ = self.child.kill();
         let _ = self.child.wait();
     }
@@ -162,7 +162,6 @@ fn run_inner(
         child,
         group,
         inherited,
-        finished: false,
     };
     let mut stdin = process.child.stdin.take();
     let mut stdout = process.child.stdout.take();
@@ -214,7 +213,6 @@ fn run_inner(
             && stderr.is_none()
             && stdin.is_none()
         {
-            process.finished = true;
             return Ok(Output {
                 status,
                 stdout: output,
@@ -386,15 +384,17 @@ mod tests {
             println!("host survived successful nested work");
         } else {
             let pid = std::env::var_os("DPDF_TEST_PRINT_DESCENDANT").unwrap();
-            let _ = run(
+            let error = run(
                 Command::new("sh")
                     .args(["-c", "sleep 30 & echo $! > \"$1\"; wait", "fixture"])
                     .arg(pid),
                 b"",
                 policy,
                 None,
-            );
-            panic!("A failed nested helper must abort its externally owned host group");
+            )
+            .unwrap_err();
+            assert!(error.to_string().contains("deadline"), "{error:#}");
+            println!("host survived failed nested work");
         }
     }
 
@@ -429,22 +429,27 @@ mod tests {
             &cancel,
         )
         .unwrap();
-        assert!(!result.status.success());
-        use std::os::unix::process::ExitStatusExt;
-        assert_eq!(result.status.signal(), Some(9));
-        assert!(start.elapsed() < Duration::from_secs(3));
-        let pid = std::fs::read_to_string(path).unwrap();
-        let stat = std::fs::read_to_string(format!("/proc/{}/stat", pid.trim()));
         assert!(
-            stat.is_err()
-                || stat
-                    .unwrap()
-                    .rsplit(')')
-                    .next()
-                    .unwrap()
-                    .split_whitespace()
-                    .next()
-                    == Some("Z")
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
         );
+        assert!(
+            String::from_utf8_lossy(&result.stdout).contains("host survived failed nested work")
+        );
+        assert!(start.elapsed() < Duration::from_secs(3));
+        // The outer owner group-kills on drop, so the descendant left by the
+        // failed nested helper cannot outlive its print host.
+        let pid = std::fs::read_to_string(path).unwrap();
+        let gone = || {
+            std::fs::read_to_string(format!("/proc/{}/stat", pid.trim())).map_or(true, |stat| {
+                stat.rsplit(')').next().unwrap().split_whitespace().next() == Some("Z")
+            })
+        };
+        let deadline = Instant::now() + Duration::from_secs(2);
+        while !gone() && Instant::now() < deadline {
+            thread::sleep(Duration::from_millis(10));
+        }
+        assert!(gone(), "nested descendant escaped its print host group");
     }
 }
