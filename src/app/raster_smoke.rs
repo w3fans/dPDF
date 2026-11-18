@@ -66,8 +66,22 @@ impl Check {
 
     fn verify_landmarks(&self, app: &Application, ui: &Workspace) -> anyhow::Result<()> {
         let snapshot = ui.window().take_snapshot()?;
+        let scale = ui.window().scale_factor() as f64;
+        // Only the document viewport: thumbnails of the same generated pages
+        // also carry tiny landmark-coloured pixels that would bias a centroid.
+        let left = ui.get_viewport_window_x() as f64 * scale;
+        let top = ui.get_viewport_window_y() as f64 * scale;
+        let right = left + ui.get_viewport_width() as f64 * scale;
+        let bottom = top + ui.get_viewport_height() as f64 * scale;
         let mut observations = [(0usize, 0.0f64, 0.0f64); 2];
         for (index, pixel) in snapshot.as_slice().iter().enumerate() {
+            let (px, py) = (
+                (index % snapshot.width() as usize) as f64 + 0.5,
+                (index / snapshot.width() as usize) as f64 + 0.5,
+            );
+            if px < left || px > right || py < top || py > bottom {
+                continue;
+            }
             let color = if pixel.r > 240 && pixel.g < 16 && pixel.b > 240 {
                 Some(0)
             } else if pixel.r < 16 && pixel.g > 240 && pixel.b > 240 {
@@ -78,8 +92,8 @@ impl Check {
             if let Some(color) = color {
                 let value = &mut observations[color];
                 value.0 += 1;
-                value.1 += (index % snapshot.width() as usize) as f64 + 0.5;
-                value.2 += (index / snapshot.width() as usize) as f64 + 0.5;
+                value.1 += px;
+                value.2 += py;
             }
         }
         let page = app
@@ -90,7 +104,6 @@ impl Check {
             .iter()
             .find(|p| p.page == self.page())
             .unwrap();
-        let scale = ui.window().scale_factor() as f64;
         let mut maximum = 0.0f64;
         for (color, (fx, fy)) in [(0.51f32, 0.51f32), (0.49, 0.49)].into_iter().enumerate() {
             let (fx, fy) = match self.case % 4 {
