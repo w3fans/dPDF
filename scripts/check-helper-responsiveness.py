@@ -32,14 +32,16 @@ def main():
         raise RuntimeError('This helper/process-identity fixture requires Linux; native Windows remains separate')
     sample = module('helper_sample', 'make-sample.py')
     private = module('helper_display', 'private-display.py')
+    pages_fixture = module('helper_page_fixtures', 'check-pages.py')
     with tempfile.TemporaryDirectory(prefix='dpdf-helper-window-') as directory:
         root = Path(directory)
         for mode in ('close', 'retry', 'shutdown', 'recovery', 'protected-print', 'protected-export',
-                     'overlay-close', 'overlay-save', 'overlay-units', 'overlay-review'):
+                     'overlay-close', 'overlay-save', 'overlay-units', 'overlay-review',
+                     'image-preflight', 'image-unit-write', 'image-save', 'pages-save', 'pages-retry'):
             folder = root / mode
             folder.mkdir()
             source = folder / 'generated50.pdf'
-            source.write_bytes(sample.make_pdf(50, user_unit=2 if mode == 'overlay-units' else 1))
+            source.write_bytes(sample.make_pdf(50, user_unit=2 if mode in ('overlay-units', 'image-preflight', 'image-unit-write', 'image-save') else 1))
             if mode.startswith('protected-'):
                 encrypted = folder / 'protected50.pdf'
                 job = folder / 'generated-encryption.json'
@@ -53,6 +55,16 @@ def main():
                 finally:
                     job.unlink()
                 source = encrypted
+            inputs = []
+            if mode.startswith('image-') or mode == 'pages-retry':
+                inputs = [Path(__file__).with_name('fixtures').joinpath('page-photo.jpg').resolve()]
+            if mode == 'pages-retry':
+                png = folder / 'generated-transparent.png'
+                png.write_bytes(pages_fixture.png(32, 16))
+                secondary = folder / 'generated3.pdf'
+                secondary.write_bytes(sample.make_pdf(3))
+                inputs += [png, secondary]
+            input_hashes = {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
             destination = folder / 'existing-output.pdf'
             destination.write_bytes(b'pre-existing generated destination must survive cancellation')
             destination_before = destination.read_bytes()
@@ -62,7 +74,14 @@ def main():
             driver = folder / 'helper.py'
             # Helpers exec directly without shell children. Metadata modes stall
             # the first inspection; protected modes stall every decryption.
-            if mode == 'overlay-save':
+            if mode in ('image-save', 'pages-save', 'pages-retry'):
+                condition = 'arm.exists() and not ready.exists() and any(arg.startswith("--job-json-file=") for arg in sys.argv[1:])'
+            elif mode == 'image-preflight':
+                condition = 'arm.exists() and not ready.exists() and sys.argv[1:2]==["--json"]'
+            elif mode == 'image-unit-write':
+                condition = ('arm.exists() and not ready.exists() and '
+                    'any(arg.startswith("--update-from-json=") and Path(arg.split("=",1)[1]).name=="units.json" for arg in sys.argv[1:])')
+            elif mode == 'overlay-save':
                 condition = 'arm.exists() and any(arg.startswith("--job-json-file=") for arg in sys.argv[1:])'
             elif mode == 'overlay-review':
                 condition = 'arm.exists() and sys.argv[1:2]==["--json"] and Path(sys.argv[-1]).name=="source.pdf"'
@@ -121,7 +140,8 @@ def main():
                         assert 'durable checkpoint written' in prepared.stdout
                         assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1
                         env['DPDF_SMOKE_RECOVERY'] = 'read'
-                    env.update(DPDF_SMOKE_PLACEMENT_IMAGE=str(Path(__file__).with_name('fixtures').joinpath('page-photo.jpg').resolve()),
+                    env.update(DPDF_SMOKE_HELPER_PAGE_INPUTS=json.dumps([str(path) for path in inputs]),
+                               DPDF_SMOKE_PLACEMENT_IMAGE=str(Path(__file__).with_name('fixtures').joinpath('page-photo.jpg').resolve()),
                                DPDF_SMOKE_PASSWORD_VALUE='generated-only helper test',
                                DPDF_SMOKE_HELPER_DESTINATION=str(destination),
                                GTK_PRINT_BACKENDS='file', GTK_USE_PORTAL='0',
@@ -137,7 +157,8 @@ def main():
                         print(result.stderr, end='', flush=True)
                     result.check_returncode()
                     assert ready.is_file(), 'Generated helper never started'
-                    rendered = ('rendered page 25 while export helper remained stalled' if mode.startswith('overlay-') else
+                    rendered = ('rendered page 25 while page export helper remained stalled' if mode.startswith(('image-', 'pages-')) else
+                                'rendered page 25 while export helper remained stalled' if mode.startswith('overlay-') else
                                 'rendered page 25 while metadata remained stalled')
                     assert rendered in result.stdout
                     expected = {'close': 'closed stalled document and reopened without a stale completion',
@@ -149,7 +170,12 @@ def main():
                                 'overlay-close': 'tab close cancelled overlay export without publishing a late result',
                                 'overlay-units': 'tab close cancelled overlay export without publishing a late result',
                                 'overlay-save': 'owned overlay save stayed pending until normal shutdown',
-                                'overlay-review': 'owned overlay save stayed pending until normal shutdown'}[mode]
+                                'overlay-review': 'owned overlay save stayed pending until normal shutdown',
+                                'image-preflight': 'tab close cancelled page export without publishing a late result',
+                                'image-unit-write': 'tab close cancelled page export without publishing a late result',
+                                'image-save': 'owned page export stayed pending until normal shutdown',
+                                'pages-save': 'tab close cancelled page export without publishing a late result',
+                                'pages-retry': 'page export retry published 55 pages after cancelling its prior generation'}[mode]
                     assert expected in result.stdout, expected
                     deadline = time.monotonic() + 1
                     while owned_pids() and time.monotonic() < deadline:
@@ -159,9 +185,16 @@ def main():
                         assert len(list((Path(env['DPDF_DATA_DIR']) / 'recovery').glob('*.dpdf'))) == 1, 'Cancelled recovery lost its durable checkpoint'
                     if mode.startswith('protected-'):
                         assert len(list(folder.glob('helper-*.json'))) == 1, 'Cancelled queued decryption was started'
-                    if mode.startswith('overlay-'):
+                    if mode.startswith(('overlay-', 'image-', 'pages-')):
                         assert not [p for p in folder.iterdir() if p.name.startswith(('.tmp', '.dpdf'))], 'Cancelled export left destination staging files'
-                    assert destination.read_bytes() == destination_before, 'Cancelled operation changed its existing destination'
+                    if mode == 'pages-retry':
+                        subprocess.run([str(args.qpdf.resolve()), '--check', str(destination)], check=True, capture_output=True, timeout=10)
+                        assert subprocess.check_output([str(args.qpdf.resolve()), '--show-npages', str(destination)], timeout=10).strip() == b'55'
+                        assert destination.read_bytes() != destination_before
+                    else:
+                        assert destination.read_bytes() == destination_before, 'Cancelled operation changed its existing destination'
+                    for path, before in input_hashes.items():
+                        assert hashlib.sha256(path.read_bytes()).hexdigest() == before, 'Page input changed during cancellation/retry'
                     assert hashlib.sha256(source.read_bytes()).hexdigest() == original
                     print(f'PASS: helper {mode}, reader responsive, child reaped, source unchanged '
                           f'({time.monotonic() - started:.2f}s)', flush=True)

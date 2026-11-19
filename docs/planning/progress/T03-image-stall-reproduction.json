@@ -1,0 +1,27 @@
+{
+  "status": "REPRODUCED",
+  "source_commit": "32f59f95aeb8cda6c661b85ea7cea41b29ce6b6e",
+  "binary_sha256": "6d68ced5b923e2f56949e8afa4ece3442640d34ce6142454b6cdfaff65f58e8b",
+  "source_sha256": "7ebdf13511c911f92194f74a65ff6037ce98773bf45c13582530ca3ec0e7358a",
+  "output_sha256": "04430b36e89473c59faafb4f186c2b9acfb4bdb0c43ec30c63cb22eacd90c513",
+  "helper": {
+    "pid": 3106122,
+    "start": "65159766"
+  },
+  "helper_reaped": true,
+  "source_unchanged": true,
+  "private_portal": true,
+  "scope": "Native page-1 replacement from generated fixture photo in a 50-page UserUnit=2 PDF; private GTK file/save dialogs; no production document",
+  "expected": "Reader page 25 renders while image replacement unit inspection waits",
+  "actual": "Page status advances to 25 while viewport/thumbnail remain blank until helper release",
+  "assessment": {
+    "crop": [
+      216,
+      218,
+      1164,
+      770
+    ],
+    "pending_ocr": "",
+    "released_ocr": "dPDF sample contract - page 25; Review clause 25: payment due within 30 days."
+  }
+}

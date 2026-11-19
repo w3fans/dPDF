@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Prepare page-input snapshots and image pixels off the reader, retaining one decoded image per operation and staging cancellable unit/assembly exports for document-owner publication.
+
 - Preserve early helper errors in the generated decryption-stall regression,
   retaining failed-run evidence without relaxing its bounds or assertions.
 

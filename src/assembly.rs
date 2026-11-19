@@ -162,6 +162,7 @@ fn checked(output: Output, action: &str) -> Result<Output> {
 }
 
 /// Bounded scalar/status qpdf calls. Metadata uses its separate 64-MiB policy.
+#[cfg(target_os = "linux")]
 pub(crate) fn run_qpdf(command: &mut Command, action: &str) -> Result<Output> {
     run_qpdf_cancellable(command, action, None)
 }
@@ -494,6 +495,21 @@ pub fn export_plan(
     create_plan: impl FnOnce(Vec<usize>) -> Result<PagePlan>,
 ) -> Result<ExportResult> {
     export_plan_cancellable(sources, destination, preserve_catalog, create_plan, None)
+}
+
+pub(crate) fn export_cancellable(
+    sources: &[SourceSnapshot],
+    operation: &PageOperation,
+    destination: &Path,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<ExportResult> {
+    export_plan_cancellable(
+        sources,
+        destination,
+        operation.kind != OperationKind::Extract,
+        |counts| build_plan(counts, operation),
+        cancel,
+    )
 }
 
 pub(crate) fn export_plan_cancellable(
