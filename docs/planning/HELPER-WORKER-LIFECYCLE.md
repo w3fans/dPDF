@@ -312,8 +312,11 @@ join. Closing a tab after handoff retains its immutable print action; shutdown
 cancellation is immediate through the shared application stop flag. Actor Drop
 sets that flag before joining. Native dialogs have byte limits and cancellation,
 with no qpdf-style interaction deadline. Parent-owned private scratch outlives
-child/group/job termination. Linux inherited-group nested failures deliberately
-abort the host; Windows retains nested jobs without breakaway or relaxed limits.
+child/group/job termination. A failed or timed-out Linux nested helper kills
+only its direct child; the host survives (a slow `lpstat` probe falls back to the
+GTK job instead of aborting the dialog) and leftover descendants stay in the host
+group, which the outer owner always kills when the host exits. Windows retains
+nested jobs without breakaway or relaxed limits.
 See progress/T03-print-ownership-2026-11-14.md for the reproduced defect, exact
 source, containment tradeoff, tests and pending qualification/review. This changes
 the earlier unfinished-print description but does not close its review gate.

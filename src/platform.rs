@@ -378,8 +378,8 @@ pub fn native_print(
             "Native printing supports PDF snapshots up to 256 MiB; use Quick Print for this file"
         );
     }
-    // This owner retains scratch across child/group/job cleanup, including a
-    // forced abort of a nested native-host helper. No private temp files detach.
+    // This owner retains scratch across child/group/job cleanup, including
+    // the group kill after the native host exits. No private temp files detach.
     let scratch = tempfile::tempdir()?;
     let output = crate::helper_process::run_dialog(
         Command::new(std::env::current_exe()?)
