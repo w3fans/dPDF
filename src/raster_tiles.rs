@@ -242,6 +242,10 @@ pub struct Comparison {
     pub larger_delta_pixels: usize,
     pub non_edge_changed_pixels: usize,
     pub quantization_limit_pixels: usize,
+    /// Changed pixels with delta > 2 that no reference pixel within one device
+    /// pixel reproduces (within 2 levels): not explainable as edge snapping.
+    pub unexplained_pixels: usize,
+    pub raster_limit_pixels: usize,
 }
 impl Comparison {
     /// Review-gated native text-edge rounding contract. Image fixtures additionally
@@ -253,22 +257,16 @@ impl Comparison {
             && self.non_edge_changed_pixels == 0
     }
 
-    /// Accepts edge-only rounding larger than one level only when untiled native
-    /// origin controls of the same page independently reproduce at least that
-    /// delta and count. Tiling may never exceed the renderer's own origin variance.
-    pub fn within_native_origin_variance(&self, controls: &[Comparison]) -> bool {
-        if self.within_native_edge_quantization() {
-            return true;
-        }
-        let edge_only =
-            |c: &Comparison| c.alpha_changed_pixels == 0 && c.non_edge_changed_pixels == 0;
-        self.changed_pixels <= self.quantization_limit_pixels
-            && edge_only(self)
-            && controls.iter().all(edge_only)
-            && controls.iter().any(|c| {
-                c.max_channel_delta >= self.max_channel_delta
-                    && c.larger_delta_pixels >= self.larger_delta_pixels
-            })
+    /// Tiled-detail contract. PDFium does not render a clipped destination
+    /// bitmap bit-identically to a full page: antialiased edges may differ by a
+    /// level or two and small axis-aligned fills may snap by one device pixel.
+    /// Accept only that: edge-only, alpha-preserving, at most 0.2% of pixels,
+    /// and every larger delta reproduced by a reference pixel within one pixel.
+    pub fn within_native_raster_tolerance(&self) -> bool {
+        self.changed_pixels <= self.raster_limit_pixels
+            && self.alpha_changed_pixels == 0
+            && self.non_edge_changed_pixels == 0
+            && self.unexplained_pixels == 0
     }
 }
 
@@ -287,6 +285,7 @@ pub fn compare_rgba(
     let actual = actual.as_chunks::<4>().0;
     let mut result = Comparison {
         quantization_limit_pixels: pixels / 10_000,
+        raster_limit_pixels: pixels / 500,
         ..Comparison::default()
     };
     for (index, (a, b)) in reference.iter().zip(actual).enumerate() {
@@ -299,6 +298,17 @@ pub fn compare_rgba(
         result.alpha_changed_pixels += usize::from(a[3] != b[3]);
         result.larger_delta_pixels += usize::from(delta > 1);
         let (x, y) = (index % width, index / width);
+        if delta > 2 {
+            let explained = (y.saturating_sub(1)..=(y + 1).min(height - 1)).any(|ny| {
+                (x.saturating_sub(1)..=(x + 1).min(width - 1)).any(|nx| {
+                    reference[ny * width + nx]
+                        .iter()
+                        .zip(b)
+                        .all(|(r, b)| r.abs_diff(*b) <= 2)
+                })
+            });
+            result.unexplained_pixels += usize::from(!explained);
+        }
         let edge = (y.saturating_sub(1)..=(y + 1).min(height - 1)).any(|ny| {
             (x.saturating_sub(1)..=(x + 1).min(width - 1)).any(|nx| {
                 a[..3]
@@ -507,38 +517,38 @@ mod tests {
         assert!(compare_rgba(&[0; 4], &[0; 3], 1, 1).is_none());
     }
     #[test]
-    fn larger_edge_delta_requires_matching_untiled_origin_control() {
-        let tile = Comparison {
-            changed_pixels: 57,
-            max_channel_delta: 2,
-            larger_delta_pixels: 1,
-            quantization_limit_pixels: 864,
-            ..Comparison::default()
-        };
-        assert!(!tile.within_native_edge_quantization());
-        let weaker = Comparison {
-            max_channel_delta: 1,
-            changed_pixels: 16,
-            ..Comparison::default()
-        };
-        assert!(!tile.within_native_origin_variance(&[]));
-        assert!(!tile.within_native_origin_variance(&[weaker]));
-        let matching = Comparison {
-            max_channel_delta: 2,
-            larger_delta_pixels: 1,
-            changed_pixels: 53,
-            ..Comparison::default()
-        };
-        assert!(tile.within_native_origin_variance(&[weaker, matching]));
-        let interior = Comparison {
-            non_edge_changed_pixels: 1,
-            ..matching
-        };
-        assert!(!tile.within_native_origin_variance(&[interior]));
-        let tile_interior = Comparison {
-            non_edge_changed_pixels: 1,
-            ..tile
-        };
-        assert!(!tile_interior.within_native_origin_variance(&[matching]));
+    fn one_pixel_edge_snap_is_tolerated_but_new_colours_are_not() {
+        let source = reference();
+        // The black column starts one pixel earlier on two rows: a snapped fill.
+        let mut snapped = source.clone();
+        for y in [40, 41] {
+            snapped[(y * 100 + 49) * 4..(y * 100 + 49) * 4 + 3].fill(0);
+        }
+        let comparison = compare_rgba(&source, &snapped, 100, 100).unwrap();
+        assert_eq!(comparison.max_channel_delta, 255);
+        assert_eq!(comparison.unexplained_pixels, 0);
+        assert!(!comparison.within_native_edge_quantization());
+        assert!(comparison.within_native_raster_tolerance());
+        // A colour no neighbour has, alpha changes and flat-area noise all fail.
+        for (x, channel, value) in [(50, 0, 255), (49, 3, 254), (20, 0, 254)] {
+            let mut actual = source.clone();
+            actual[(40 * 100 + x) * 4 + channel] = value;
+            assert!(
+                !compare_rgba(&source, &actual, 100, 100)
+                    .unwrap()
+                    .within_native_raster_tolerance(),
+                "{x} {channel} {value}"
+            );
+        }
+        // More than 0.2% changed pixels fails even when each is explained.
+        let mut many = source.clone();
+        for y in 0..21 {
+            many[(y * 100 + 49) * 4..(y * 100 + 49) * 4 + 3].fill(0);
+        }
+        assert!(
+            !compare_rgba(&source, &many, 100, 100)
+                .unwrap()
+                .within_native_raster_tolerance()
+        );
     }
 }
