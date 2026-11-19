@@ -1,9 +1,11 @@
 //! PDFium lives on one worker thread. No PDFium handles or borrowed objects enter the UI.
+mod overlay_jobs;
+use crate::background_jobs::{Cancellation, Jobs, Reply, Request};
 use crate::{cache::ByteCache, document::*};
 use anyhow::{Context, Result, bail, ensure};
 use pdfium_render::prelude::*;
 use std::{
-    collections::HashMap,
+    collections::{HashMap, VecDeque},
     path::{Path, PathBuf},
     sync::{
         Arc,
@@ -35,7 +37,7 @@ pub enum Command {
     OpenSnapshot(DocumentId, PathBuf, Arc<Vec<u8>>),
     Snapshot(DocumentId),
     Unlock(DocumentId, String),
-    LoadReview(DocumentId),
+    LoadReview(DocumentId, u64),
     PrintReviewed {
         id: DocumentId,
         review: crate::review::Review,
@@ -96,14 +98,42 @@ pub enum Command {
     },
 }
 
+impl Command {
+    fn working_document(&self) -> Option<DocumentId> {
+        match self {
+            Self::PrintReviewed { id, .. }
+            | Self::ExportWorkspace { id, .. }
+            | Self::ExportPages { id, .. }
+            | Self::ExportMarks { id, .. }
+            | Self::Print { id, .. } => Some(*id),
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
+            Self::PrintNative { id, .. } => Some(*id),
+            _ => None,
+        }
+    }
+
+    fn preparation_failed(self, message: String) -> Event {
+        match self {
+            Self::PrintReviewed { .. } | Self::Print { .. } => Event::PrintFinished(Err(message)),
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
+            Self::PrintNative { .. } => Event::PrintFinished(Err(message)),
+            _ => Event::ExportFinished(Err(message)),
+        }
+    }
+}
+
 pub enum Event {
     Ready,
     Opened(DocumentInfo),
     Snapshot(DocumentId, Arc<Vec<u8>>),
     OpenFailed(DocumentId, String),
     PasswordRequired(DocumentId, PathBuf, bool),
-    ReviewLoaded(DocumentId, Result<Option<crate::review::Review>, String>),
-    PageUnitsLoaded(DocumentId, Result<Vec<f64>, String>),
+    ReviewLoaded(
+        DocumentId,
+        u64,
+        Result<Option<crate::review::Review>, String>,
+    ),
+    PageUnitsLoaded(DocumentId, u64, Result<Vec<f64>, String>),
     Rendered {
         generation: u64,
         key: RenderKey,
@@ -136,6 +166,45 @@ pub struct Worker {
     pub events: Receiver<Event>,
     pub generation: Arc<AtomicU64>,
     pub search_token: Arc<AtomicU64>,
+    shutdown: Cancellation,
+    thread: Option<thread::JoinHandle<()>>,
+}
+impl Worker {
+    pub fn try_send(&self, command: Command) -> Result<(), &'static str> {
+        let closed = match &command {
+            Command::Close(id) => Some(*id),
+            _ => None,
+        };
+        let send = || {
+            self.commands
+                .try_send(command)
+                .map_err(|error| match error {
+                    mpsc::TrySendError::Full(_) => "request queue is full",
+                    mpsc::TrySendError::Disconnected(_) => "worker is disconnected",
+                })
+        };
+        match closed {
+            Some(id) => self.shutdown.close_on_success(id, send),
+            None => send(),
+        }
+    }
+}
+impl Drop for Worker {
+    fn drop(&mut self) {
+        self.shutdown.stop();
+        // Release blocked response sends before joining the PDF worker. It
+        // drops its helper pool (cancel/kill/reap/join) before normal engine
+        // destruction on that same worker thread.
+        let (_, empty) = mpsc::channel();
+        drop(std::mem::replace(&mut self.events, empty));
+        drop(std::mem::replace(
+            &mut self.commands,
+            mpsc::sync_channel(1).0,
+        ));
+        if let Some(thread) = self.thread.take() {
+            let _ = thread.join();
+        }
+    }
 }
 
 pub fn bind_pdfium() -> Result<Pdfium> {
@@ -311,15 +380,15 @@ struct OpenDocument<'a> {
 }
 impl OpenDocument<'_> {
     fn working_bytes(&self) -> Result<Arc<Vec<u8>>> {
-        let Some(password) = &self.password else {
+        if self.password.is_none() {
             return Ok(self.original.clone());
-        };
-        if let Some(bytes) = self.unlocked.get() {
-            return Ok(bytes.clone());
         }
-        let bytes = crate::encrypted::decrypt(&self.original, password)?;
-        let _ = self.unlocked.set(bytes.clone());
-        Ok(bytes)
+        // Operation admission below prepares missing bytes off this worker.
+        // Never fall back to synchronous decryption while the reader is live.
+        self.unlocked
+            .get()
+            .cloned()
+            .context("Protected PDF preparation has not completed")
     }
 }
 struct PendingDocument {
@@ -366,26 +435,13 @@ fn describe(
         signatures: pdf.signatures().len() as usize,
     })
 }
-fn describe_open(
-    id: DocumentId,
-    document: &OpenDocument<'_>,
-    recovery: bool,
-) -> Result<DocumentInfo> {
-    let mut info = describe(
+fn describe_open(id: DocumentId, document: &OpenDocument<'_>) -> Result<DocumentInfo> {
+    describe(
         id,
         document.path.clone(),
         &document.pdf,
         document.password.is_some(),
-    )?;
-    if recovery {
-        let bytes = document.working_bytes()?;
-        let units = crate::pdf_units::load(bytes.as_slice())?;
-        info.physical_pages = Some(
-            physical_page_sizes(&info.pages, &units)
-                .context("Cannot verify recovered physical page dimensions")?,
-        );
-    }
-    Ok(info)
+    )
 }
 
 fn password_error(error: &PdfiumError) -> bool {
@@ -416,6 +472,338 @@ struct SearchJob {
     truncated: bool,
 }
 
+enum ReviewWork {
+    SaveOverlay(Box<overlay_jobs::Save>),
+    Decrypt {
+        bytes: Arc<Vec<u8>>,
+        password: String,
+    },
+    Inspect {
+        bytes: Arc<Vec<u8>>,
+        password: Option<String>,
+    },
+    Clean {
+        prepared: crate::review::Prepared,
+        max_bytes: usize,
+    },
+}
+enum ReviewData {
+    Exported(crate::assembly::StagedExport),
+    Decrypted(Arc<Vec<u8>>),
+    Inspected {
+        bytes: Arc<Vec<u8>>,
+        metadata: serde_json::Value,
+    },
+    Cleaned(Arc<Vec<u8>>),
+}
+struct ReviewPending {
+    request: Request,
+    load_generation: u64,
+    clean: Option<(Result<Vec<f64>, String>, crate::review::Review)>,
+}
+
+struct RecoveryPending {
+    request: Request,
+    info: DocumentInfo,
+}
+
+struct WorkingPending {
+    request: Request,
+    command: Command,
+}
+
+fn working_completed(
+    documents: &HashMap<DocumentId, OpenDocument<'_>>,
+    responses: &SyncSender<Event>,
+    state: WorkingPending,
+    completion: Reply<ReviewData>,
+) -> Option<Command> {
+    let result = (|| -> Result<()> {
+        ensure!(
+            state.request.matches(&completion.ticket),
+            "Protected preparation cancelled"
+        );
+        let document = documents
+            .get(&state.request.id)
+            .context("Document was closed")?;
+        let bytes = match completion.result {
+            Ok(ReviewData::Decrypted(bytes)) => bytes,
+            Err(message) => bail!(message),
+            _ => bail!("Unexpected protected preparation result"),
+        };
+        // A review completion can have populated the same immutable snapshot.
+        let _ = document.unlocked.set(bytes);
+        Ok(())
+    })();
+    match result {
+        Ok(()) => Some(state.command),
+        Err(error) => {
+            let _ = responses.send(state.command.preparation_failed(format!("{error:#}")));
+            None
+        }
+    }
+}
+
+// Native documents stay on this PDF worker. Recovery metadata validation uses
+// the same bounded byte-only pool as review preparation, before publishing Opened.
+fn finish_open<'a>(
+    id: DocumentId,
+    document: OpenDocument<'a>,
+    recovery: bool,
+    documents: &mut HashMap<DocumentId, OpenDocument<'a>>,
+    pending: &mut HashMap<DocumentId, RecoveryPending>,
+    background: &mut Result<Jobs<ReviewWork, ReviewData>>,
+) -> Result<Option<Event>> {
+    let info = describe_open(id, &document)?;
+    if recovery {
+        let request = background
+            .as_mut()
+            .map_err(|error| anyhow::anyhow!("{error:#}"))?
+            .submit(
+                id,
+                ReviewWork::Inspect {
+                    bytes: document.original.clone(),
+                    password: document.password.clone(),
+                },
+            )?;
+        pending.insert(id, RecoveryPending { request, info });
+        documents.insert(id, document);
+        Ok(None)
+    } else {
+        documents.insert(id, document);
+        Ok(Some(Event::Opened(info)))
+    }
+}
+
+fn recovery_completed(
+    documents: &mut HashMap<DocumentId, OpenDocument<'_>>,
+    pending: &mut HashMap<DocumentId, RecoveryPending>,
+    responses: &SyncSender<Event>,
+    completion: Reply<ReviewData>,
+) {
+    let id = completion.ticket.request.id;
+    if !pending
+        .get(&id)
+        .is_some_and(|state| state.request.matches(&completion.ticket))
+    {
+        return;
+    }
+    let state = pending.remove(&id).unwrap();
+    if !documents.contains_key(&id) {
+        return;
+    }
+    let result = (|| -> Result<DocumentInfo> {
+        let document = &documents[&id];
+        match completion.result {
+            Ok(ReviewData::Inspected { bytes, metadata }) => {
+                let mut info = state.info;
+                let units = crate::pdf_units::from_metadata(&metadata, info.pages.len())?;
+                info.physical_pages = Some(
+                    physical_page_sizes(&info.pages, &units)
+                        .context("Cannot verify recovered physical page dimensions")?,
+                );
+                if document.password.is_some() {
+                    let _ = document.unlocked.set(bytes);
+                }
+                Ok(info)
+            }
+            Ok(ReviewData::Cleaned(_) | ReviewData::Decrypted(_) | ReviewData::Exported(_)) => {
+                bail!("Unexpected recovery metadata result")
+            }
+            Err(error) => bail!("{error}"),
+        }
+    })();
+    let event = match result {
+        Ok(info) => Event::Opened(info),
+        Err(error) => {
+            documents.remove(&id);
+            Event::OpenFailed(id, format!("{error:#}"))
+        }
+    };
+    let _ = responses.send(event);
+}
+
+fn review_work(work: ReviewWork, cancel: &std::sync::atomic::AtomicBool) -> Result<ReviewData> {
+    let data = match work {
+        ReviewWork::SaveOverlay(save) => ReviewData::Exported(save.run(cancel)?),
+        ReviewWork::Decrypt { bytes, password } => ReviewData::Decrypted(
+            crate::encrypted::decrypt_cancellable(&bytes, &password, Some(cancel))?,
+        ),
+        ReviewWork::Inspect { bytes, password } => {
+            let bytes = match password {
+                Some(password) => {
+                    crate::encrypted::decrypt_cancellable(&bytes, &password, Some(cancel))?
+                }
+                None => bytes,
+            };
+            let metadata = crate::assembly::inspect_snapshot_cancellable(&bytes, Some(cancel))?;
+            ReviewData::Inspected { bytes, metadata }
+        }
+        ReviewWork::Clean {
+            prepared,
+            max_bytes,
+        } => {
+            use std::io::Read;
+            let folder = tempfile::tempdir()?;
+            let path = folder.path().join("reading-base.pdf");
+            prepared.save_cancellable(&path, Some(cancel))?;
+            let mut input = std::fs::File::open(path)?;
+            let mut bytes = Vec::new();
+            loop {
+                crate::background_jobs::check_cancelled(Some(cancel))?;
+                let mut chunk = [0; 64 * 1024];
+                let count = input.read(&mut chunk)?;
+                if count == 0 {
+                    break;
+                }
+                ensure!(
+                    count <= max_bytes.saturating_sub(bytes.len()),
+                    "Clean reader snapshot exceeds its source-relative byte limit"
+                );
+                bytes.extend_from_slice(&chunk[..count]);
+            }
+            ReviewData::Cleaned(Arc::new(bytes))
+        }
+    };
+    crate::background_jobs::check_cancelled(Some(cancel))?;
+    Ok(data)
+}
+
+fn review_finished(
+    responses: &SyncSender<Event>,
+    id: DocumentId,
+    generation: u64,
+    units: Option<Result<Vec<f64>, String>>,
+    result: Result<Option<crate::review::Review>, String>,
+) {
+    let units = units.unwrap_or_else(|| {
+        Err(result
+            .as_ref()
+            .err()
+            .cloned()
+            .unwrap_or_else(|| "Page dimensions unavailable".into()))
+    });
+    let _ = responses.send(Event::PageUnitsLoaded(id, generation, units));
+    let _ = responses.send(Event::ReviewLoaded(id, generation, result));
+}
+
+fn review_completed<'a>(
+    pdfium: &'a Pdfium,
+    documents: &mut HashMap<DocumentId, OpenDocument<'a>>,
+    cache: &mut ByteCache<RenderKey, Frame>,
+    pending: &mut HashMap<DocumentId, ReviewPending>,
+    jobs: &Jobs<ReviewWork, ReviewData>,
+    responses: &SyncSender<Event>,
+    completion: Reply<ReviewData>,
+) {
+    let id = completion.ticket.request.id;
+    if !documents.contains_key(&id)
+        || !pending
+            .get(&id)
+            .is_some_and(|state| state.request.matches(&completion.ticket))
+    {
+        return; // Closed/retried document: drop bytes and its admission lease.
+    }
+    let mut state = pending.remove(&id).unwrap();
+    let generation = state.load_generation;
+    match completion.result {
+        Err(error) => review_finished(
+            responses,
+            id,
+            generation,
+            state.clean.map(|(units, _)| units),
+            Err(error),
+        ),
+        Ok(ReviewData::Inspected { bytes, metadata }) => {
+            let max_bytes = bytes.len().saturating_add(64 * 1024 * 1024);
+            let document = documents.get_mut(&id).unwrap();
+            if document.password.is_some() {
+                let _ = document.unlocked.set(bytes.clone());
+            }
+            let units =
+                crate::pdf_units::from_metadata(&metadata, document.pdf.pages().len() as usize)
+                    .map_err(|e| format!("{e:#}"));
+            let prepared = (|| -> Result<_> {
+                let model = crate::review::from_metadata(&metadata, &document.pdf)?;
+                model
+                    .map(|model| {
+                        let source = crate::assembly::SourceSnapshot {
+                            path: document.path.clone(),
+                            bytes,
+                        };
+                        let prepared = crate::review::prepare(
+                            source,
+                            &document.pdf,
+                            &model,
+                            crate::review::ExportMode::Clean,
+                        )?;
+                        Ok((model, prepared))
+                    })
+                    .transpose()
+            })();
+            match prepared {
+                Ok(Some((model, prepared))) => {
+                    match jobs.continue_task(
+                        completion.ticket,
+                        ReviewWork::Clean {
+                            prepared,
+                            max_bytes,
+                        },
+                    ) {
+                        Ok(()) => {
+                            state.clean = Some((units, model));
+                            pending.insert(id, state);
+                        }
+                        Err(error) => review_finished(
+                            responses,
+                            id,
+                            generation,
+                            Some(units),
+                            Err(format!("{error:#}")),
+                        ),
+                    }
+                }
+                Ok(None) => review_finished(responses, id, generation, Some(units), Ok(None)),
+                Err(error) => review_finished(
+                    responses,
+                    id,
+                    generation,
+                    Some(units),
+                    Err(format!("{error:#}")),
+                ),
+            }
+        }
+        Ok(ReviewData::Cleaned(bytes)) => {
+            let Some((units, model)) = state.clean.take() else {
+                review_finished(
+                    responses,
+                    id,
+                    generation,
+                    None,
+                    Err("Unexpected review preparation phase".into()),
+                );
+                return;
+            };
+            let loaded = load_shared_pdf(pdfium, bytes, None).map_err(|error| format!("{error:#}"));
+            match loaded {
+                Ok(pdf) => {
+                    documents.get_mut(&id).unwrap().pdf = pdf;
+                    cache.retain(|key| key.document != id);
+                    review_finished(responses, id, generation, Some(units), Ok(Some(model)));
+                }
+                Err(error) => review_finished(responses, id, generation, Some(units), Err(error)),
+            }
+        }
+        Ok(ReviewData::Decrypted(_) | ReviewData::Exported(_)) => review_finished(
+            responses,
+            id,
+            generation,
+            None,
+            Err("Unexpected review preparation phase".into()),
+        ),
+    }
+}
+
 pub fn start() -> Worker {
     let (commands, requests) = mpsc::sync_channel(64);
     let (responses, events) = mpsc::sync_channel(8);
@@ -423,20 +811,65 @@ pub fn start() -> Worker {
     let search_token = Arc::new(AtomicU64::new(0));
     let active = generation.clone();
     let search_active = search_token.clone();
-    thread::Builder::new().name("dpdf-pdf".into()).spawn(move || {
+    let shutdown = Cancellation::default();
+    let stopping = shutdown.clone();
+    let worker_thread = thread::Builder::new().name("dpdf-pdf".into()).spawn(move || {
         let pdfium = match bind_pdfium() {
             Ok(pdfium) => pdfium,
             Err(error) => { let _ = responses.send(Event::Unavailable(format!("{error:#}"))); return; }
         };
         let _ = responses.send(Event::Ready);
+        let mut background = Jobs::new(stopping.clone(), review_work);
+        let mut review_pending: HashMap<DocumentId, ReviewPending> = HashMap::new();
+        let mut recovery_pending: HashMap<DocumentId, RecoveryPending> = HashMap::new();
+        let mut working_pending: HashMap<u64, WorkingPending> = HashMap::new();
+        let mut overlay_pending: HashMap<u64, overlay_jobs::Pending> = HashMap::new();
+        let mut prepared_commands = VecDeque::new();
         let mut documents: HashMap<DocumentId, OpenDocument<'_>> = HashMap::new();
         let mut passwords:HashMap<DocumentId,PendingDocument>=HashMap::new();
         let mut cache = ByteCache::new(64 * 1024 * 1024);
         let mut search: Option<SearchJob> = None;
         loop {
-            let command = if search.is_some() { requests.try_recv().ok() } else {
-                match requests.recv() { Ok(command) => Some(command), Err(_) => break }
+            if stopping.stopped() { break; }
+            if let Ok(jobs) = &background {
+                while let Some(completion) = jobs.poll() {
+                    let generation = completion.ticket.request.generation;
+                    if overlay_pending.contains_key(&generation) {
+                        overlay_jobs::completed(&pdfium, &documents, &mut overlay_pending, jobs, &responses, completion);
+                    } else if let Some(state) = working_pending.remove(&generation) {
+                        if let Some(command) = working_completed(&documents, &responses, state, completion) {
+                            prepared_commands.push_back(command);
+                        }
+                    } else if recovery_pending.contains_key(&completion.ticket.request.id) {
+                        recovery_completed(&mut documents, &mut recovery_pending, &responses, completion);
+                    } else {
+                        review_completed(&pdfium, &mut documents, &mut cache, &mut review_pending, jobs, &responses, completion);
+                    }
+                }
+            }
+            let command = if let Some(command) = prepared_commands.pop_front() { Some(command) } else if search.is_some() { requests.try_recv().ok() } else {
+                match requests.recv_timeout(Duration::from_millis(20)) {
+                    Ok(command) => Some(command),
+                    Err(mpsc::RecvTimeoutError::Timeout) => None,
+                    Err(mpsc::RecvTimeoutError::Disconnected) => break,
+                }
             };
+            if let Some(id) = command.as_ref().and_then(Command::working_document)
+                && let Some(document) = documents.get(&id)
+                && let Some(password) = &document.password
+                && document.unlocked.get().is_none()
+            {
+                let command = command.unwrap();
+                let request = background.as_mut().map_err(|error| anyhow::anyhow!("{error:#}"))
+                    .and_then(|jobs| jobs.submit(id, ReviewWork::Decrypt {
+                        bytes: document.original.clone(), password: password.clone(),
+                    }));
+                match request {
+                    Ok(request) => { working_pending.insert(request.generation, WorkingPending { request, command }); }
+                    Err(error) => { let _ = responses.send(command.preparation_failed(format!("{error:#}"))); }
+                }
+                continue;
+            }
             match command {
                 Some(request @ (Command::Open(..) | Command::OpenSnapshot(..))) => {
                     let (id,path,snapshot)=match request {
@@ -445,46 +878,42 @@ pub fn start() -> Worker {
                         _=>unreachable!(),
                     };
                     let recovery=snapshot.is_some();
-                    let result = (|| -> Result<Event> {
+                    let result = (|| -> Result<Option<Event>> {
                         let original=match snapshot {Some(bytes)=>bytes,None=>Arc::new(std::fs::read(&path).with_context(||format!("Read {}",path.display()))?)};
                         match load_shared_pdf(&pdfium,original.clone(),None) {
                             Ok(pdf)=>{
                                 let document=OpenDocument{pdf,original,path,password:None,unlocked:Default::default()};
-                                let info=describe_open(id,&document,recovery)?;
-                                documents.insert(id,document);
-                                Ok(Event::Opened(info))
+                                finish_open(id, document, recovery, &mut documents, &mut recovery_pending, &mut background)
                             }
                             Err(error) if password_error(&error)=>{
                                 if passwords.len()>=16 || original.len().saturating_add(passwords.values().map(|p|p.original.len()).sum::<usize>())>256*1024*1024 {bail!("Pending protected PDFs exceed 16 files / 256 MiB; finish or cancel their prompts first");}
                                 passwords.insert(id,PendingDocument{recovery,path:path.clone(),original});
-                                Ok(Event::PasswordRequired(id,path,false))
+                                Ok(Some(Event::PasswordRequired(id,path,false)))
                             }
                             Err(error)=>Err(open_pdf_error(error)),
                         }
                     })();
-                    let event=result.unwrap_or_else(|error|Event::OpenFailed(id,format!("{error:#}")));
-                    if responses.send(event).is_err(){break;}
+                    let event=result.unwrap_or_else(|error|Some(Event::OpenFailed(id,format!("{error:#}"))));
+                    if let Some(event)=event && responses.send(event).is_err(){break;}
                 }
                 Some(Command::Unlock(id,password))=>{
                     let Some(pending)=passwords.remove(&id) else{continue;};
                     let path=pending.path.clone();
-                    let result=(||->Result<Event>{
+                    let result=(||->Result<Option<Event>>{
                         crate::encrypted::validate_password(&password)?;
                         match load_shared_pdf(&pdfium,pending.original.clone(),Some(&password)) {
                             Ok(pdf)=>{
                                 let document=OpenDocument{pdf,original:pending.original,path,password:Some(password),unlocked:Default::default()};
-                                let info=describe_open(id,&document,pending.recovery)?;
-                                documents.insert(id,document);
-                                Ok(Event::Opened(info))
+                                finish_open(id, document, pending.recovery, &mut documents, &mut recovery_pending, &mut background)
                             }
                             Err(error) if password_error(&error)=>{
-                                passwords.insert(id,pending);Ok(Event::PasswordRequired(id,path,true))
+                                passwords.insert(id,pending);Ok(Some(Event::PasswordRequired(id,path,true)))
                             }
                             Err(error)=>Err(open_pdf_error(error)),
                         }
                     })();
-                    let event=result.unwrap_or_else(|error|Event::OpenFailed(id,format!("{error:#}")));
-                    if responses.send(event).is_err(){break;}
+                    let event=result.unwrap_or_else(|error|Some(Event::OpenFailed(id,format!("{error:#}"))));
+                    if let Some(event)=event && responses.send(event).is_err(){break;}
                 }
                 Some(Command::PrintReviewed{id,review,current,range,printer,fit,native})=>{
                     let prepared=(||->Result<_>{let document=documents.get(&id).context("Document was closed")?;let source=crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?};let path=source.path.clone();Ok((crate::review::prepare(source,&document.pdf,&review,crate::review::ExportMode::Current)?,path))})();
@@ -505,53 +934,54 @@ pub fn start() -> Worker {
                         Err(e)=>{let _=responses.send(Event::PrintFinished(Err(format!("{e:#}"))));}
                     }
                 }
-                Some(Command::LoadReview(id))=>{
-                    let mut units = None;
-                    let result=(||->Result<Option<crate::review::Review>> {
-                        let document=documents.get_mut(&id).context("Document was closed")?;
-                        let source=crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?};
-                        let metadata=crate::assembly::inspect_snapshot(source.bytes.as_slice())?;
-                        units=Some(crate::pdf_units::from_metadata(&metadata,document.pdf.pages().len() as usize).map_err(|e|format!("{e:#}")));
-                        let model=crate::review::from_metadata(&metadata,&document.pdf)?;
-                        if let Some(model)=&model {
-                            let folder=tempfile::tempdir()?;let path=folder.path().join("reading-base.pdf");
-                            crate::review::prepare(source,&document.pdf,model,crate::review::ExportMode::Clean)?.save(&path)?;
-                            document.pdf=pdfium.load_pdf_from_byte_vec(std::fs::read(path)?,None)?;
-                            cache.retain(|key:&RenderKey|key.document!=id);
-                        }
-                        Ok(model)
-                    })().map_err(|e|format!("{e:#}"));
-                    let units=units.unwrap_or_else(||Err(result.as_ref().err().cloned().unwrap_or_else(||"Page dimensions unavailable".into())));
-                    let _=responses.send(Event::PageUnitsLoaded(id,units));
-                    let _=responses.send(Event::ReviewLoaded(id,result));
-                }
-                Some(Command::ExportWorkspace{id,placements,review,mode,destination})=>{
-                    let result=(||->Result<_> {
-                        let document=documents.get(&id).context("Document was closed")?;
-                        let source=crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?};
-                        let review=crate::review::prepare(source.clone(),&document.pdf,&review,mode)?;
-                        let overlays=if placements.is_empty(){None}else{Some(crate::overlay::prepare(&pdfium,&document.pdf,source,&placements)?)};
-                        Ok((review,overlays))
+                Some(Command::LoadReview(id, generation))=>{
+                    if let Some(previous) = review_pending.remove(&id) { previous.request.cancel(); }
+                    let request = (|| -> Result<Request> {
+                        let document = documents.get(&id).context("Document was closed")?;
+                        let (bytes, password) = match document.unlocked.get() {
+                            Some(bytes) => (bytes.clone(), None),
+                            None => (document.original.clone(), document.password.clone()),
+                        };
+                        background.as_mut().map_err(|e| anyhow::anyhow!("{e:#}"))?.submit(id, ReviewWork::Inspect {bytes, password})
                     })();
+                    match request {
+                        Ok(request) => { review_pending.insert(id, ReviewPending { request, load_generation: generation, clean: None }); }
+                        Err(error) => review_finished(&responses, id, generation, None, Err(format!("{error:#}"))),
+                    }
+                }
+                Some(command @ (Command::ExportWorkspace { .. } | Command::ExportMarks { .. })) => {
+                    let result = background.as_mut().map_err(|error| anyhow::anyhow!("{error:#}"))
+                        .and_then(|jobs| overlay_jobs::start(&pdfium, &documents, jobs, command));
                     match result {
-                        Ok((mut review,overlays))=>{let reply=responses.clone();thread::spawn(move || {
-                            let result=(||->Result<_>{
-                                if let Some(overlays)=overlays {let folder=tempfile::tempdir()?;let path=folder.path().join("marked-base.pdf");overlays.save(&path)?;review.set_source_bytes(Arc::new(std::fs::read(path)?));}
-                                review.save(&destination)
-                            })().map_err(|e|format!("{e:#}"));
-                            let _=reply.send(Event::ExportFinished(result));
-                        });},
-                        Err(e)=>{let _=responses.send(Event::ExportFinished(Err(format!("{e:#}"))));}
+                        Ok(state) => { overlay_pending.insert(state.request.generation, state); }
+                        Err(error) => { let _ = responses.send(Event::ExportFinished(Err(format!("{error:#}")))); }
                     }
                 }
                 Some(Command::Snapshot(id)) => {
                     if let Some(document)=documents.get(&id) {let _=responses.send(Event::Snapshot(id,document.original.clone()));}
                 }
                 Some(Command::Close(id)) => {
+                    let cancelled: Vec<_> = overlay_pending.iter()
+                        .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
+                    for generation in cancelled {
+                        let state = overlay_pending.remove(&generation).unwrap();
+                        state.request.cancel();
+                        let _ = responses.send(Event::ExportFinished(Err("Export cancelled: document was closed".into())));
+                    }
+                    let cancelled: Vec<_> = working_pending.iter()
+                        .filter(|(_, state)| state.request.id == id).map(|(generation, _)| *generation).collect();
+                    for generation in cancelled {
+                        let state = working_pending.remove(&generation).unwrap();
+                        state.request.cancel();
+                        let _ = responses.send(state.command.preparation_failed("Protected preparation cancelled: document was closed".into()));
+                    }
+                    if let Some(pending) = review_pending.remove(&id) { pending.request.cancel(); }
+                    if let Some(pending) = recovery_pending.remove(&id) { pending.request.cancel(); }
                     passwords.remove(&id);
                     documents.remove(&id);
                     cache.retain(|k: &RenderKey| k.document != id);
                     if search.as_ref().is_some_and(|s| s.id == id) { search = None; }
+                    stopping.forget_document(id);
                 }
                 Some(Command::Render { generation, key }) => {
                     if generation != active.load(Ordering::Relaxed) { continue; }
@@ -597,16 +1027,6 @@ pub fn start() -> Worker {
                             .map_err(|error| format!("{error:#}"));
                         let _ = reply.send(Event::ExportFinished(result));
                     });
-                }
-                Some(Command::ExportMarks { id, placements, destination }) => {
-                    let result=(|| -> Result<_> {
-                        let document=documents.get(&id).context("Document was closed")?;
-                        crate::overlay::prepare(&pdfium,&document.pdf,crate::assembly::SourceSnapshot{path:document.path.clone(),bytes:document.working_bytes()?},&placements)
-                    })();
-                    match result {
-                        Ok(prepared)=> {let reply=responses.clone();thread::spawn(move || {let _=reply.send(Event::ExportFinished(prepared.save(&destination).map_err(|e|format!("{e:#}"))));});},
-                        Err(error)=>{let _=responses.send(Event::ExportFinished(Err(format!("{error:#}"))));},
-                    }
                 }
                 #[cfg(any(target_os="linux",target_os="windows"))]
                 Some(Command::PrintNative { id,current,range,printer,fit }) => {
@@ -665,12 +1085,15 @@ pub fn start() -> Worker {
                 }
             }
         }
+        stopping.stop();
     }).expect("start PDF worker");
     Worker {
         commands,
         events,
         generation,
         search_token,
+        shutdown,
+        thread: Some(worker_thread),
     }
 }
 
@@ -883,6 +1306,108 @@ pub fn probe_search(path: &Path, query: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn admission_worker(shutdown: Cancellation) -> (Worker, Receiver<Command>) {
+        let (commands, requests) = mpsc::sync_channel(1);
+        let (_, events) = mpsc::sync_channel(1);
+        (
+            Worker {
+                commands,
+                events,
+                generation: Arc::new(AtomicU64::new(0)),
+                search_token: Arc::new(AtomicU64::new(0)),
+                shutdown,
+                thread: None,
+            },
+            requests,
+        )
+    }
+
+    fn ready_helper(jobs: &Jobs<(), ()>) -> Reply<()> {
+        let deadline = std::time::Instant::now() + Duration::from_secs(3);
+        loop {
+            if let Some(reply) = jobs.poll() {
+                return reply;
+            }
+            assert!(std::time::Instant::now() < deadline);
+            thread::sleep(Duration::from_millis(1));
+        }
+    }
+
+    #[test]
+    fn accepted_close_cancels_a_ready_reply_before_owner_cleanup() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let request = jobs.submit(7, ()).unwrap();
+        let reply = ready_helper(&jobs);
+        let (worker, _requests) = admission_worker(shutdown);
+        assert!(worker.try_send(Command::Close(7)).is_ok());
+        // The UI removes the tab after successful admission. The PDF owner has
+        // not consumed Close yet and polls helper replies before queued commands.
+        assert!(
+            !request.matches(&reply.ticket),
+            "Accepted tab close still permits a ready helper result to publish"
+        );
+        assert!(!request.claim_publication(&reply.ticket));
+    }
+
+    #[test]
+    fn rejected_close_preserves_the_open_documents_request() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let request = jobs.submit(7, ()).unwrap();
+        let reply = ready_helper(&jobs);
+        let (worker, _requests) = admission_worker(shutdown);
+        assert!(worker.try_send(Command::Snapshot(7)).is_ok());
+        assert!(worker.try_send(Command::Close(7)).is_err());
+        assert!(request.matches(&reply.ticket));
+    }
+
+    #[test]
+    fn accepted_close_rejects_late_registration_without_leaking_a_lease() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let (worker, requests) = admission_worker(shutdown.clone());
+        assert!(worker.try_send(Command::Close(7)).is_ok());
+        assert!(jobs.submit(7, ()).is_err());
+        assert!(jobs.submit(8, ()).is_ok());
+        assert!(jobs.submit(9, ()).is_ok());
+        assert!(jobs.submit(10, ()).is_err());
+        drop(ready_helper(&jobs));
+        drop(ready_helper(&jobs));
+        assert!(matches!(requests.try_recv(), Ok(Command::Close(7))));
+        shutdown.forget_document(7); // Owner cleanup after preceding FIFO commands.
+        assert!(jobs.submit(7, ()).is_ok());
+    }
+
+    #[test]
+    fn publication_claim_precedes_close_and_is_single_use() {
+        let shutdown = Cancellation::default();
+        let mut jobs = Jobs::new(shutdown.clone(), |_: (), _| Ok(())).unwrap();
+        let request = jobs.submit(7, ()).unwrap();
+        let reply = ready_helper(&jobs);
+        let folder = tempfile::tempdir().unwrap();
+        let source = folder.path().join("source.pdf");
+        let destination = folder.path().join("output.pdf");
+        std::fs::write(&source, b"generated immutable source").unwrap();
+        std::fs::write(&destination, b"previous output").unwrap();
+        let staged =
+            crate::assembly::StagedExport::new(&destination, vec![source.clone()]).unwrap();
+        std::fs::write(staged.path(), b"validated generated output").unwrap();
+        assert!(request.claim_publication(&reply.ticket));
+        let (worker, _requests) = admission_worker(shutdown);
+        assert!(worker.try_send(Command::Close(7)).is_ok());
+        assert!(!request.claim_publication(&reply.ticket));
+        staged.with_pages(1).publish().unwrap();
+        assert_eq!(
+            std::fs::read(&destination).unwrap(),
+            b"validated generated output"
+        );
+        assert_eq!(
+            std::fs::read(&source).unwrap(),
+            b"generated immutable source"
+        );
+    }
     #[test]
     fn shared_reader_retains_snapshot_without_copy_and_supports_random_access() {
         use std::io::{Read, Seek, SeekFrom};

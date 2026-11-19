@@ -1,0 +1,39 @@
+{
+  "source": "15983766c147287461965fab973d68227484af6f",
+  "run_id": 43558979273,
+  "job_id": 132338174520,
+  "url": "https://github.com/w3fans/dPDF/actions/runs/43558979273/job/132338174520",
+  "profile": "release",
+  "test": "encrypted::tests::stalled_helper_holds_decryption_until_fixture_release",
+  "result": {
+    "passed": 92,
+    "failed": 1
+  },
+  "error": "Generated helper did not reach its controlled stall",
+  "log_excerpt": [
+    "2026-11-14T04:58:35.8799119Z failures:",
+    "2026-11-14T04:58:35.8799221Z ",
+    "2026-11-14T04:58:35.8799442Z ---- encrypted::tests::stalled_helper_holds_decryption_until_fixture_release stdout ----",
+    "2026-11-14T04:58:35.8799713Z ",
+    "2026-11-14T04:58:35.8800025Z thread 'encrypted::tests::stalled_helper_holds_decryption_until_fixture_release' (3699) panicked at src/encrypted.rs:200:9:",
+    "2026-11-14T04:58:35.8800504Z Generated helper did not reach its controlled stall",
+    "2026-11-14T04:58:35.8800685Z ",
+    "2026-11-14T04:58:35.8800688Z ",
+    "2026-11-14T04:58:35.8800758Z failures:",
+    "2026-11-14T04:58:35.8801016Z     encrypted::tests::stalled_helper_holds_decryption_until_fixture_release",
+    "2026-11-14T04:58:35.8801261Z ",
+    "2026-11-14T04:58:35.8801472Z test result: FAILED. 92 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.51s",
+    "2026-11-14T04:58:35.8801743Z ",
+    "2026-11-14T04:58:35.8807021Z error: test failed, to rerun pass `--bin dpdf`",
+    "2026-11-14T04:58:35.8901800Z ##[error]Process completed with exit code 101.",
+    "2026-11-14T04:58:35.8974087Z ##[group]Run set -euo pipefail",
+    "2026-11-14T04:58:35.8974356Z \u001b[36;1mset -euo pipefail\u001b[0m"
+  ],
+  "artifact": {
+    "id": 14099024346,
+    "sha256": "db51246f755d4c558b6dba5b316a8969d8a0ee5fc3b8e4f297f522cafc8cb3f9",
+    "scope": "minimum compiler reports only; no release unit-test runtime retained"
+  },
+  "diagnosis": "unknown; startup assertion did not preserve early helper completion/error",
+  "followup": "test-only diagnostics preserve early completion; no production code, deadline or assertion relaxation"
+}

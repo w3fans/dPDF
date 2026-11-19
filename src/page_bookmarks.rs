@@ -1,6 +1,6 @@
 //! Keep primary outline navigation attached to a replaced logical page.
 use crate::{
-    assembly::{inspect_metadata, path_string, qpdf_executable},
+    assembly::{inspect_metadata_cancellable, path_string, qpdf_executable},
     pages::PagePlan,
 };
 use anyhow::{Context, Result, ensure};
@@ -55,7 +55,12 @@ fn visit<'a>(
     Ok(())
 }
 
-pub(crate) fn capture(path: &Path, plan: &PagePlan) -> Result<Vec<Target>> {
+pub(crate) fn capture(
+    path: &Path,
+    plan: &PagePlan,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<Vec<Target>> {
+    crate::background_jobs::check_cancelled(cancel)?;
     let mut replacements = HashMap::new();
     for (output, page) in plan.pages().iter().enumerate() {
         if let Some(origin) = page.primary_origin
@@ -67,11 +72,12 @@ pub(crate) fn capture(path: &Path, plan: &PagePlan) -> Result<Vec<Target>> {
     if replacements.is_empty() {
         return Ok(Vec::new());
     }
-    let document = inspect_metadata(path)?;
+    let document = inspect_metadata_cancellable(path, cancel)?;
     let mut outlines = Vec::new();
     visit(&document["outlines"], &mut Vec::new(), &mut outlines)?;
     let mut targets = Vec::new();
     for (route, node) in outlines {
+        crate::background_jobs::check_cancelled(cancel)?;
         let Some(origin) = node["destpageposfrom1"]
             .as_u64()
             .and_then(|page| page.checked_sub(1))
@@ -115,13 +121,20 @@ fn node_at<'a>(document: &'a Value, route: &[usize]) -> Result<&'a Value> {
     node.context("Missing bookmark route")
 }
 
-pub(crate) fn restore(targets: &[Target], input: &Path, scratch: &Path) -> Result<()> {
+pub(crate) fn restore(
+    targets: &[Target],
+    input: &Path,
+    scratch: &Path,
+    cancel: Option<&std::sync::atomic::AtomicBool>,
+) -> Result<()> {
+    crate::background_jobs::check_cancelled(cancel)?;
     if targets.is_empty() {
         return Ok(());
     }
-    let document = inspect_metadata(input)?;
+    let document = inspect_metadata_cancellable(input, cancel)?;
     let mut changes = Map::new();
     for target in targets {
+        crate::background_jobs::check_cancelled(cancel)?;
         let node = node_at(&document, &target.route)?;
         ensure!(
             node["title"] == target.title,
@@ -174,7 +187,7 @@ pub(crate) fn restore(targets: &[Target], input: &Path, scratch: &Path) -> Resul
         &patch,
         serde_json::to_vec(&json!({"qpdf":[{"jsonversion":2},changes]}))?,
     )?;
-    crate::assembly::run_qpdf(
+    crate::assembly::run_qpdf_cancellable(
         Command::new(qpdf_executable())
             .arg(path_string(input)?.as_ref())
             .arg(format!("--update-from-json={}", path_string(&patch)?))
@@ -182,8 +195,9 @@ pub(crate) fn restore(targets: &[Target], input: &Path, scratch: &Path) -> Resul
             .arg("--object-streams=preserve")
             .arg(path_string(&output)?.as_ref()),
         "Restore replacement bookmarks",
+        cancel,
     )?;
-    let verified = inspect_metadata(&output)?;
+    let verified = inspect_metadata_cancellable(&output, cancel)?;
     for target in targets {
         let node = node_at(&verified, &target.route)?;
         ensure!(

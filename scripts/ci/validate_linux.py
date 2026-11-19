@@ -59,7 +59,8 @@ def plan(source, binary, pdfium, qpdf, xvfb, desktop=True, print_report=None):
     print_args = ['--stress']
     if print_report is not None:
         print_args += ['--benchmark-report', str(print_report)]
-    tests += [('review-ui', [*py, script('check-review-ui.py'), *both, *display], 900),
+    tests += [('helper-responsiveness', [*py, script('check-helper-responsiveness.py'), *both, *display], 180),
+              ('review-ui', [*py, script('check-review-ui.py'), *both, *display], 900),
               ('passwords', [*py, script('check-passwords.py'), *both, *display], 900),
               ('recovery', [*py, script('check-recovery.py'), *both, *display], 900),
               ('native-print', [*py, script('check-native-print.py'), *both, *display, *print_args], 900)]

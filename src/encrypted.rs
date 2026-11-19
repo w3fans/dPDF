@@ -5,7 +5,10 @@ use std::{
     io::{Read, Write},
     process::Stdio,
 };
-use std::{process::Command, sync::Arc};
+use std::{
+    process::Command,
+    sync::{Arc, atomic::AtomicBool},
+};
 
 pub fn validate_password(password: &str) -> Result<()> {
     if password.len() > 4096 || password.chars().any(|c| matches!(c, '\0' | '\r' | '\n')) {
@@ -14,14 +17,28 @@ pub fn validate_password(password: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn decrypt(bytes: &[u8], password: &str) -> Result<Arc<Vec<u8>>> {
-    decrypt_with(bytes, password, &crate::assembly::qpdf_executable())
+pub(crate) fn decrypt_cancellable(
+    bytes: &[u8],
+    password: &str,
+    cancel: Option<&AtomicBool>,
+) -> Result<Arc<Vec<u8>>> {
+    decrypt_with_cancel(bytes, password, &crate::assembly::qpdf_executable(), cancel)
 }
+#[cfg(all(test, unix))]
 fn decrypt_with(
     bytes: &[u8],
     password: &str,
     executable: &std::path::Path,
 ) -> Result<Arc<Vec<u8>>> {
+    decrypt_with_cancel(bytes, password, executable, None)
+}
+fn decrypt_with_cancel(
+    bytes: &[u8],
+    password: &str,
+    executable: &std::path::Path,
+    cancel: Option<&AtomicBool>,
+) -> Result<Arc<Vec<u8>>> {
+    crate::background_jobs::check_cancelled(cancel)?;
     validate_password(password)?;
     if bytes.len() > 256 * 1024 * 1024 {
         bail!("Encrypted editing/printing supports PDF snapshots up to 256 MiB");
@@ -46,7 +63,7 @@ fn decrypt_with(
                 stdout: 256 * 1024 * 1024,
                 stderr: 0,
             },
-            None,
+            cancel,
         )?;
         (result.stdout, result.status)
     };
@@ -97,6 +114,7 @@ fn decrypt_with(
     if data.is_empty() {
         bail!("qpdf returned an empty unlocked PDF");
     }
+    crate::background_jobs::check_cancelled(cancel)?;
     Ok(Arc::new(data))
 }
 
@@ -163,7 +181,7 @@ mod tests {
         let (tx, rx) = mpsc::channel();
         let worker = thread::spawn(move || {
             let result = decrypt_with(original, "generated password", &helper)
-                .map_err(|error| error.to_string());
+                .map_err(|error| format!("{error:#}"));
             let _ = tx.send(result);
         });
         let startup = Instant::now();
@@ -171,21 +189,32 @@ mod tests {
             thread::sleep(Duration::from_millis(10));
         }
         let started = ready.exists();
-        let stalled = matches!(
-            rx.recv_timeout(Duration::from_millis(250)),
-            Err(mpsc::RecvTimeoutError::Timeout)
-        );
+        let startup_elapsed = startup.elapsed();
+        let observation = rx.recv_timeout(Duration::from_millis(250));
+        let stalled = matches!(&observation, Err(mpsc::RecvTimeoutError::Timeout));
         // Release before assertions so a failed observation still cleans up.
         std::fs::write(&release, b"release").unwrap();
-        let result = rx.recv_timeout(Duration::from_secs(10));
+        // Preserve early completion, especially a spawn/pipe error. A second
+        // receive would discard that evidence and report only Disconnected.
+        let result = match observation {
+            Ok(result) => Ok(result),
+            Err(mpsc::RecvTimeoutError::Timeout) => rx.recv_timeout(Duration::from_secs(10)),
+            Err(error) => Err(error),
+        };
         worker.join().unwrap();
+        // Only byte counts and sanitized errors: never print password or PDF
+        // contents, even when the generated fixture fails before its handshake.
+        let outcome = result
+            .as_ref()
+            .map(|value| value.as_ref().map(|bytes| bytes.len()));
         assert!(
             started,
-            "Generated helper did not reach its controlled stall"
+            "Generated helper did not reach its controlled stall after {startup_elapsed:?}; \
+             stalled={stalled}; completion={outcome:?}"
         );
         assert!(
             stalled,
-            "Decryption unexpectedly completed before fixture release"
+            "Decryption unexpectedly completed before fixture release: {outcome:?}"
         );
         assert_eq!(result.unwrap().unwrap().as_slice(), original);
     }

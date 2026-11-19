@@ -83,6 +83,7 @@ pub struct Placement {
 pub struct PreparedExport {
     sources: Vec<SourceSnapshot>,
     replacements: Vec<usize>,
+    units: Vec<f64>,
 }
 
 #[derive(serde::Deserialize)]
@@ -186,13 +187,40 @@ pub fn run_cli(mut args: impl Iterator<Item = std::ffi::OsString>) -> Result<()>
 
 impl PreparedExport {
     pub fn save(self, destination: &Path) -> Result<ExportResult> {
-        assembly::export_plan(&self.sources, destination, true, |counts| {
-            let mut plan = PagePlan::new(counts)?;
-            for (index, page) in self.replacements.iter().enumerate() {
-                plan.replace(*page, index + 1, 0)?;
+        self.save_cancellable(destination, None)
+    }
+
+    pub(crate) fn save_cancellable(
+        self,
+        destination: &Path,
+        cancel: Option<&std::sync::atomic::AtomicBool>,
+    ) -> Result<ExportResult> {
+        crate::background_jobs::check_cancelled(cancel)?;
+        // Serialized-page verification is byte-only helper work. It must not
+        // run while the reader owns the native document being rendered.
+        for (source, &unit) in self.sources.iter().skip(1).zip(&self.units) {
+            if unit != 1.0 {
+                let metadata = assembly::inspect_snapshot_cancellable(&source.bytes, cancel)?;
+                let saved = crate::pdf_units::from_metadata(&metadata, 1)?;
+                ensure!(
+                    (saved[0] - unit).abs() <= unit * 1e-6,
+                    "Modified page did not preserve its physical unit scale"
+                );
             }
-            Ok(plan)
-        })
+        }
+        assembly::export_plan_cancellable(
+            &self.sources,
+            destination,
+            true,
+            |counts| {
+                let mut plan = PagePlan::new(counts)?;
+                for (index, page) in self.replacements.iter().enumerate() {
+                    plan.replace(*page, index + 1, 0)?;
+                }
+                Ok(plan)
+            },
+            cancel,
+        )
     }
 }
 
@@ -303,6 +331,25 @@ pub fn prepare(
     if placements.is_empty() || placements.len() > 256 {
         bail!("Place between 1 and 256 marks before exporting");
     }
+    let units = crate::pdf_units::mark_units(&original, document.pages().len() as usize)?;
+    prepare_with_units(pdfium, document, original, placements, &units)
+}
+
+pub(crate) fn prepare_with_units(
+    pdfium: &Pdfium,
+    document: &PdfDocument<'_>,
+    original: SourceSnapshot,
+    placements: &[Placement],
+    units: &[f64],
+) -> Result<PreparedExport> {
+    ensure!(
+        units.len() == document.pages().len() as usize
+            && units.iter().all(|unit| unit.is_finite() && *unit > 0.0),
+        "PDF page metadata differs from the opened document"
+    );
+    if placements.is_empty() || placements.len() > 256 {
+        bail!("Place between 1 and 256 marks before exporting");
+    }
     let mut unique = HashSet::new();
     let mut bytes = 0usize;
     let mut pages: BTreeMap<usize, Vec<&Placement>> = BTreeMap::new();
@@ -323,9 +370,9 @@ pub fn prepare(
         }
         pages.entry(placement.page).or_default().push(placement);
     }
-    let units = crate::pdf_units::mark_units(&original, document.pages().len() as usize)?;
     let mut sources = vec![original];
     let mut replacements = Vec::new();
+    let mut expected_units = Vec::new();
     for (index, placements) in pages {
         let mut edited = pdfium.create_new_pdf()?;
         edited
@@ -342,22 +389,17 @@ pub fn prepare(
             }
         }
         let bytes = edited.save_to_bytes()?;
-        if units[index] != 1.0 {
-            let saved = crate::pdf_units::load(&bytes)?;
-            ensure!(
-                saved.len() == 1 && (saved[0] - units[index]).abs() <= units[index] * 1e-6,
-                "Modified page did not preserve its physical unit scale"
-            );
-        }
         sources.push(SourceSnapshot {
             path: sources[0].path.clone(),
             bytes: Arc::new(bytes),
         });
         replacements.push(index);
+        expected_units.push(units[index]);
     }
     Ok(PreparedExport {
         sources,
         replacements,
+        units: expected_units,
     })
 }
 
