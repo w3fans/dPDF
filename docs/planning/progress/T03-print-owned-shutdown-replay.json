@@ -1,0 +1,23 @@
+{
+  "private_scratch_empty": true,
+  "status": "PASS: generated native print ownership replay",
+  "mode": "shutdown",
+  "native_root_reaped": true,
+  "nested_helper": null,
+  "tab_close_retained_action": false,
+  "source_commit": "a2dd9cbde822744baee36b379d3adc3c7a21ae7c",
+  "binary_sha256": "0f2231fb14922ff16351f44532cec948b3828f644c695e61c75e91808a2ce6d1",
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "parent_exit_code": 0,
+  "normal_WM_DELETE_WINDOW": true,
+  "native_child_pid": 3142676,
+  "native_child_start": "65815082",
+  "native_dialog_alive_after_parent_exit": false,
+  "source_unchanged": true,
+  "GTK_PRINT_BACKENDS": "file",
+  "physical_submission": false,
+  "pr_head": "affa712c2c8ff0c35c5ec98ce32f0602db4fcd06",
+  "workflow_run": 43530445402,
+  "artifact_id": 14087985393,
+  "artifact_zip_sha256": "86f832ba4752b6b7c0167b642972477550374027dc630295c54fb666b3661f91"
+}

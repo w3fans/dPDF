@@ -1,0 +1,34 @@
+{
+  "status": "PASS: exact-source native overlay responsiveness replay",
+  "source_commit": "896fec1018f5452cbe888195aa70de238032430b",
+  "binary_sha256": "a8fb4bb480a7c8d8c40168f51cfd967c099eb7ec6ca3ded2018d3597a0c29e7a",
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "output_sha256": "d2117112185cdb6fd02f8f7b9559b5cd5121a89641e448e0eb45b935627d0bc0",
+  "helper": {
+    "pid": 3152909,
+    "start": "65959363"
+  },
+  "helper_reaped": true,
+  "source_unchanged": true,
+  "private_portal": true,
+  "pr_head": "e71a67268cdf98c9aaa42916531b0c7fe5be0a02",
+  "workflow_run": 43532813603,
+  "artifact_id": 14088791581,
+  "artifact_zip_sha256": "28588a429dda5a9e4c94959f611c9e7834114012c67ecbd3979fdfe38d8553ab",
+  "body_page_25_visible_before_helper_release": true,
+  "aligned_viewport": {
+    "before_crop": [
+      216,
+      218,
+      1164,
+      770
+    ],
+    "after_crop": [
+      216,
+      138,
+      1164,
+      690
+    ],
+    "pixels_changed": 0
+  }
+}

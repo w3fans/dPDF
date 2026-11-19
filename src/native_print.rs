@@ -318,6 +318,9 @@ fn zero_ranges(range: &str, count: usize) -> Result<String> {
 }
 
 pub fn run_cli(mut args: impl Iterator<Item = OsString>, diagnostic: bool) -> Result<()> {
+    if !diagnostic {
+        crate::helper_process::enable_owned_print_host()?;
+    }
     let source = PathBuf::from(args.next().context("Missing original path")?);
     let output = if diagnostic {
         Some(PathBuf::from(

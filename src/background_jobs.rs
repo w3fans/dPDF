@@ -55,6 +55,9 @@ struct CancellationState {
     requests: Mutex<Registry>,
 }
 impl Cancellation {
+    pub fn shutdown_flag(&self) -> &AtomicBool {
+        &self.0.stopped
+    }
     pub fn stopped(&self) -> bool {
         self.0.stopped.load(Ordering::Acquire)
     }

@@ -145,6 +145,36 @@ pub(crate) fn run(
     limits: Limits,
     cancel: Option<&AtomicBool>,
 ) -> Result<Output> {
+    let timeout = Some(limits.timeout);
+    run_inner(command, input, limits, timeout, cancel)
+}
+
+/// Owned native dialog: no user-interaction deadline; shutdown still cancels.
+pub(crate) fn run_dialog(
+    command: &mut Command,
+    input: &[u8],
+    cancel: &AtomicBool,
+) -> Result<Output> {
+    run_inner(
+        command,
+        input,
+        Limits {
+            timeout: Duration::ZERO,
+            stdout: 64 * 1024,
+            stderr: 64 * 1024,
+        },
+        None,
+        Some(cancel),
+    )
+}
+
+fn run_inner(
+    command: &mut Command,
+    input: &[u8],
+    limits: Limits,
+    timeout: Option<Duration>,
+    cancel: Option<&AtomicBool>,
+) -> Result<Output> {
     let started = Instant::now();
     let cancelled = || cancel.is_some_and(|value| value.load(Ordering::Relaxed));
     if cancelled() {
@@ -219,7 +249,7 @@ pub(crate) fn run(
             if cancelled() {
                 bail!("Helper operation cancelled");
             }
-            if started.elapsed() >= limits.timeout {
+            if timeout.is_some_and(|limit| started.elapsed() >= limit) {
                 bail!("Helper operation exceeded its deadline");
             }
             while let Ok(message) = receiver.try_recv() {
@@ -320,6 +350,11 @@ mod tests {
                 io::stdout().flush().unwrap();
                 io::stderr().write_all(b"warning fixture").unwrap();
                 std::process::exit(3);
+            }
+            "nested" => {
+                let mut policy = limits();
+                policy.timeout = Duration::from_secs(30);
+                let _ = run(&mut fixture("descendant"), b"", policy, None);
             }
             "descendant" => {
                 let child = fixture("sleep")
@@ -429,5 +464,59 @@ mod tests {
             assert!(error.to_string().contains("cancelled"));
         });
         assert!(start.elapsed() < Duration::from_secs(8));
+    }
+    #[test]
+    fn dialog_has_no_interaction_deadline_and_cancellation_covers_nested_jobs() {
+        use windows_sys::Win32::{
+            Foundation::{ERROR_INVALID_PARAMETER, WAIT_OBJECT_0},
+            System::Threading::{OpenProcess, PROCESS_SYNCHRONIZE, WaitForSingleObject},
+        };
+        let cancel = AtomicBool::new(false);
+        let start = Instant::now();
+        assert!(
+            run_dialog(&mut fixture("finite"), b"", &cancel)
+                .unwrap()
+                .status
+                .success()
+        );
+        assert!(start.elapsed() >= Duration::from_millis(200));
+        let folder = tempfile::tempdir().unwrap();
+        let pid_path = folder.path().join("nested.pid");
+        thread::scope(|scope| {
+            scope.spawn(|| {
+                let until = Instant::now() + Duration::from_secs(3);
+                while !pid_path.exists() && Instant::now() < until {
+                    thread::sleep(Duration::from_millis(5));
+                }
+                // Always cancel, even when fixture setup failed, so no dialog test hangs.
+                cancel.store(true, Ordering::Release);
+            });
+            let error = run_dialog(
+                fixture("nested").env("DPDF_TEST_HELPER_PID", &pid_path),
+                &vec![0; 1024 * 1024],
+                &cancel,
+            )
+            .unwrap_err();
+            assert!(error.to_string().contains("cancelled"));
+        });
+        let pid = std::fs::read_to_string(pid_path).unwrap().parse().unwrap();
+        let raw = unsafe { OpenProcess(PROCESS_SYNCHRONIZE, 0, pid) };
+        if raw.is_null() {
+            assert_eq!(
+                io::Error::last_os_error().raw_os_error(),
+                Some(ERROR_INVALID_PARAMETER as i32)
+            );
+        } else {
+            let process = owned_handle(raw, "Inspect nested dialog descendant").unwrap();
+            assert_eq!(
+                unsafe { WaitForSingleObject(process.as_raw_handle(), 3000) },
+                WAIT_OBJECT_0
+            );
+        }
+        cancel.store(false, Ordering::Release);
+        for mode in ["stdout", "stderr"] {
+            let error = run_dialog(&mut fixture(mode), b"", &cancel).unwrap_err();
+            assert!(error.to_string().contains("byte limit"));
+        }
     }
 }

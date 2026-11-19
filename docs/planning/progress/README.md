@@ -10,7 +10,7 @@ partial increments below do not replace their exit criteria.
 | --- | --- | --- |
 | T01 | DONE for public portability | Public unit split merged #5; installed authority integration remains separately pending |
 | T02 | DONE for reconciliation/publication | T02-documentation-2026-11-13.md; canonical documentation and plan/evidence merged in PR #15; later receipts remain pending |
-| T03 | IN_PROGRESS | Core bounded helpers merged #8; review/recovery/protected candidate #10 passed CI/replay but awaits lifecycle review; overlay staging increment unqualified; image/page-export/print ownership remains unfinished |
+| T03 | REVIEW for PDF/print helper increment | Drafts #10/#16/#17 retain dependency order and experienced lifecycle gate. Functional e71a6726 passed all jobs, eighteen helper windows and exact-source native print/discovery replays; manual platform/operator evidence remains separate. See T03-print-ownership-2026-11-14.md |
 | T04 | DONE for implementation/generated checks | Shared selectors and history fixes merged #4/#9/#12/#13; explicit focus rules and three-scale native X11 replays. See T04-exit-2026-11-13.md; actual Wayland/Windows visual/input acceptance remains T06 |
 | T05 | PENDING T03 | Generated headless baseline exists; full performance baseline and high-zoom tiles not implemented |
 | T06 | PENDING T04/T05 | Exact-source real Wayland/Windows input/clipboard acceptance required |
@@ -151,3 +151,17 @@ with identical aligned body pixels. Exact-source final-head replay and retention
 are still being completed separately; it depends on PR #10 and must integrate the
 close-admission/publication follow-up before any merge. Its source remains isolated
 under /tmp/dpdf-image-preflight, never overlaid onto this active worktree.
+
+
+## Final PDF/print helper increment ready for review
+
+Current functional head e71a6726 in draft #17 passed every job in run
+43532813603 and all eighteen helper-window cases. Original native discovery close
+now cancels/reaps its helper (~0.018s). Native print shutdown, tab-close/user-cancel
+and nested-helper group cleanup passed again on that exact Linux artifact, with
+unchanged sources, empty print scratch and no submission. Inventories/text hashes
+match both native targets. Exact qualification and nested-reaping scope are in
+T03-print-ownership-2026-11-14.md and linked replay JSON receipts. #10/#16 parents
+retain their earlier exact-source qualification. All three require experienced
+lifecycle review before merge; T03 is REVIEW, not complete. Subsequent receipt-only
+publication does not silently transfer source or manual acceptance.

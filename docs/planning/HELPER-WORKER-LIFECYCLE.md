@@ -1,10 +1,11 @@
 # Metadata helper worker and normal shutdown — review draft
 
-Status: draft stacked image/page-preparation increment integrating parent close
-fix a87095b9. Qualification of this combined source and experienced lifecycle
-review are PENDING. Earlier parent overlay head 10b443f4 and image head dfa5a999
-passed their own hosted gates; their evidence does not qualify this new head.
-Production baking remains disabled.
+Status: REVIEW draft. Final functional head e71a6726 passed all hosted gates,
+eighteen helper-window cases and scoped native X11 print/discovery replays.
+Experienced lifecycle review remains required for drafts #10/#16/#17 before
+merge. Historical increments and their failures are retained below. Actual
+Wayland/native Windows desktop/physical output and operator acceptance remain
+separate. Production baking stays disabled.
 
 ## Reproduced problem
 
@@ -301,6 +302,33 @@ hosted/runtime gates are PENDING. This dependent page/image implementation integ
 publication policy; its cancelled ready replies also send a terminal error. Experienced review must assess
 both orderings, delayed registration, lease release, marker reclamation and no
 mutex held across work that needs a UI callback or native owner to complete.
+
+
+## Owned print follow-up (unqualified draft)
+
+Print preparation uses document identity until an atomic handoff claim. A separate
+single-action byte-only actor owns dialog/submission latency and normal-shutdown
+join. Closing a tab after handoff retains its immutable print action; shutdown
+cancellation is immediate through the shared application stop flag. Actor Drop
+sets that flag before joining. Native dialogs have byte limits and cancellation,
+with no qpdf-style interaction deadline. Parent-owned private scratch outlives
+child/group/job termination. A failed or timed-out Linux nested helper kills
+only its direct child; the host survives (a slow `lpstat` probe falls back to the
+GTK job instead of aborting the dialog) and leftover descendants stay in the host
+group, which the outer owner always kills when the host exits. Windows retains
+nested jobs without breakaway or relaxed limits.
+See progress/T03-print-ownership-2026-11-14.md for the reproduced defect, exact
+source, containment tradeoff, tests and pending qualification/review. This changes
+the earlier unfinished-print description but does not close its review gate.
+
+
+Printer discovery follow-up: Application owns its separate Jobs<(), Vec<String>>
+service, whose Drop cancels and joins noninteractive discovery. Its registry is
+independent of document closure and the print actor; the UI retains one pending
+request. The main metadata pool keeps two leases; each UI print/discovery service
+admits one action. This is a bounded operation count, not a whole-app RSS claim.
+The native panel-open reproduction and eighteenth window case must pass on the
+new head. Previous seventeen-case evidence is retained with its exact source.
 
 
 ## Accepted main reconciliation for lifecycle review (14 November)

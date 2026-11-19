@@ -1,0 +1,17 @@
+{
+  "status": "REPRODUCED: printer discovery survives normal main exit",
+  "source_commit": "a2dd9cbde822744baee36b379d3adc3c7a21ae7c",
+  "binary_sha256": "0f2231fb14922ff16351f44532cec948b3828f644c695e61c75e91808a2ce6d1",
+  "parent_exit_code": 0,
+  "close_elapsed_seconds": 0.011836425052024424,
+  "helper": {
+    "pid": 3143775,
+    "start": "65827258",
+    "pgrp": 3143775
+  },
+  "helper_alive_after_parent_exit": true,
+  "source_sha256": "c6327e578b0acda7e5279551c4889b0059c01581ff7534710af4cfc1dffa5a86",
+  "source_unchanged": true,
+  "submission": false,
+  "fixture_cleanup": "Identity-verified fixture process group killed and adopted root reaped after reproduction"
+}
