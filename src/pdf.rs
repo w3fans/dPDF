@@ -25,6 +25,7 @@ pub struct RenderKey {
     pub width: i32,
     pub rotation: u8,
     pub thumbnail: bool,
+    pub region: Option<crate::raster_tiles::Region>,
 }
 
 #[derive(Debug)]
@@ -60,6 +61,7 @@ pub enum Command {
     Render {
         generation: u64,
         key: RenderKey,
+        permit: crate::raster_tiles::RenderPermit,
     },
     Search {
         id: DocumentId,
@@ -140,11 +142,13 @@ pub enum Event {
         generation: u64,
         key: RenderKey,
         frame: Arc<Frame>,
+        permit: crate::raster_tiles::RenderPermit,
     },
     RenderFailed {
         generation: u64,
         key: RenderKey,
         message: String,
+        permit: crate::raster_tiles::RenderPermit,
     },
     SearchResults {
         id: DocumentId,
@@ -168,10 +172,24 @@ pub struct Worker {
     pub events: Receiver<Event>,
     pub generation: Arc<AtomicU64>,
     pub search_token: Arc<AtomicU64>,
+    render_slots: crate::raster_tiles::RenderSlots,
     shutdown: Cancellation,
     thread: Option<thread::JoinHandle<()>>,
 }
 impl Worker {
+    pub fn render_requests_in_flight(&self) -> usize {
+        self.render_slots.in_flight()
+    }
+
+    pub fn try_render(&self, generation: u64, key: RenderKey) -> Result<(), &'static str> {
+        let permit = self.render_slots.acquire().ok_or("render budget is full")?;
+        self.try_send(Command::Render {
+            generation,
+            key,
+            permit,
+        })
+    }
+
     pub fn try_send(&self, command: Command) -> Result<(), &'static str> {
         let closed = match &command {
             Command::Close(id) => Some(*id),
@@ -254,6 +272,31 @@ fn render(document: &PdfDocument<'_>, key: &RenderKey) -> Result<Frame> {
         _ => PdfPageRenderRotation::None,
     };
     let page = document.pages().get(key.page as i32)?;
+    if let Some(region) = key.region {
+        ensure!(
+            !key.thumbnail && key.width > 0 && region.valid_for(key.width as u32),
+            "Invalid raster detail region"
+        );
+        // A small destination, not a full-page allocation. Native origin keeps
+        // the standard form/annotation path and PDFium's own page transforms.
+        let mut bitmap = PdfBitmap::empty(
+            region.width as i32,
+            region.height as i32,
+            PdfBitmapFormat::BGRA,
+        )?;
+        page.render_into_bitmap_with_config(
+            &mut bitmap,
+            &PdfRenderConfig::new()
+                .set_fixed_size(key.width, region.canvas_height as i32)
+                .rotate(rotation, false)
+                .set_origin(-(region.x as i32), -(region.y as i32)),
+        )?;
+        return Ok(Frame {
+            width: bitmap.width() as u32,
+            height: bitmap.height() as u32,
+            rgba: bitmap.as_rgba_bytes(),
+        });
+    }
     let bitmap = page.render_with_config(
         &PdfRenderConfig::new()
             .set_target_width(key.width.clamp(32, 3072))
@@ -1017,7 +1060,7 @@ pub fn start() -> Worker {
                     if search.as_ref().is_some_and(|s| s.id == id) { search = None; }
                     stopping.forget_document(id);
                 }
-                Some(Command::Render { generation, key }) => {
+                Some(Command::Render { generation, key, permit }) => {
                     if generation != active.load(Ordering::Relaxed) { continue; }
                     let Some(document) = documents.get(&key.document) else { continue; };
                     let result = match cache.get(&key) { Some(frame) => Ok(frame), None => render(&document.pdf, &key).map(|frame| {
@@ -1025,8 +1068,8 @@ pub fn start() -> Worker {
                     }) };
                     if generation != active.load(Ordering::Relaxed) { continue; }
                     let event = match result {
-                        Ok(frame) => Event::Rendered { generation, key, frame },
-                        Err(error) => Event::RenderFailed { generation, key, message: format!("{error:#}") },
+                        Ok(frame) => Event::Rendered { generation, key, frame, permit },
+                        Err(error) => Event::RenderFailed { generation, key, message: format!("{error:#}"), permit },
                     };
                     if responses.send(event).is_err() { break; }
                 }
@@ -1102,6 +1145,7 @@ pub fn start() -> Worker {
         events,
         generation,
         search_token,
+        render_slots: crate::raster_tiles::RenderSlots::default(),
         shutdown,
         thread: Some(worker_thread),
     }
@@ -1133,6 +1177,7 @@ pub fn benchmark_reader(path: &Path, compare_eager: bool) -> Result<()> {
         width: 1000,
         rotation: 0,
         thumbnail: false,
+        region: None,
     };
     let first = Arc::new(render(&pdf, &key)?);
     let first_ready = start.elapsed();
@@ -1152,6 +1197,7 @@ pub fn benchmark_reader(path: &Path, compare_eager: bool) -> Result<()> {
             width,
             rotation: 0,
             thumbnail,
+            region: None,
         };
         let sample_start = Instant::now();
         let existing = cache.get(&key);
@@ -1225,6 +1271,7 @@ pub fn render_probe(path: &Path, index: usize, output: &Path, width: i32) -> Res
             width,
             rotation: 0,
             thumbnail: false,
+            region: None,
         },
     )?;
     let mut file = std::io::BufWriter::new(std::fs::File::create(output)?);
@@ -1233,6 +1280,153 @@ pub fn render_probe(path: &Path, index: usize, output: &Path, width: i32) -> Res
         file.write_all(&pixel[..3])?;
     }
     file.flush()?;
+    Ok(())
+}
+
+/// Bounded generated-fixture oracle: detail tiles must equal the same native
+/// full-page transform, including form data, annotations and intrinsic rotation.
+pub fn check_render_tiles(
+    path: &Path,
+    index: usize,
+    width: i32,
+    height: i32,
+    rotation: u8,
+    reference: Option<&Path>,
+) -> Result<()> {
+    use std::io::Write;
+    ensure!(
+        (1..=8192).contains(&width)
+            && (1..=8192).contains(&height)
+            && (width as u64) * (height as u64) <= 16_777_216
+            && rotation < 4,
+        "Tile oracle dimensions/rotation exceed the diagnostic budget"
+    );
+    let pdfium = bind_pdfium()?;
+    let pdf = pdfium.load_pdf_from_file(path, None)?;
+    let page = pdf.pages().get(index as i32)?;
+    let turn = match rotation {
+        1 => PdfPageRenderRotation::Degrees90,
+        2 => PdfPageRenderRotation::Degrees180,
+        3 => PdfPageRenderRotation::Degrees270,
+        _ => PdfPageRenderRotation::None,
+    };
+    let full = page.render_with_config(
+        &PdfRenderConfig::new()
+            .set_fixed_size(width, height)
+            .rotate(turn, false),
+    )?;
+    let expected = full.as_rgba_bytes();
+    ensure!(
+        expected.len() == width as usize * height as usize * 4,
+        "Unexpected reference bitmap length"
+    );
+    let mut stitched = vec![0u8; expected.len()];
+    let mut count = 0usize;
+    let mut peak_tile_bytes = 0usize;
+    for cy in (0..height as u32).step_by(crate::raster_tiles::TILE_EDGE as usize) {
+        for cx in (0..width as u32).step_by(crate::raster_tiles::TILE_EDGE as usize) {
+            let (x, y) = (cx.saturating_sub(1), cy.saturating_sub(1));
+            let core_width = crate::raster_tiles::TILE_EDGE.min(width as u32 - cx);
+            let core_height = crate::raster_tiles::TILE_EDGE.min(height as u32 - cy);
+            let region = crate::raster_tiles::Region {
+                canvas_height: height as u32,
+                x,
+                y,
+                width: (cx + core_width + 1).min(width as u32) - x,
+                height: (cy + core_height + 1).min(height as u32) - y,
+            };
+            let frame = render(
+                &pdf,
+                &RenderKey {
+                    document: 0,
+                    page: index,
+                    width,
+                    rotation,
+                    thumbnail: false,
+                    region: Some(region),
+                },
+            )?;
+            ensure!(
+                frame.rgba.len() == region.bytes()
+                    && frame.width == region.width
+                    && frame.height == region.height,
+                "Unexpected detail bitmap dimensions"
+            );
+            peak_tile_bytes = peak_tile_bytes.max(frame.rgba.len());
+            for row in 0..core_height {
+                let start = (((cy - y + row) * frame.width + cx - x) * 4) as usize;
+                let destination = (((cy + row) * width as u32 + cx) * 4) as usize;
+                stitched[destination..destination + core_width as usize * 4]
+                    .copy_from_slice(&frame.rgba[start..start + core_width as usize * 4]);
+            }
+            count += 1;
+        }
+    }
+    let comparison =
+        crate::raster_tiles::compare_rgba(&expected, &stitched, width as usize, height as usize)
+            .context("Invalid tile comparison dimensions")?;
+    let changed_pixels = comparison.changed_pixels;
+    // Untiled, large destination controls distinguish native origin rounding
+    // from tile clipping. They never relax the strict CLI's equality assertion.
+    let mut origin_controls = Vec::new();
+    if changed_pixels != 0 {
+        for offset in [1, 127, 509] {
+            if width <= offset || height <= offset {
+                continue;
+            }
+            let (cw, ch) = (width - offset, height - offset);
+            let mut bitmap = PdfBitmap::empty(cw, ch, PdfBitmapFormat::BGRA)?;
+            page.render_into_bitmap_with_config(
+                &mut bitmap,
+                &PdfRenderConfig::new()
+                    .set_fixed_size(width, height)
+                    .rotate(turn, false)
+                    .set_origin(-offset, -offset),
+            )?;
+            let actual = bitmap.as_rgba_bytes();
+            let mut cropped = Vec::with_capacity(cw as usize * ch as usize * 4);
+            for row in offset..height {
+                let start = (row as usize * width as usize + offset as usize) * 4;
+                cropped.extend_from_slice(&expected[start..start + cw as usize * 4]);
+            }
+            let control =
+                crate::raster_tiles::compare_rgba(&cropped, &actual, cw as usize, ch as usize)
+                    .context("Invalid native origin control dimensions")?;
+            let json = serde_json::json!({"offset":offset,"width":cw,"height":ch,
+                "changed_pixels":control.changed_pixels,"max_channel_delta":control.max_channel_delta,
+                "alpha_changed_pixels":control.alpha_changed_pixels,"larger_delta_pixels":control.larger_delta_pixels,
+                "non_edge_changed_pixels":control.non_edge_changed_pixels});
+            origin_controls.push(json);
+        }
+    }
+    if let Some(output) = reference {
+        let mut file = std::io::BufWriter::new(std::fs::File::create(output)?);
+        write!(file, "P6\n{width} {height}\n255\n")?;
+        for pixel in expected.as_chunks::<4>().0 {
+            file.write_all(&pixel[..3])?;
+        }
+        file.flush()?;
+    }
+    println!(
+        "{}",
+        serde_json::json!({"schema":1,"scope":"bounded_native_tile_stitch_oracle",
+        "width":width,"height":height,"rotation":rotation,"tiles":count,
+        "peak_tile_bytes":peak_tile_bytes,"changed_pixels":changed_pixels,"forms_enabled":true,
+        "max_channel_delta":comparison.max_channel_delta,
+        "alpha_changed_pixels":comparison.alpha_changed_pixels,
+        "larger_delta_pixels":comparison.larger_delta_pixels,
+        "non_edge_changed_pixels":comparison.non_edge_changed_pixels,
+        "native_edge_quantization_limit_pixels":comparison.quantization_limit_pixels,
+        "within_native_edge_quantization":comparison.within_native_edge_quantization(),
+        "unexplained_pixels":comparison.unexplained_pixels,
+        "native_raster_limit_pixels":comparison.raster_limit_pixels,
+        "within_native_raster_tolerance":comparison.within_native_raster_tolerance(),
+        "native_origin_controls":origin_controls})
+    );
+    ensure!(
+        changed_pixels == 0,
+        "Detail tiles differ from the native full-page reference"
+    );
     Ok(())
 }
 
@@ -1260,6 +1454,7 @@ pub fn probe_page(path: &Path, index: usize) -> Result<()> {
             width: 1000,
             rotation: 0,
             thumbnail: false,
+            region: None,
         },
     )?;
     let first_frame = started.elapsed();
@@ -1326,11 +1521,55 @@ mod tests {
                 events,
                 generation: Arc::new(AtomicU64::new(0)),
                 search_token: Arc::new(AtomicU64::new(0)),
+                render_slots: crate::raster_tiles::RenderSlots::default(),
                 shutdown,
                 thread: None,
             },
             requests,
         )
+    }
+
+    #[test]
+    fn render_admission_failure_and_unconsumed_reply_release_global_slots() {
+        let (worker, requests) = admission_worker(Cancellation::default());
+        let key = RenderKey {
+            document: 1,
+            page: 0,
+            width: 1000,
+            rotation: 0,
+            thumbnail: false,
+            region: None,
+        };
+        assert!(worker.try_send(Command::Snapshot(1)).is_ok());
+        assert!(worker.try_render(7, key.clone()).is_err());
+        assert_eq!(worker.render_requests_in_flight(), 0);
+        drop(requests.recv().unwrap());
+        assert!(worker.try_render(7, key).is_ok());
+        assert_eq!(worker.render_requests_in_flight(), 1);
+        let Command::Render {
+            generation,
+            key,
+            permit,
+        } = requests.recv().unwrap()
+        else {
+            panic!("Expected render request")
+        };
+        // The old generation may already be cancelled; an unconsumed reply
+        // still owns its byte slot until the receiver drops it.
+        worker.generation.store(8, Ordering::Relaxed);
+        let reply = Event::Rendered {
+            generation,
+            key,
+            frame: Arc::new(Frame {
+                width: 1,
+                height: 1,
+                rgba: vec![255; 4],
+            }),
+            permit,
+        };
+        assert_eq!(worker.render_requests_in_flight(), 1);
+        drop(reply);
+        assert_eq!(worker.render_requests_in_flight(), 0);
     }
 
     fn ready_helper(jobs: &Jobs<(), ()>) -> Reply<()> {

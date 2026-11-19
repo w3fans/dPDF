@@ -24,14 +24,18 @@ UNQUALIFIED = ['physical printer output', 'Wayland compositor input and clipboar
                'complete dependency/toolchain/native-library license audit']
 
 
-def plan(source, binary, pdfium, qpdf, xvfb, desktop=True, print_report=None):
+def plan(source, binary, pdfium, qpdf, xvfb, desktop=True, print_report=None, raster_reports=None):
     py = [sys.executable]
     script = lambda name: str(source / 'scripts' / name)
     engines = ['--binary', str(binary), '--pdfium', str(pdfium)]
     both = [*engines, '--qpdf', str(qpdf)]
+    tile_args = [*engines]
+    if raster_reports is not None:
+        tile_args += ['--report', str(Path(raster_reports) / 'render-tiles.json')]
     tests = [('reader', [*py, script('check-reader.py'), *engines], 600),
              ('geometry', [*py, script('benchmark-reader.py'), *engines, '--geometry-only'], 300),
              ('engine-paths', [*py, script('check-engine-paths.py'), *engines], 300),
+             ('render-tiles', [*py, script('check-render-tiles.py'), *tile_args], 600),
              ('pages', [*py, script('check-pages.py'), *both], 900),
              ('marks', [*py, script('check-marks.py'), '--binary', str(binary)], 600),
              ('overlays', [*py, script('check-overlays.py'), *both], 1200),
@@ -49,7 +53,11 @@ def plan(source, binary, pdfium, qpdf, xvfb, desktop=True, print_report=None):
     for scale in ('1', '1.5', '2'):
         suffix = '-' + scale.replace('.', '-')
         scaled = [*display, '--scale', scale]
+        raster_args = [*scaled]
+        if raster_reports is not None:
+            raster_args += ['--report', str(Path(raster_reports) / ('raster-ui' + suffix + '.json'))]
         tests += [('viewport' + suffix, [*py, script('check-viewport.py'), *engines, *scaled], 300),
+                  ('raster-ui' + suffix, [*py, script('check-raster-ui.py'), *engines, *raster_args], 300),
                   ('physical-reader' + suffix, [*py, script('check-physical-reader.py'), *both, *scaled], 300),
                   ('tabs' + suffix, [*py, script('check-tabs.py'), *engines, *scaled], 300),
                   ('clipboard-placement' + suffix,
@@ -136,7 +144,7 @@ def main():
         root = Path(tempfile.mkdtemp(prefix='dpdf-linux-validation-')).resolve()
         env = environment(root)
         tests = plan(source, binary, pdfium, qpdf, args.xvfb, desktop=not args.no_desktop,
-                     print_report=output / 'print-benchmark.json')
+                     print_report=output / 'print-benchmark.json', raster_reports=output)
         if args.only:
             unknown = set(args.only) - {name for name, _, _ in tests}
             if unknown:

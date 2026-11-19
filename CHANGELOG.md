@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add bounded high-zoom viewport detail with small native tiles, stale-generation cancellation and shared render admission; retain generated stitch and real-window diagnostics.
+
 - Cancel and join printer discovery during normal application shutdown, retaining the existing deadline and single pending UI request.
 
 - Own print preparation and immutable print actions through shutdown, supervise native dialog pipes without an interaction deadline, and cancel/reap nested helpers without retrying ambiguous submissions.

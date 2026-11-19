@@ -17,7 +17,7 @@ def fixture_environment(folder: Path):
 
 
 @contextmanager
-def display(folder: Path, xvfb: str):
+def display(folder: Path, xvfb: str, screen: str = '1280x900x24'):
     if os.name == 'nt':
         if os.environ.get('DPDF_TEST_NATIVE_DISPLAY') != '1':
             raise RuntimeError('On Windows set DPDF_TEST_NATIVE_DISPLAY=1 to use native fixture windows with isolated data/config; no private desktop is provided')
@@ -34,7 +34,7 @@ def display(folder: Path, xvfb: str):
     authority('')
     reader, writer = os.pipe()
     with (folder / 'xvfb.log').open('wb') as log:
-        server = subprocess.Popen([xvfb, '-displayfd', str(writer), '-screen', '0', '1280x900x24', '-nolisten', 'tcp', '-noreset', '-auth', str(auth)], pass_fds=(writer,), stdout=log, stderr=log)
+        server = subprocess.Popen([xvfb, '-displayfd', str(writer), '-screen', '0', screen, '-nolisten', 'tcp', '-noreset', '-auth', str(auth)], pass_fds=(writer,), stdout=log, stderr=log)
         os.close(writer)
         try:
             if not select.select([reader], [], [], 10)[0]:

@@ -121,10 +121,29 @@ fn decrypt_with_cancel(
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Writes a generated helper from a short-lived child process. A writable fd
+    /// opened in this multithreaded test binary can be inherited by a concurrent
+    /// fork before exec closes it, so executing the fixture fails with ETXTBSY.
+    #[cfg(unix)]
+    fn write_executable_fixture(path: &std::path::Path, script: &str) {
+        use std::io::Write;
+        let mut child = std::process::Command::new("/bin/sh")
+            .args(["-c", "cat > \"$1\" && chmod 700 \"$1\"", "sh"])
+            .arg(path)
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(script.as_bytes())
+            .unwrap();
+        assert!(child.wait().unwrap().success());
+    }
     #[cfg(unix)]
     #[test]
     fn helper_receives_password_only_on_stdin_and_cannot_echo_it_into_errors() {
-        use std::os::unix::fs::PermissionsExt;
         let folder = tempfile::tempdir().unwrap();
         let helper = folder.path().join("qpdf-fixture");
         let args = folder.path().join("args");
@@ -134,8 +153,7 @@ mod tests {
             args.display(),
             stdin.display()
         );
-        std::fs::write(&helper, script).unwrap();
-        std::fs::set_permissions(&helper, std::fs::Permissions::from_mode(0o700)).unwrap();
+        write_executable_fixture(&helper, &script);
         let password = "  synthetic secret čšž  ";
         let original = b"%PDF fixture bytes";
         assert_eq!(
@@ -149,7 +167,7 @@ mod tests {
             format!("{password}\n")
         );
         assert!(!std::fs::read_to_string(&args).unwrap().contains(password));
-        std::fs::write(&helper, "#!/bin/sh\ncat >&2\nexit 1\n").unwrap();
+        write_executable_fixture(&helper, "#!/bin/sh\ncat >&2\nexit 1\n");
         let error = decrypt_with(original, password, &helper)
             .unwrap_err()
             .to_string();
@@ -161,7 +179,6 @@ mod tests {
     #[test]
     fn stalled_helper_holds_decryption_until_fixture_release() {
         use std::{
-            os::unix::fs::PermissionsExt,
             sync::mpsc,
             thread,
             time::{Duration, Instant},
@@ -175,8 +192,7 @@ mod tests {
             ready.display(),
             release.display()
         );
-        std::fs::write(&helper, script).unwrap();
-        std::fs::set_permissions(&helper, std::fs::Permissions::from_mode(0o700)).unwrap();
+        write_executable_fixture(&helper, &script);
         let original = b"%PDF generated stalled-helper snapshot";
         let (tx, rx) = mpsc::channel();
         let worker = thread::spawn(move || {

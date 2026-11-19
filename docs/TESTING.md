@@ -969,3 +969,55 @@ Run this compiler helper only on approved build infrastructure. Public contract
 tests inject a process runner; they do not compile locally. They reject wrong
 source identity or a newer compiler, retain a failing check's exit/log and verify
 private-target cleanup. A skipped platform test is not native compiler evidence.
+
+## Bounded high-zoom detail diagnostics (T05 draft)
+
+`check-render-tiles.py --binary PATH --pdfium PATH` compares generated tile cores
+with the exact native full-page transform at all rotations, crop/UserUnit variants,
+a generated scan, forms and annotations. It also asserts a positive visible form
+appearance. Individual tile allocations are at most 512×512 RGBA.
+
+`check-raster-ui.py --binary PATH --pdfium PATH --scale 1.5` uses a private
+authenticated X11 display, or the explicitly enabled dedicated Windows test
+desktop. It exercises three view modes, all rotations, panning, successive zoom
+generations and tab switching/closure. Observed render slots include queued,
+active and unconsumed replies; they do not measure the complete command queue.
+The suite does not prove subjective sharpness, complete RSS plateau, native
+Wayland input or physical output. Use approved compiler lanes for its executable.
+
+`compare-reader.py --baseline PATH --candidate PATH --pdfium PATH --repeat 5
+--output report.json` alternates ordinary-path runs on identical generated
+fixtures. Reports above the proposed 10% median guard require investigation,
+including run-to-run noise; the driver never converts a flag into acceptance.
+Use `check-raster-ui.py --report report.json` to retain diagnostic timings and
+50ms Linux RSS observations. These samples do not establish a full plateau.
+
+The strict `--check-render-tiles` CLI still returns failure for every nonzero
+pixel difference. The corpus records that exact-mode result and independently
+checks a review-gated native edge-rounding contract: at most one channel level,
+unchanged alpha, a neighbouring reference RGB contrast of at least 8 within
+3×3, and at most 0.01% changed pixels. Image-only fixtures remain exact.
+All differences and bounds are retained in `render-tiles.json`; crashes and
+other errors never satisfy the contract. See the dated T05 characterization
+before accepting this numerical policy or reusing it with another engine pair.
+
+`benchmark-reader-window.py --binary PATH --pdfium PATH --qpdf PATH --repeat 3
+--output report.json` measures Linux/private-X11 GUI timing upper bounds with
+deterministically generated per-page fiducials. It requires xdotool and
+ImageMagick import. The launch phase includes a Fit Page request; input and
+capture overhead are retained. This is neither stock-startup latency nor
+Windows operator acceptance. Generated inputs and runtime hashes are checked,
+and current/peak process RSS is recorded separately from child-tree memory.
+
+The diagnostic also records large, untiled origin-offset controls (1/127/509
+pixels) whenever strict comparison differs. They characterize native rounding
+without changing the comparison bound. The corpus attempts all cases and
+returns failure if any case violates its assertions, retaining all failed
+counters rather than stopping at the first case.
+
+The high-zoom window fixture now includes two colored PDF landmarks. Snapshot
+centroids must remain within two physical pixels per axis of rotated page
+coordinates. `check-raster-ui.py --rounds 3 ...` repeats the view/rotation
+matrix on pages 7/17/27 for longer finite cache/memory observations; it keeps
+the original diagnostic deadline, render budget and memory guard. These new
+checks require their source-bound compiled runtime.

@@ -23,7 +23,7 @@ def git(source, *args):
 
 
 def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo.exe', probe_report=None,
-         print_report=None):
+         print_report=None, raster_reports=None):
     tests = [('build', ['powershell.exe', '-NoProfile', '-NonInteractive', '-ExecutionPolicy',
                         'Bypass', '-File', str(source / 'build.ps1'), '-Release'], 2700),
              ('unit-tests', [cargo, 'test', '--locked', '--release'], 1500),
@@ -43,6 +43,9 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
                               *common, '--pdfium', str(pdfium), '--geometry-only'], 300))
     tests.append(('engine-paths', [python, str(source / 'scripts' / 'check-engine-paths.py'),
                                   *common, '--pdfium', str(pdfium)], 300))
+    tile_args = ['--report', str(Path(raster_reports) / 'render-tiles.json')] if raster_reports is not None else []
+    tests.append(('render-tiles', [python, str(source / 'scripts' / 'check-render-tiles.py'),
+                                 *common, '--pdfium', str(pdfium), *tile_args], 600))
     command = [python, str(source / 'scripts' / 'check-block-rust.py'), *common,
                '--pdfium', str(pdfium), '--qpdf', str(qpdf)]
     if probe_report is not None:
@@ -54,12 +57,18 @@ def plan(source, binary, pdfium, qpdf, mode, python=sys.executable, cargo='cargo
                                         *common, '--pdfium', str(pdfium)], 300))
     if mode == 'desktop':
         for scale in ('1', '1.5', '2'):
+            raster_args = []
+            if raster_reports is not None:
+                raster_args = ['--report', str(Path(raster_reports) / ('raster-ui-' + scale.replace('.', '-') + '.json'))]
             tests.append(('native-file-drop-' + scale.replace('.', '-'),
                           [python, str(source / 'scripts' / 'check-windows-drop.py'), *common,
                            '--pdfium', str(pdfium), '--scale', scale, '--allow-native-input'], 180))
             tests.append(('viewport-' + scale.replace('.', '-'),
                           [python, str(source / 'scripts' / 'check-viewport.py'), *common,
                            '--pdfium', str(pdfium), '--scale', scale], 180))
+            tests.append(('raster-ui-' + scale.replace('.', '-'),
+                          [python, str(source / 'scripts' / 'check-raster-ui.py'), *common,
+                           '--pdfium', str(pdfium), '--scale', scale, *raster_args], 180))
             tests.append(('physical-reader-' + scale.replace('.', '-'),
                           [python, str(source / 'scripts' / 'check-physical-reader.py'), *common,
                            '--pdfium', str(pdfium), '--qpdf', str(qpdf), '--scale', scale], 300))
@@ -284,7 +293,7 @@ def main():
         probe_report = output / 'block-probe.json'
         tests = plan(source, binary, runtimes['pdfium'], runtimes['qpdf'],
                      'desktop' if args.lane == 'desktop' else 'service', cargo=cargo,
-                     probe_report=probe_report, print_report=output / 'print-benchmark.json')
+                     probe_report=probe_report, print_report=output / 'print-benchmark.json', raster_reports=output)
         for name, command, timeout in tests:
             if name not in ('build', 'format', 'unit-tests', 'clippy') and not build_ok:
                 report['checks'].append(dict(name=name, status='SKIP', reason='build failed'))

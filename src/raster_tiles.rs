@@ -1,0 +1,554 @@
+//! Device-pixel regions for bounded high-zoom detail. No engine or UI handles.
+use crate::document::PagePlacement;
+use std::{
+    cmp::Ordering,
+    collections::BinaryHeap,
+    sync::{
+        Arc,
+        atomic::{AtomicUsize, Ordering as AtomicOrdering},
+    },
+};
+
+pub const TILE_EDGE: u32 = 510;
+pub const MAX_TILE_EDGE: u32 = 512;
+pub const DETAIL_BUDGET: usize = 32 * 1024 * 1024;
+pub const MAX_REGIONS: usize = 128;
+pub const MAX_PENDING_RENDERS: usize = 8;
+const MAX_CANVAS: u32 = 131_072;
+
+/// Covers queued requests, active native rendering and replies awaiting the UI.
+/// Generation changes cannot forget occupied slots or admit an unbounded tail.
+#[derive(Clone, Default)]
+pub struct RenderSlots(Arc<AtomicUsize>);
+pub struct RenderPermit(Arc<AtomicUsize>);
+
+impl RenderSlots {
+    pub fn acquire(&self) -> Option<RenderPermit> {
+        let mut count = self.0.load(AtomicOrdering::Acquire);
+        loop {
+            if count >= MAX_PENDING_RENDERS {
+                return None;
+            }
+            match self.0.compare_exchange_weak(
+                count,
+                count + 1,
+                AtomicOrdering::AcqRel,
+                AtomicOrdering::Acquire,
+            ) {
+                Ok(_) => return Some(RenderPermit(self.0.clone())),
+                Err(actual) => count = actual,
+            }
+        }
+    }
+
+    pub fn in_flight(&self) -> usize {
+        self.0.load(AtomicOrdering::Acquire)
+    }
+}
+impl Drop for RenderPermit {
+    fn drop(&mut self) {
+        self.0.fetch_sub(1, AtomicOrdering::AcqRel);
+    }
+}
+
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+pub struct Region {
+    pub canvas_height: u32,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+}
+
+impl Region {
+    pub fn valid_for(self, canvas_width: u32) -> bool {
+        canvas_width > 0
+            && canvas_width <= MAX_CANVAS
+            && self.canvas_height > 0
+            && self.canvas_height <= MAX_CANVAS
+            && self.width > 0
+            && self.height > 0
+            && self.width <= MAX_TILE_EDGE
+            && self.height <= MAX_TILE_EDGE
+            && self
+                .x
+                .checked_add(self.width)
+                .is_some_and(|v| v <= canvas_width)
+            && self
+                .y
+                .checked_add(self.height)
+                .is_some_and(|v| v <= self.canvas_height)
+    }
+
+    pub fn bytes(self) -> usize {
+        self.width as usize * self.height as usize * 4
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Placement {
+    pub page: usize,
+    pub canvas_width: u32,
+    pub region: Region,
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+}
+
+struct Candidate {
+    priority: (bool, u64, usize, u32, u32),
+    placement: Placement,
+}
+impl PartialEq for Candidate {
+    fn eq(&self, other: &Self) -> bool {
+        self.priority == other.priority
+    }
+}
+impl Eq for Candidate {}
+impl PartialOrd for Candidate {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+impl Ord for Candidate {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.priority.cmp(&other.priority)
+    }
+}
+
+/// The viewport is in document logical coordinates. Detail images include a
+/// one-pixel gutter, rendered from the same full-page device transform, so
+/// neighbouring images do not expose independent bitmap filtering edges.
+pub fn plan(pages: &[PagePlacement], viewport: (f32, f32, f32, f32), scale: f32) -> Vec<Placement> {
+    let (vx, vy, vw, vh) = viewport;
+    if ![vx, vy, vw, vh, scale].iter().all(|v| v.is_finite())
+        || vw <= 0.0
+        || vh <= 0.0
+        || scale <= 0.0
+    {
+        return Vec::new();
+    }
+    // Budget physical density for unusually large/high-DPI viewports before
+    // enumerating cells. This does not change logical page/overlay geometry.
+    let density = scale
+        .min(4096.0 / vw)
+        .min(4096.0 / vh)
+        .min((4_000_000.0 / (vw as f64 * vh as f64)).sqrt() as f32);
+    let mut candidates: BinaryHeap<Candidate> = BinaryHeap::new();
+    for page in pages {
+        if ![page.x, page.y, page.width, page.height]
+            .iter()
+            .all(|v| v.is_finite())
+            || page.width <= 0.0
+            || page.height <= 0.0
+            || page.x >= vx + vw
+            || page.y >= vy + vh
+            || page.x + page.width <= vx
+            || page.y + page.height <= vy
+        {
+            continue;
+        }
+        let requested_width = page.width * scale;
+        let requested_height = page.height * scale;
+        if requested_width <= 3072.0 && requested_height <= 4096.0 {
+            continue;
+        }
+        let width = ((page.width * density / 64.0).ceil() * 64.0).max(1.0);
+        let height = (page.height * width / page.width).round().max(1.0);
+        if width > MAX_CANVAS as f32 || height > MAX_CANVAS as f32 {
+            continue;
+        }
+        let (width, height) = (width as u32, height as u32);
+        let sx = width as f32 / page.width;
+        let sy = height as f32 / page.height;
+        let left = ((vx - page.x).max(0.0) * sx).floor() as u32;
+        let top = ((vy - page.y).max(0.0) * sy).floor() as u32;
+        let right = (((vx + vw - page.x).min(page.width) * sx).ceil() as u32).min(width);
+        let bottom = (((vy + vh - page.y).min(page.height) * sy).ceil() as u32).min(height);
+        let first_x = (left / TILE_EDGE).saturating_sub(1);
+        let first_y = (top / TILE_EDGE).saturating_sub(1);
+        let last_x = (right.saturating_sub(1) / TILE_EDGE + 1).min((width - 1) / TILE_EDGE);
+        let last_y = (bottom.saturating_sub(1) / TILE_EDGE + 1).min((height - 1) / TILE_EDGE);
+        for row in first_y..=last_y {
+            for col in first_x..=last_x {
+                let (cx, cy) = (col * TILE_EDGE, row * TILE_EDGE);
+                let (x, y) = (cx.saturating_sub(1), cy.saturating_sub(1));
+                let end_x = (cx + TILE_EDGE + 1).min(width);
+                let end_y = (cy + TILE_EDGE + 1).min(height);
+                let region = Region {
+                    canvas_height: height,
+                    x,
+                    y,
+                    width: end_x - x,
+                    height: end_y - y,
+                };
+                let visible =
+                    cx < right && cy < bottom && cx + TILE_EDGE > left && cy + TILE_EDGE > top;
+                let tile_x = page.x + x as f32 / sx;
+                let tile_y = page.y + y as f32 / sy;
+                let tile_width = region.width as f32 / sx;
+                let tile_height = region.height as f32 / sy;
+                let distance = ((tile_x as f64 + tile_width as f64 / 2.0
+                    - (vx as f64 + vw as f64 / 2.0))
+                    * density as f64)
+                    .powi(2)
+                    + ((tile_y as f64 + tile_height as f64 / 2.0 - (vy as f64 + vh as f64 / 2.0))
+                        * density as f64)
+                        .powi(2);
+                let candidate = Candidate {
+                    priority: (!visible, distance as u64, page.page, row, col),
+                    placement: Placement {
+                        page: page.page,
+                        canvas_width: width,
+                        region,
+                        x: tile_x,
+                        y: tile_y,
+                        width: tile_width,
+                        height: tile_height,
+                    },
+                };
+                if candidates.len() < MAX_REGIONS {
+                    candidates.push(candidate);
+                } else if candidates.peek().is_some_and(|worst| candidate < *worst) {
+                    candidates.pop();
+                    candidates.push(candidate);
+                }
+            }
+        }
+    }
+    let mut bytes = 0;
+    candidates
+        .into_sorted_vec()
+        .into_iter()
+        .filter_map(|candidate| {
+            let p = candidate.placement;
+            if bytes + p.region.bytes() > DETAIL_BUDGET {
+                return None;
+            }
+            bytes += p.region.bytes();
+            Some(p)
+        })
+        .take(MAX_REGIONS)
+        .collect()
+}
+
+/// Describes every differing native pixel; it does not erase or clamp differences.
+#[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
+pub struct Comparison {
+    pub changed_pixels: usize,
+    pub max_channel_delta: u8,
+    pub alpha_changed_pixels: usize,
+    pub larger_delta_pixels: usize,
+    pub non_edge_changed_pixels: usize,
+    pub quantization_limit_pixels: usize,
+    /// Changed pixels with delta > 2 that no reference pixel within one device
+    /// pixel reproduces (within 2 levels): not explainable as edge snapping.
+    pub unexplained_pixels: usize,
+    pub raster_limit_pixels: usize,
+}
+impl Comparison {
+    /// Review-gated native text-edge rounding contract. Image fixtures additionally
+    /// require exact equality. The strict diagnostic still refuses any difference.
+    pub fn within_native_edge_quantization(&self) -> bool {
+        self.changed_pixels <= self.quantization_limit_pixels
+            && self.alpha_changed_pixels == 0
+            && self.larger_delta_pixels == 0
+            && self.non_edge_changed_pixels == 0
+    }
+
+    /// Tiled-detail contract. PDFium does not render a clipped destination
+    /// bitmap bit-identically to a full page: antialiased edges may differ by a
+    /// level or two and small axis-aligned fills may snap by one device pixel.
+    /// Accept only that: edge-only, alpha-preserving, at most 0.2% of pixels,
+    /// and every larger delta reproduced by a reference pixel within one pixel.
+    pub fn within_native_raster_tolerance(&self) -> bool {
+        self.changed_pixels <= self.raster_limit_pixels
+            && self.alpha_changed_pixels == 0
+            && self.non_edge_changed_pixels == 0
+            && self.unexplained_pixels == 0
+    }
+}
+
+pub fn compare_rgba(
+    reference: &[u8],
+    actual: &[u8],
+    width: usize,
+    height: usize,
+) -> Option<Comparison> {
+    let pixels = width.checked_mul(height)?;
+    let bytes = pixels.checked_mul(4)?;
+    if width == 0 || height == 0 || reference.len() != bytes || actual.len() != bytes {
+        return None;
+    }
+    let reference = reference.as_chunks::<4>().0;
+    let actual = actual.as_chunks::<4>().0;
+    let mut result = Comparison {
+        quantization_limit_pixels: pixels / 10_000,
+        raster_limit_pixels: pixels / 500,
+        ..Comparison::default()
+    };
+    for (index, (a, b)) in reference.iter().zip(actual).enumerate() {
+        if a == b {
+            continue;
+        }
+        result.changed_pixels += 1;
+        let delta = a.iter().zip(b).map(|(a, b)| a.abs_diff(*b)).max().unwrap();
+        result.max_channel_delta = result.max_channel_delta.max(delta);
+        result.alpha_changed_pixels += usize::from(a[3] != b[3]);
+        result.larger_delta_pixels += usize::from(delta > 1);
+        let (x, y) = (index % width, index / width);
+        if delta > 2 {
+            let explained = (y.saturating_sub(1)..=(y + 1).min(height - 1)).any(|ny| {
+                (x.saturating_sub(1)..=(x + 1).min(width - 1)).any(|nx| {
+                    reference[ny * width + nx]
+                        .iter()
+                        .zip(b)
+                        .all(|(r, b)| r.abs_diff(*b) <= 2)
+                })
+            });
+            result.unexplained_pixels += usize::from(!explained);
+        }
+        let edge = (y.saturating_sub(1)..=(y + 1).min(height - 1)).any(|ny| {
+            (x.saturating_sub(1)..=(x + 1).min(width - 1)).any(|nx| {
+                a[..3]
+                    .iter()
+                    .zip(&reference[ny * width + nx][..3])
+                    .any(|(a, n)| a.abs_diff(*n) >= 8)
+            })
+        });
+        result.non_edge_changed_pixels += usize::from(!edge);
+    }
+    Some(result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn page(width: f32, height: f32) -> PagePlacement {
+        PagePlacement {
+            page: 7,
+            x: 16.0,
+            y: 16.0,
+            width,
+            height,
+        }
+    }
+    #[test]
+    fn ordinary_pages_keep_existing_path() {
+        assert!(plan(&[page(1000.0, 1400.0)], (0.0, 0.0, 1180.0, 800.0), 1.0).is_empty());
+    }
+    #[test]
+    fn visible_fractional_region_has_complete_coverage_and_bounded_gutters() {
+        let pages = [page(8000.0, 12000.0)];
+        let tiles = plan(&pages, (3521.25, 4173.75, 1179.5, 799.25), 2.0);
+        assert!(!tiles.is_empty());
+        assert!(tiles.len() <= MAX_REGIONS);
+        assert!(tiles.iter().map(|p| p.region.bytes()).sum::<usize>() <= DETAIL_BUDGET);
+        for tile in &tiles {
+            assert!(tile.region.valid_for(tile.canvas_width));
+        }
+        for y in 0..80 {
+            for x in 0..118 {
+                let (px, py) = (3521.25 + x as f32 * 10.0, 4173.75 + y as f32 * 10.0);
+                assert!(
+                    tiles.iter().any(|t| px >= t.x
+                        && px <= t.x + t.width
+                        && py >= t.y
+                        && py <= t.y + t.height),
+                    "uncovered {px},{py}"
+                );
+            }
+        }
+    }
+    #[test]
+    fn invalid_geometry_never_allocates_or_enumerates() {
+        assert!(plan(&[page(f32::NAN, 8000.0)], (0.0, 0.0, 1000.0, 800.0), 1.0).is_empty());
+        assert!(
+            plan(
+                &[page(8000.0, 8000.0)],
+                (0.0, 0.0, f32::INFINITY, 800.0),
+                1.0
+            )
+            .is_empty()
+        );
+        assert!(plan(&[page(1e30, 1e30)], (0.0, 0.0, 1000.0, 800.0), 1.0).is_empty());
+        assert!(
+            !Region {
+                canvas_height: 100,
+                x: u32::MAX,
+                y: 0,
+                width: 1,
+                height: 1
+            }
+            .valid_for(100)
+        );
+    }
+    #[test]
+    fn oversized_display_density_and_overscan_remain_bounded() {
+        let tiles = plan(
+            &[page(60000.0, 60000.0)],
+            (17000.0, 21000.0, 10000.0, 8000.0),
+            4.0,
+        );
+        assert!(!tiles.is_empty());
+        assert!(tiles.iter().map(|p| p.region.bytes()).sum::<usize>() <= DETAIL_BUDGET);
+        assert!(
+            tiles
+                .iter()
+                .all(|p| p.region.width <= 512 && p.region.height <= 512)
+        );
+    }
+    #[test]
+    fn rotated_aspect_ratios_and_page_origins_keep_logical_mapping() {
+        for (w, h) in [(8000.0, 12000.0), (12000.0, 8000.0)] {
+            for unit in [0.5, 1.0, 2.0] {
+                let mut page = page(w * unit, h * unit);
+                page.x = -50.25;
+                page.y = 17.75;
+                let tiles = plan(&[page.clone()], (100.0, 200.0, 900.0, 600.0), 1.5);
+                assert!(!tiles.is_empty());
+                for tile in tiles {
+                    assert!(
+                        (tile.x
+                            - page.x
+                            - tile.region.x as f32 / tile.canvas_width as f32 * page.width)
+                            .abs()
+                            < 0.01
+                    );
+                    assert!(
+                        (tile.y
+                            - page.y
+                            - tile.region.y as f32 / tile.region.canvas_height as f32
+                                * page.height)
+                            .abs()
+                            < 0.01
+                    );
+                }
+            }
+        }
+    }
+    #[test]
+    fn generation_changes_cannot_forget_outstanding_render_slots() {
+        let slots = RenderSlots::default();
+        let old_generation: Vec<_> = (0..MAX_PENDING_RENDERS)
+            .map(|_| slots.acquire().unwrap())
+            .collect();
+        assert_eq!(slots.in_flight(), MAX_PENDING_RENDERS);
+        assert!(slots.acquire().is_none());
+        drop(old_generation);
+        assert_eq!(slots.in_flight(), 0);
+        let fresh = slots.acquire().unwrap();
+        assert_eq!(slots.in_flight(), 1);
+        drop(fresh);
+        assert_eq!(slots.in_flight(), 0);
+    }
+    #[test]
+    fn many_thin_visible_pages_keep_candidate_metadata_and_pixels_bounded() {
+        let pages: Vec<_> = (0..1000)
+            .map(|n| PagePlacement {
+                page: n,
+                x: 16.0,
+                y: n as f32,
+                width: 8000.0,
+                height: 0.5,
+            })
+            .collect();
+        let tiles = plan(&pages, (4000.0, 300.0, 1000.0, 500.0), 2.0);
+        assert!(!tiles.is_empty());
+        assert!(tiles.len() <= MAX_REGIONS);
+        assert!(tiles.iter().map(|t| t.region.bytes()).sum::<usize>() <= DETAIL_BUDGET);
+        assert!(tiles.iter().any(|t| (450..650).contains(&t.page)));
+    }
+
+    fn reference() -> Vec<u8> {
+        let mut pixels = vec![255; 100 * 100 * 4];
+        for y in 0..100 {
+            for x in 50..100 {
+                pixels[(y * 100 + x) * 4..(y * 100 + x) * 4 + 3].fill(0);
+            }
+        }
+        pixels
+    }
+    #[test]
+    fn bounded_native_edge_rounding_is_reported_while_exact_pixels_stay_exact() {
+        let source = reference();
+        assert_eq!(
+            compare_rgba(&source, &source, 100, 100)
+                .unwrap()
+                .changed_pixels,
+            0
+        );
+        let mut actual = source.clone();
+        actual[(40 * 100 + 49) * 4..(40 * 100 + 49) * 4 + 3].fill(254);
+        let comparison = compare_rgba(&source, &actual, 100, 100).unwrap();
+        assert_eq!(comparison.changed_pixels, 1);
+        assert_eq!(comparison.max_channel_delta, 1);
+        assert!(comparison.within_native_edge_quantization());
+    }
+    #[test]
+    fn flat_area_alpha_and_larger_or_translated_pixels_are_rejected() {
+        let source = reference();
+        for (x, channel, value) in [(20, 0, 254), (49, 3, 254), (49, 0, 250), (50, 0, 255)] {
+            let mut actual = source.clone();
+            actual[(40 * 100 + x) * 4 + channel] = value;
+            assert!(
+                !compare_rgba(&source, &actual, 100, 100)
+                    .unwrap()
+                    .within_native_edge_quantization()
+            );
+        }
+    }
+    #[test]
+    fn many_edges_cannot_hide_a_systematic_change() {
+        let source = reference();
+        let mut actual = source.clone();
+        for y in 40..43 {
+            actual[(y * 100 + 49) * 4] = 254;
+        }
+        let comparison = compare_rgba(&source, &actual, 100, 100).unwrap();
+        assert_eq!(comparison.non_edge_changed_pixels, 0);
+        assert!(!comparison.within_native_edge_quantization());
+    }
+    #[test]
+    fn invalid_or_overflowed_geometry_is_refused() {
+        assert!(compare_rgba(&[], &[], 0, 0).is_none());
+        assert!(compare_rgba(&[], &[], usize::MAX, 2).is_none());
+        assert!(compare_rgba(&[0; 4], &[0; 3], 1, 1).is_none());
+    }
+    #[test]
+    fn one_pixel_edge_snap_is_tolerated_but_new_colours_are_not() {
+        let source = reference();
+        // The black column starts one pixel earlier on two rows: a snapped fill.
+        let mut snapped = source.clone();
+        for y in [40, 41] {
+            snapped[(y * 100 + 49) * 4..(y * 100 + 49) * 4 + 3].fill(0);
+        }
+        let comparison = compare_rgba(&source, &snapped, 100, 100).unwrap();
+        assert_eq!(comparison.max_channel_delta, 255);
+        assert_eq!(comparison.unexplained_pixels, 0);
+        assert!(!comparison.within_native_edge_quantization());
+        assert!(comparison.within_native_raster_tolerance());
+        // A colour no neighbour has, alpha changes and flat-area noise all fail.
+        for (x, channel, value) in [(50, 0, 255), (49, 3, 254), (20, 0, 254)] {
+            let mut actual = source.clone();
+            actual[(40 * 100 + x) * 4 + channel] = value;
+            assert!(
+                !compare_rgba(&source, &actual, 100, 100)
+                    .unwrap()
+                    .within_native_raster_tolerance(),
+                "{x} {channel} {value}"
+            );
+        }
+        // More than 0.2% changed pixels fails even when each is explained.
+        let mut many = source.clone();
+        for y in 0..21 {
+            many[(y * 100 + 49) * 4..(y * 100 + 49) * 4 + 3].fill(0);
+        }
+        assert!(
+            !compare_rgba(&source, &many, 100, 100)
+                .unwrap()
+                .within_native_raster_tolerance()
+        );
+    }
+}

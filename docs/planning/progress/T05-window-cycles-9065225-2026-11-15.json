@@ -1,0 +1,130 @@
+{
+  "scope": "finite_generated_high_zoom_scroll_zoom_cycle_observation_not_acceptance",
+  "binary_sha256": "51c1471697bedd23bf50c2ac8af9c092616ffd663d3f2efe8afc93f77898ecee",
+  "pdfium_sha256": "f728930966f503652b92acc89b9374a2eeca00ce42e26dccd3e4b5c5161b2d64",
+  "input_sha256": "f570d25b5eca37672605e898373a82749b7c6c3769bb096487535a7fba8f2836",
+  "scale": "2",
+  "window_appearance_seconds": 0.12064490607008338,
+  "window_appearance_is_first_page_latency": false,
+  "zoom_input": "18 Ctrl+plus events; inspect UI zoom label",
+  "rss_kib": [
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688,
+    203688
+  ],
+  "cycle_rss": [
+    {
+      "cycle": 0,
+      "kib": 199404
+    },
+    {
+      "cycle": 1,
+      "kib": 199404
+    },
+    {
+      "cycle": 2,
+      "kib": 199404
+    },
+    {
+      "cycle": 3,
+      "kib": 199404
+    },
+    {
+      "cycle": 4,
+      "kib": 199404
+    },
+    {
+      "cycle": 5,
+      "kib": 199404
+    },
+    {
+      "cycle": 6,
+      "kib": 199404
+    },
+    {
+      "cycle": 7,
+      "kib": 199404
+    },
+    {
+      "cycle": 8,
+      "kib": 199404
+    },
+    {
+      "cycle": 9,
+      "kib": 199404
+    },
+    {
+      "cycle": 10,
+      "kib": 199404
+    },
+    {
+      "cycle": 11,
+      "kib": 199404
+    },
+    {
+      "cycle": 12,
+      "kib": 199404
+    },
+    {
+      "cycle": 13,
+      "kib": 199404
+    },
+    {
+      "cycle": 14,
+      "kib": 199404
+    },
+    {
+      "cycle": 15,
+      "kib": 199404
+    },
+    {
+      "cycle": 16,
+      "kib": 199404
+    },
+    {
+      "cycle": 17,
+      "kib": 199404
+    },
+    {
+      "cycle": 18,
+      "kib": 199404
+    },
+    {
+      "cycle": 19,
+      "kib": 199404
+    }
+  ],
+  "source_head": "9065225dbd885d70f219b2f6a10e6e829f6cca86",
+  "artifacts": {
+    "after-cycles.png": "6f481fcca3dadb72330b05664470f77c17ab0dccc091cec75ef3a5f95284e279",
+    "high-zoom.png": "79cac0cf57eb119f6499b6b36770252660aa39afe04e1ec7f6586970100375d0",
+    "ordinary.png": "9c220be81d49e6c6147403c06aae411b72f6f6828681da57ede90b7a492f9b43"
+  }
+}
